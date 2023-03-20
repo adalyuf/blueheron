@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+Domains
+{% endblock %}
+
+{% block content %}
+
+<h1>Domains</h1>
+<p>All domains</p>
+
+{% if items %}
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+        <thead>
+            <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Domain</th>
+            <th scope="col">Keywords</th>
+            <th scope="col">Traffic</th>
+            <th scope="col">Cost</th>
+            <th scope="col">Rank</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for domain in items %}
+            <tr>
+                <td>{{domain.id}}</td>
+                <td><a href="{% url 'domain_detail' domain.id %}">{{domain.domain}}</a></td>
+                <td>{{domain.keywords}}</td>
+                <td>{{domain.traffic}}</td>
+                <td>{{domain.cost}}</td>
+                <td>{{domain.rank}}</td>
+            </tr>
+    {% endfor %}
+        </tbody>
+        </table>
+    </div>
+    {% include 'owl/partials/_pagination.html' %}
+{% else %}
+    <p>No domains available.</p>
+{% endif %}
+
+{% endblock %}

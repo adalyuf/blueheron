@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Conversation Detail
+{% endblock %}
+
+{% block content %}
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Get Responses</button>
+</form>
+
+{% for message in items %}
+    <h3>{{message.prompt}}</h3>
+    {{message.formatted_response|safe}}
+    <br>
+{% endfor %}
+{% include 'owl/partials/_pagination.html' %}
+{% endblock %}

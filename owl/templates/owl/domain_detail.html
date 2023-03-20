@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+Domain Detail
+{% endblock %}
+
+{% block content %}
+
+<h1>Domain Detail</h1>
+<p>More info on this domain</p>
+
+{{ domain }}
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Upload</button>
+</form>
+
+{% if notice %}
+<p>{{ notice }}</p>
+{% endif %}
+
+{% if conversations %}
+<h2>Products</h2>
+    <ul>
+    {% for conversation in conversations %}
+        <li><a href="{% url 'conversation_detail' conversation.id %}">{{conversation.product.product}}</a></li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+
+{% if keyword_files %}
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+        <thead>
+            <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Uploaded at</th>
+            <th scope="col">Filepath</th>
+            <th scope="col">Primary</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for file in keyword_files %}
+            <tr>
+                <td>{{file.id}}</td>
+                <td>{{file.uploaded_at}}</td>
+                <td>{{file.filepath}}</td>
+                <td><a href="{% url 'keywordfile_make_primary' domain.id file.id %}">{{file.primary}}</a></td>
+            </tr>
+    {% endfor %}
+        </tbody>
+        </table>
+    </div>
+{% else %}
+    <p>No files are available.</p>
+{% endif %}
+
+
+{% endblock %}
