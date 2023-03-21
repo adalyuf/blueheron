@@ -1,5 +1,5 @@
 from django.urls import path
-from owl import views
+from ranker import views
 
 urlpatterns = [
     path("", views.domain_list, name="home"),

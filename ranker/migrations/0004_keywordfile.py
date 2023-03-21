@@ -6,7 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("owl", "0003_alter_domain_cost"),
+        ("ranker", "0003_alter_domain_cost"),
     ]
 
     operations = [
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 (
                     "domain_id",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="owl.domain"
+                        on_delete=django.db.models.deletion.CASCADE, to="ranker.domain"
                     ),
                 ),
             ],

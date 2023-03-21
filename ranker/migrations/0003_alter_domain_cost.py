@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("owl", "0002_domain_delete_domains"),
+        ("ranker", "0002_domain_delete_domains"),
     ]
 
     operations = [

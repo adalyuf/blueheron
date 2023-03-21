@@ -32,7 +32,7 @@ def domain_list(request):
         items = paginator.get_page(paginator.num_pages)
 
     context = { 'items': items}
-    return render(request, 'owl/domain_list.html', context)
+    return render(request, 'ranker/domain_list.html', context)
 
 def domain_detail(request, domain_id):
     domain = get_object_or_404(Domain, pk=domain_id)
@@ -47,7 +47,7 @@ def domain_detail(request, domain_id):
             notice = "File uploaded successfully."
     else:
         form = KeywordFileForm()
-    return render(request, 'owl/domain_detail.html', {'domain': domain, 'keyword_files': keyword_files, 'form': form, 'notice': notice, 'conversations': conversations})
+    return render(request, 'ranker/domain_detail.html', {'domain': domain, 'keyword_files': keyword_files, 'form': form, 'notice': notice, 'conversations': conversations})
 
 def keywordfile_make_primary(request, domain_id, keywordfile_id):
     domain = get_object_or_404(Domain, pk=domain_id)
@@ -91,4 +91,4 @@ def conversation_detail(request, conversation_id):
     except EmptyPage:
         items = paginator.get_page(paginator.num_pages)
 
-    return render(request, 'owl/conversation_detail.html', {'messages': messages, 'items': items})
+    return render(request, 'ranker/conversation_detail.html', {'messages': messages, 'items': items})

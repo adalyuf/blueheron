@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("owl", "0008_conversation_product_scope_and_more"),
+        ("ranker", "0008_conversation_product_scope_and_more"),
     ]
 
     operations = [

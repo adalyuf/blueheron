@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("owl", "0011_conversation_answered_at_message_answered_at"),
+        ("ranker", "0011_conversation_answered_at_message_answered_at"),
     ]
 
     operations = [

@@ -2,12 +2,12 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-import owl.models
+import ranker.models
 
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("owl", "0005_rename_domain_id_keywordfile_domain_and_more"),
+        ("ranker", "0005_rename_domain_id_keywordfile_domain_and_more"),
     ]
 
     operations = [
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="keywordfile",
             name="filepath",
-            field=models.FileField(upload_to=owl.models.keyword_directory_path),
+            field=models.FileField(upload_to=ranker.models.keyword_directory_path),
         ),
         migrations.CreateModel(
             name="Token",
@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
                 (
                     "type",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="owl.tokentype"
+                        on_delete=django.db.models.deletion.CASCADE, to="ranker.tokentype"
                     ),
                 ),
             ],

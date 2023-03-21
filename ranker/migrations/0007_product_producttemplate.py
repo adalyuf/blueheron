@@ -6,7 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("owl", "0006_tokentype_alter_keywordfile_filepath_token"),
+        ("ranker", "0006_tokentype_alter_keywordfile_filepath_token"),
     ]
 
     operations = [
@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
                 (
                     "product",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="owl.product"
+                        on_delete=django.db.models.deletion.CASCADE, to="ranker.product"
                     ),
                 ),
                 (
@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
-                        to="owl.tokentype",
+                        to="ranker.tokentype",
                     ),
                 ),
             ],

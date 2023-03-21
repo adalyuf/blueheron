@@ -6,7 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("owl", "0007_product_producttemplate"),
+        ("ranker", "0007_product_producttemplate"),
     ]
 
     operations = [
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
-                        to="owl.domain",
+                        to="ranker.domain",
                     ),
                 ),
             ],
@@ -58,7 +58,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
-                to="owl.tokentype",
+                to="ranker.tokentype",
             ),
         ),
         migrations.CreateModel(
@@ -82,7 +82,7 @@ class Migration(migrations.Migration):
                     "conversation",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to="owl.conversation",
+                        to="ranker.conversation",
                     ),
                 ),
             ],
@@ -91,7 +91,7 @@ class Migration(migrations.Migration):
             model_name="conversation",
             name="product",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="owl.product"
+                on_delete=django.db.models.deletion.CASCADE, to="ranker.product"
             ),
         ),
     ]

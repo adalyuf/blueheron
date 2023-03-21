@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("owl", "0010_message_formatted_response"),
+        ("ranker", "0010_message_formatted_response"),
     ]
 
     operations = [
