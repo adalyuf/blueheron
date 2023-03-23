@@ -6,6 +6,9 @@ from ranker.models import Domain, TokenType, Token, Product, ProductTemplate, Co
 import os, openai, markdown
 
 import asyncio
+import concurrent.futures              # Allows creating new processes
+from math import floor                 # Helps divide up our requests evenly across our CPU cores
+from multiprocessing import cpu_count  # Returns our number of CPU cores
 
 async def getresponse(message):
     message.requested_at = timezone.now()
@@ -24,6 +27,34 @@ async def get_conversations(messages):
     return messages
     # The await is implicit when the context manager exits.
 
+def start_run(messages, i):
+    print(f"Starting process {i}")
+    asyncio.run(get_conversations(messages))
+
+def run_in_parallel(messages):
+    futures = []
+    NUM_CORES = cpu_count()
+    message_array = [[]]
+    message_array[1].append(messages[0])
+    for core in range(1, NUM_CORES):
+        i=1
+        while i < len(messages):
+            if i%core == 0:
+                message_array[core].append(messages[i])
+            i += 1
+
+    with concurrent.futures.ProcessPoolExecutor(NUM_CORES) as executor:
+        for core in range(1, NUM_CORES):
+            new_future = executor.submit(
+                start_run, # Function to perform
+                # v Arguments v
+                messages=message_array[core],
+                i=core
+            )
+            futures.append(new_future)
+
+    concurrent.futures.wait(futures)
+
 class Command(BaseCommand):
     help = "Get responses for every message"
 
@@ -34,12 +65,13 @@ class Command(BaseCommand):
         openai.api_key = os.getenv("OPENAI_API_KEY")
         start_time = timezone.now()
 
-        conversations = Conversation.objects.filter(answered_at__isnull=True)[30:35]
+        conversations = Conversation.objects.filter(answered_at__isnull=True)[31:32]
         print(f"Processing {len(conversations)} conversations")
         messages = Message.objects.filter(conversation__in=conversations).filter(answered_at__isnull=True)
         print(f"Processing {len(messages)} messages") #this print statement surprisingly important, forces evaluation of the query statement above, preventing it from being sent to the async function which cant handle querysets
 
-        messages = asyncio.run(get_conversations(messages))
+        run_in_parallel(messages)
+        # messages = asyncio.run(get_conversations(messages))
             
         Message.objects.bulk_update(messages, ['response','formatted_response', 'requested_at', 'answered_at'])
         end_time = timezone.now()

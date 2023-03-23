@@ -25,7 +25,7 @@ class Command(BaseCommand):
         start_time = timezone.now()
 
         for product in products: #TODO: Implement  handling if the conversation already exists for a product/domain combinations
-            domains = Domain.objects.order_by('rank')[:100] #limiting to top 100 until we fix performance speeds
+            domains = Domain.objects.order_by('rank') #limiting to top 100 until we fix performance speeds
 
             #Create one conversation for every domain
             conversations = []
