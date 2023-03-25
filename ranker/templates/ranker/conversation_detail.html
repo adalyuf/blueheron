@@ -2,10 +2,11 @@
 {% load static %}
 
 {% block title %}
-Conversation Detail
+Conversation Detail ({{conversation.product.product}} - {{conversation.domain.domain}})
 {% endblock %}
 
 {% block content %}
+<h1>Conversation Detail ({{conversation.product.product}} - {{conversation.domain.domain}})</h1>
 
 <form method="post">
     {% csrf_token %}

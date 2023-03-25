@@ -3,12 +3,12 @@
 {% load static %}
 
 {% block title %}
-Domain Detail
+Domain Detail - {{domain.domain}}
 {% endblock %}
 
 {% block content %}
 
-<h1>Domain Detail</h1>
+<h1>Domain Detail - {{domain.domain}}</h1>
 <p>More info on this domain</p>
 
 {{ domain }}
@@ -24,14 +24,29 @@ Domain Detail
 {% endif %}
 
 {% if conversations %}
-<h2>Products</h2>
+<h2>Conversations</h2>
     <ul>
     {% for conversation in conversations %}
-        <li><a href="{% url 'conversation_detail' conversation.id %}">{{conversation.product.product}}</a></li>
+        <li><a href="{% url 'conversation_detail' conversation.id %}">{{conversation.product.product}}</a>
+            {% if convrsation.answered_at %}
+            (answered at: {{answered_at}})
+            {% else %}
+            (not yet answered)
+            {% endif %}
+        </li>
     {% endfor %}
     </ul>
 {% endif %}
 
+{% if products %}
+<h2>Products</h2>
+    <ul>
+    {% for product in products %}
+        <li><a href="{% url 'conversation_add' product.id domain.id %}">{{product.product}}</a>
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
 
 {% if keyword_files %}
     <div class="table-responsive">

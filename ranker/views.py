@@ -5,8 +5,8 @@ from django.core.files.storage import FileSystemStorage
 from django.utils import timezone, html
 from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
 
-from .models import Domain, KeywordFile, Conversation, Product, ProductTemplate
-from .forms import KeywordFileForm, ProductTemplateForm
+from .models import Domain, KeywordFile, Conversation, Product, ProductTemplate, Message
+from .forms import KeywordFileForm, ProductTemplateForm, MessageForm, ProductForm
 
 import csv
 import os
@@ -39,6 +39,7 @@ def domain_detail(request, domain_id):
     domain = get_object_or_404(Domain, pk=domain_id)
     keyword_files = domain.keywordfile_set.all()
     conversations = domain.conversation_set.all()
+    products = Product.objects.filter(scope__exact='per_domain')
     notice = ''
     if request.method == 'POST':
         form = KeywordFileForm(request.POST, request.FILES)
@@ -48,7 +49,7 @@ def domain_detail(request, domain_id):
             notice = "File uploaded successfully."
     else:
         form = KeywordFileForm()
-    return render(request, 'ranker/domain_detail.html', {'domain': domain, 'keyword_files': keyword_files, 'form': form, 'notice': notice, 'conversations': conversations})
+    return render(request, 'ranker/domain_detail.html', {'domain': domain, 'keyword_files': keyword_files, 'form': form, 'notice': notice, 'conversations': conversations, 'products': products})
 
 def keywordfile_make_primary(request, domain_id, keywordfile_id):
     domain = get_object_or_404(Domain, pk=domain_id)
@@ -62,7 +63,8 @@ def keywordfile_make_primary(request, domain_id, keywordfile_id):
     return redirect('domain_detail', domain_id=domain_id)
 
 def conversation_detail(request, conversation_id):
-    messages = get_object_or_404(Conversation, pk=conversation_id).message_set.filter(visible=True).order_by('order')
+    conversation = get_object_or_404(Conversation, pk=conversation_id)
+    messages = conversation.message_set.filter(visible=True).order_by('order')
     if request.method == 'POST':
         openai.api_key = os.getenv("OPENAI_API_KEY")
         message_array = [{"role": "system", "content": "You are a helpful assistant."}]
@@ -92,11 +94,77 @@ def conversation_detail(request, conversation_id):
     except EmptyPage:
         items = paginator.get_page(paginator.num_pages)
 
-    return render(request, 'ranker/conversation_detail.html', {'messages': messages, 'items': items})
+    return render(request, 'ranker/conversation_detail.html', {'conversation': conversation, 'messages': messages, 'items': items})
+
+def conversation_add(request, product_id, domain_id):
+    product = get_object_or_404(Product, pk=product_id)
+    domain = get_object_or_404(Domain, pk=domain_id)
+    if Conversation.objects.filter(product_id__exact=product.id).filter(domain_id__exact=domain.id).count() == 0:
+        conversation = Conversation(domain=domain, product=product)
+        conversation.save()
+        templates = product.producttemplate_set.all()
+        for template in templates:
+            m = Message(
+                prompt = template.prompt1, #TODO: Add logic that uses tokens and concatenates with other parts of prompt
+                title = template.title,
+                visible = template.visible,
+                order = template.order,
+                conversation = conversation
+            )
+            m.prompt = m.prompt.replace("@currentDomain", conversation.domain.domain)
+            m.save()
+    else:
+        conversation = Conversation.objects.filter(product_id__exact=product.id).filter(domain_id__exact=domain.id).first()
+        #TODO: Add combined unique requirement on conversation(product, domain) and figure out how to do this better
+    return redirect('conversation_edit', conversation_id=conversation.id)
+
+
+def conversation_edit(request, conversation_id):
+    conversation = get_object_or_404(Conversation, pk=conversation_id)
+    messages = conversation.message_set.all().order_by('order')
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = MessageForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.conversation = conversation
+            message.order = 100
+            message.save()
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = MessageForm()
+    return render(request, 'ranker/conversation_edit.html', {'messages': messages, 'conversation': conversation, 'form': form})
+
+def conversation_update_order(request, conversation_id):
+    conversation = get_object_or_404(Conversation, pk=conversation_id)
+    messages = conversation.message_set.all().order_by('order')
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        message_ids = json.loads(request.body) 
+        print(message_ids)
+        index = 0
+        while index < len(message_ids):
+            message = get_object_or_404(Message, pk=int(message_ids[index]))
+            message.order = index
+            message.save()
+            index += 1
+
+    form = MessageForm()
+
+    return render(request, 'ranker/conversation_edit.html', {'conversation': conversation, 'messages': messages, 'form': form})
 
 def product_list(request):
     products = Product.objects.all()
-    return render(request, 'ranker/product_list.html', {'products': products})
+    if request.method == 'POST':
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            form.save()
+    else:
+        form = ProductForm
+    return render(request, 'ranker/product_list.html', {'products': products, 'form': form})
 
 def product_detail(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
@@ -109,6 +177,7 @@ def product_detail(request, product_id):
         if form.is_valid():
             template = form.save(commit=False)
             template.product = product
+            template.order = 100
             template.save()
 
     # if a GET (or any other method) we'll create a blank form

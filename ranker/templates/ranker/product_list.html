@@ -14,4 +14,11 @@ Product List
 
 {% endfor %}
 </ul>
+
+<h3>Create new product</h3>
+<form action="{% url 'product_list' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+</form>
 {% endblock %}
