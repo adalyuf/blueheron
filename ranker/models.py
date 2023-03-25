@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.db.models import UniqueConstraint
 
 # Create your models here.
 
@@ -39,6 +40,8 @@ class TokenType(models.Model):
 class Token(models.Model):
     value = models.CharField(max_length=200)
     type = models.ForeignKey(TokenType, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.value
 
 class Product(models.Model):
     scope_choices = [
@@ -55,7 +58,7 @@ class ProductTemplate(models.Model):
     token1 = models.ForeignKey(TokenType, on_delete=models.SET_NULL, null=True, blank=True)
     prompt2 = models.CharField(max_length=200, null=True, blank=True)
     title = models.CharField(max_length=200, null=True, blank=True)
-    order = models.IntegerField()
+    order = models.IntegerField(default=100)
     visible = models.BooleanField(default=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     def __str__(self):
@@ -66,6 +69,9 @@ class Conversation(models.Model):
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, null=True)
     requested_at = models.DateTimeField(null=True)
     answered_at = models.DateTimeField(null=True)
+    UniqueConstraint(name='unique_product_domain', fields=['product', 'domain'], include=['answered_at'])
+    def __str__(self):
+        return f"Conversation for {self.product.product} and {self.domain.domain}"
 
 
 class Message(models.Model):
@@ -75,7 +81,7 @@ class Message(models.Model):
     formatted_response = models.TextField(null=True)
     visible = models.BooleanField(default=True)
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
-    order = models.IntegerField()
+    order = models.IntegerField(default=100)
     requested_at = models.DateTimeField(null=True)
     answered_at = models.DateTimeField(null=True)
     def __str__(self):
