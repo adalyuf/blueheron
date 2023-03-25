@@ -6,13 +6,17 @@ from ranker.models import Product, ProductTemplate
 class Command(BaseCommand):
     help = "Initialize a few products and templates when a fresh environment launches"
 
-    def add_arguments(self, parser):
-        parser.add_argument('file_path', nargs=1, type=str) 
+    # def add_arguments(self, parser):
+    #     parser.add_argument('file_path', nargs=1, type=str) 
         #This is a positional argument, which, since added first, evaluates the first word to come after the command
         # The nargs='+' command says to take every word in the command and combine it together into a list and error if no words are found
 
     def handle(self, *args, **options):
         #handle is a special method that the django manage command will run, with the args and options provided
+
+        if Product.objects.count() > 0:
+            self.stderr.write(f"There are already {Product.objects.count()} products in the database. Skipping creation.")
+            return
 
         market_research = Product(
             product = "Market Research",
@@ -150,8 +154,10 @@ class Command(BaseCommand):
         pt.save()
                                                   
         pt = ProductTemplate(
-            prompt1 = "If I run @currentDomain, What are my competitors' long-term goals and how are they working to achieve them?",
+            prompt1 = "If I run @currentDomain, what might be some of my competitors' long-term goals and how might they work to achieve them?",
             order = 11,
             product = competitive_analysis,
         )
         pt.save()
+
+        print(f"After startproducts, there are now {Product.objects.count()} products and {ProductTemplate.objects.count()} product templates.")

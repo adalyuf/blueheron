@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.utils import timezone, html
 from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
+from django.core.management import call_command
 
 from .models import Domain, KeywordFile, Conversation, Product, ProductTemplate, Message
 from .forms import KeywordFileForm, ProductTemplateForm, MessageForm, ProductForm
@@ -144,7 +145,6 @@ def conversation_update_order(request, conversation_id):
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         message_ids = json.loads(request.body) 
-        print(message_ids)
         index = 0
         while index < len(message_ids):
             message = get_object_or_404(Message, pk=int(message_ids[index]))
@@ -155,6 +155,17 @@ def conversation_update_order(request, conversation_id):
     form = MessageForm()
 
     return render(request, 'ranker/conversation_edit.html', {'conversation': conversation, 'messages': messages, 'form': form})
+
+def conversation_get_responses(request, conversation_id):
+    conversation = get_object_or_404(Conversation, pk=conversation_id)
+    messages = conversation.message_set.all().order_by('order')
+
+    if request.method == 'POST':
+        print(f"We'll get responses in this function.")
+        call_command('mpresponses', '--conversation', conversation.id)
+
+    return redirect('conversation_detail', conversation_id=conversation.id)
+
 
 def message_delete(request, message_id):
     message = get_object_or_404(Message, pk=message_id)
@@ -204,15 +215,12 @@ def product_template_order(request, product_id):
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         product_template_ids = json.loads(request.body) 
-        print(product_template_ids)
         index = 0
         while index < len(product_template_ids):
             pt = get_object_or_404(ProductTemplate, pk=int(product_template_ids[index]))
             pt.order = index
             pt.save()
             index += 1
-
-
     form = ProductTemplateForm()
 
     return render(request, 'ranker/product_detail.html', {'product':product, 'product_templates':product_templates, 'form': form})

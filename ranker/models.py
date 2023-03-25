@@ -54,7 +54,7 @@ class Product(models.Model):
         return self.product
 
 class ProductTemplate(models.Model):
-    prompt1 = models.CharField(max_length=200)
+    prompt1 = models.TextField()
     token1 = models.ForeignKey(TokenType, on_delete=models.SET_NULL, null=True, blank=True)
     prompt2 = models.CharField(max_length=200, null=True, blank=True)
     title = models.CharField(max_length=200, null=True, blank=True)
@@ -69,7 +69,10 @@ class Conversation(models.Model):
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, null=True)
     requested_at = models.DateTimeField(null=True)
     answered_at = models.DateTimeField(null=True)
-    UniqueConstraint(name='unique_product_domain', fields=['product', 'domain'], include=['answered_at'])
+    class Meta:
+        constraints = [ #Apparently SQLLite doesn't support unique constraints on anything other than primary key columns. So... this won't be enforced
+            UniqueConstraint(name='unique_product_domain', fields=['product', 'domain'], include=['answered_at']),
+        ]
     def __str__(self):
         return f"Conversation for {self.product.product} and {self.domain.domain}"
 

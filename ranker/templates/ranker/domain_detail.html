@@ -28,8 +28,8 @@ Domain Detail - {{domain.domain}}
     <ul>
     {% for conversation in conversations %}
         <li><a href="{% url 'conversation_detail' conversation.id %}">{{conversation.product.product}}</a>
-            {% if convrsation.answered_at %}
-            (answered at: {{answered_at}})
+            {% if conversation.answered_at %}
+            (answered at: {{conversation.answered_at}})
             {% else %}
             (not yet answered)
             {% endif %}

@@ -11,8 +11,11 @@ idna==3.4
 Markdown==3.4.1
 multidict==6.0.4
 openai==0.27.2
+pyngrok==5.2.1
+PyYAML==6.0
 requests==2.28.2
 sqlparse==0.4.3
+tenacity==8.2.2
 tqdm==4.65.0
 urllib3==1.26.15
 yarl==1.8.2

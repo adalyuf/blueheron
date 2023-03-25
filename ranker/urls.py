@@ -12,6 +12,8 @@ urlpatterns = [
     path('conversations/add/<int:product_id>/<int:domain_id>/', views.conversation_add, name='conversation_add'),
     path('conversations/edit/<int:conversation_id>/', views.conversation_edit, name='conversation_edit'),
     path('conversations/edit/<int:conversation_id>/update_order/', views.conversation_update_order, name='conversation_update_order'),
+    path('conversations/edit/<int:conversation_id>/get_responses/', views.conversation_get_responses, name='conversation_get_responses'),
+
 
     path('messages/delete/<int:message_id>/', views.message_delete, name='message_delete'),
 

@@ -88,19 +88,30 @@ class Command(BaseCommand):
     help = "Get responses for every message"
 
     def add_arguments(self, parser):
-        parser.add_argument('conversation_start', nargs=1, type=int)
-        parser.add_argument('conversation_end', nargs=1, type=int) 
- 
+        parser.add_argument('--start', nargs=1, type=int)
+        parser.add_argument('--end', nargs=1, type=int) 
+        parser.add_argument('--conversation', action='append', type=int)
+
 
     def handle(self, *args, **options):
         openai.api_key = os.getenv("OPENAI_API_KEY")
         start_time = timezone.now()
 
-        conversations = Conversation.objects.filter(answered_at__isnull=True)[options["conversation_start"][0]:options["conversation_end"][0]] #<-- This controls which 
-        print(f"Processing {len(conversations)} conversations")
+        if options['conversation']:
+            conversations = Conversation.objects.filter(id__exact=options['conversation'][0])
+        elif options['start'] and options['end']:
+            conversations = Conversation.objects.filter(answered_at__isnull=True)[options["start"][0]:options["end"][0]]
+        else:
+            print("Command needs either --conversation or --start and --end arguments")
+            return
 
+        print(f"Processing {len(conversations)} conversations")
         messages = Message.objects.filter(conversation__in=conversations).filter(answered_at__isnull=True)
-        print(f"Processing {len(messages)} messages") #this print statement surprisingly important, forces evaluation of the query statement above, preventing it from being sent to the async function which cant handle querysets
+        if len(messages) == 0:
+            print("All messages have already been processed, canceling operation.")
+            return
+
+        print(f"Processing {len(messages)} messages") 
 
         messages = run_in_parallel(messages)
             

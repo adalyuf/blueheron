@@ -8,10 +8,6 @@ Conversation Detail ({{conversation.product.product}} - {{conversation.domain.do
 {% block content %}
 <h1>Conversation Detail ({{conversation.product.product}} - {{conversation.domain.domain}})</h1>
 
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Get Responses</button>
-</form>
 
 {% for message in items %}
     <h3>{{message.prompt}}</h3>

@@ -67,6 +67,12 @@ Edit Conversation ({{conversation.product.product}} - {{conversation.domain.doma
 {% endfor %}
 </ul>
 <br>
+<h3>Get responses</h3>
+<form action="{% url 'conversation_get_responses' conversation.id %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Get Responses">
+</form>
+<br>
 <h3>Create new message</h3>
 <form action="{% url 'conversation_edit' conversation.id %}" method="post">
     {% csrf_token %}
