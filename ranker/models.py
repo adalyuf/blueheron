@@ -4,11 +4,15 @@ from django.utils import timezone
 # Create your models here.
 
 class Domain(models.Model):
-    domain = models.CharField(max_length=200)
+    domain = models.CharField(max_length=200, unique=True)
     keywords = models.BigIntegerField(null=True)
     traffic = models.BigIntegerField(null=True)
     cost = models.DecimalField(max_digits=19, decimal_places=2,null=True)
     rank = models.IntegerField(null=True)
+    ad_keywords = models.BigIntegerField(null=True)
+    ad_traffic = models.BigIntegerField(null=True)
+    ad_cost = models.DecimalField(max_digits=19, decimal_places=2,null=True)
+    adult_content = models.BooleanField(default=False)
     def __str__(self):
         return self.domain
 

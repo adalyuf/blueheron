@@ -8,7 +8,10 @@
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="{% static 'bootstrap.css' %}">
-
+    <link href="{% static '/fontawesome/css/fontawesome.css' %}" rel="stylesheet">
+    <link href="{% static '/fontawesome/css/brands.css' %}" rel="stylesheet">
+    <link href="{% static '/fontawesome/css/solid.css' %}" rel="stylesheet">
+    {% block header %}{% endblock %}
 
     <title>{% block title %}{% endblock %}</title>
 </head>

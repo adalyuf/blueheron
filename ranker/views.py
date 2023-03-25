@@ -5,20 +5,21 @@ from django.core.files.storage import FileSystemStorage
 from django.utils import timezone, html
 from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
 
-from .models import Domain, KeywordFile, Conversation
-from .forms import KeywordFileForm
+from .models import Domain, KeywordFile, Conversation, Product, ProductTemplate
+from .forms import KeywordFileForm, ProductTemplateForm
 
 import csv
 import os
 import openai
-import markdown 
+import markdown
+import json
 
 def domain_list(request):
     default_page = 1
     page_number = request.GET.get('page', default_page)
 
     # Get queryset of items to paginate
-    domain_list = Domain.objects.order_by('rank')
+    domain_list = Domain.objects.filter(adult_content__exact=False).order_by('rank')
 
     # Paginate items
     items_per_page = 100
@@ -92,3 +93,46 @@ def conversation_detail(request, conversation_id):
         items = paginator.get_page(paginator.num_pages)
 
     return render(request, 'ranker/conversation_detail.html', {'messages': messages, 'items': items})
+
+def product_list(request):
+    products = Product.objects.all()
+    return render(request, 'ranker/product_list.html', {'products': products})
+
+def product_detail(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    product_templates = product.producttemplate_set.all().order_by('order')
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = ProductTemplateForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            template = form.save(commit=False)
+            template.product = product
+            template.save()
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = ProductTemplateForm()
+
+    return render(request, 'ranker/product_detail.html', {'product':product, 'product_templates':product_templates, 'form': form})
+
+def product_template_order(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    product_templates = product.producttemplate_set.all().order_by('order')
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        product_template_ids = json.loads(request.body) 
+        print(product_template_ids)
+        index = 0
+        while index < len(product_template_ids):
+            pt = get_object_or_404(ProductTemplate, pk=int(product_template_ids[index]))
+            pt.order = index
+            pt.save()
+            index += 1
+
+
+    form = ProductTemplateForm()
+
+    return render(request, 'ranker/product_detail.html', {'product':product, 'product_templates':product_templates, 'form': form})

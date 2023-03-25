@@ -15,7 +15,11 @@ from tenacity import (
     wait_random_exponential,
 )  # for exponential backoff
 
-@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
+def return_last_value(retry_state):
+    """return the result of the last call attempt"""
+    return retry_state.outcome.result()
+
+@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6), retry_error_callback=return_last_value)
 def call_openai(prompt, proc_num):
     message_array = [{"role": "system", "content": "You are a helpful assistant."}] #by using async we forgo ability to have each message be dependent on previous messages and there is no guarantee of time order
     message_array.append({"role": "user", "content": prompt})
@@ -83,14 +87,16 @@ def run_in_parallel(messages):
 class Command(BaseCommand):
     help = "Get responses for every message"
 
-    # def add_arguments(self, parser):
-    #     parser.add_argument('file_path', nargs=1, type=str) 
+    def add_arguments(self, parser):
+        parser.add_argument('conversation_start', nargs=1, type=int)
+        parser.add_argument('conversation_end', nargs=1, type=int) 
+ 
 
     def handle(self, *args, **options):
         openai.api_key = os.getenv("OPENAI_API_KEY")
         start_time = timezone.now()
 
-        conversations = Conversation.objects.filter(answered_at__isnull=True)[36:40] #<-- This controls which 
+        conversations = Conversation.objects.filter(answered_at__isnull=True)[options["conversation_start"][0]:options["conversation_end"][0]] #<-- This controls which 
         print(f"Processing {len(conversations)} conversations")
 
         messages = Message.objects.filter(conversation__in=conversations).filter(answered_at__isnull=True)

@@ -17,22 +17,30 @@ Domains
         <thead>
             <tr>
             <th scope="col">ID</th>
+            <th scope="col">Rank</th>
             <th scope="col">Domain</th>
             <th scope="col">Keywords</th>
             <th scope="col">Traffic</th>
             <th scope="col">Cost</th>
-            <th scope="col">Rank</th>
+            <th scope="col">Ad Keywords</th>
+            <th scope="col">Ad Traffic</th>
+            <th scope="col">Ad Cost</th>
+            <th scope="col">Adult Content</th>
             </tr>
         </thead>
         <tbody>
     {% for domain in items %}
             <tr>
                 <td>{{domain.id}}</td>
+                <td>{{domain.rank}}</td>
                 <td><a href="{% url 'domain_detail' domain.id %}">{{domain.domain}}</a></td>
                 <td>{{domain.keywords}}</td>
                 <td>{{domain.traffic}}</td>
                 <td>{{domain.cost}}</td>
-                <td>{{domain.rank}}</td>
+                <td>{{domain.ad_keywords}}</td>
+                <td>{{domain.ad_traffic}}</td>
+                <td>{{domain.ad_cost}}</td>
+                <td>{{domain.adult_content}}</td>
             </tr>
     {% endfor %}
         </tbody>
