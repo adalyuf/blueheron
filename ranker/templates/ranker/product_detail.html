@@ -57,6 +57,10 @@ Product Detail - {{product.product}}
             <div class="fw-bold">{{product_template.prompt1}}</div>
             View more...
         </div>
+        <form action="{% url 'product_template_delete' product_template.id %}" method="post">
+            {% csrf_token %}
+            <button class="btn btn-danger btn-sm rounded-2" type="submit" data-toggle="tooltip" data-placement="top" title="Delete"><i class="bi bi-trash"></i></button>
+        </form>
       <span class="badge bg-primary rounded-pill">{{product_template.order}}</span>
     </li>
 {% endfor %}

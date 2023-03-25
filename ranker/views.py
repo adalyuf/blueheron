@@ -156,6 +156,17 @@ def conversation_update_order(request, conversation_id):
 
     return render(request, 'ranker/conversation_edit.html', {'conversation': conversation, 'messages': messages, 'form': form})
 
+def message_delete(request, message_id):
+    message = get_object_or_404(Message, pk=message_id)
+    conversation = message.conversation
+
+    if request.method == 'POST':
+        message.delete()
+    
+    return redirect('conversation_edit', conversation_id=conversation.id)
+
+
+
 def product_list(request):
     products = Product.objects.all()
     if request.method == 'POST':
@@ -205,3 +216,12 @@ def product_template_order(request, product_id):
     form = ProductTemplateForm()
 
     return render(request, 'ranker/product_detail.html', {'product':product, 'product_templates':product_templates, 'form': form})
+
+def product_template_delete(request, producttemplate_id):
+    product_template = get_object_or_404(ProductTemplate, pk=producttemplate_id)
+    product = product_template.product
+
+    if request.method == 'POST':
+        product_template.delete()
+    
+    return redirect('product_detail', product_id=product.id)

@@ -58,6 +58,10 @@ Edit Conversation ({{conversation.product.product}} - {{conversation.domain.doma
             <div class="fw-bold">{{message.prompt}}</div>
             View more...
         </div>
+        <form action="{% url 'message_delete' message.id %}" method="post">
+            {% csrf_token %}
+            <button class="btn btn-danger btn-sm rounded-2" type="submit" data-toggle="tooltip" data-placement="top" title="Delete"><i class="bi bi-trash"></i></button>
+        </form>
       <span class="badge bg-primary rounded-pill">{{message.order}}</span>
     </li>
 {% endfor %}
