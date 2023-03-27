@@ -1,6 +1,10 @@
-{% extends "base.html" %}
-{% load static %}
-{% block header %}
+{% extends 'layout/default.html' %}
+
+{% load i18n %}
+
+{% block title %}{% translate "Edit Conversation ({{conversation.product.product}} - {{conversation.domain.domain}})" %}{% endblock %}
+
+{% block javascript %}
 {% csrf_token %}
 <script src="{% static '/ranker/sortable.js' %}"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
@@ -45,9 +49,6 @@
 
 {% endblock %}
 
-{% block title %}
-Edit Conversation ({{conversation.product.product}} - {{conversation.domain.domain}})
-{% endblock %}
 {% block content %}
 <h1>Edit Conversation ({{conversation.product.product}} - {{conversation.domain.domain}})</h1>
 

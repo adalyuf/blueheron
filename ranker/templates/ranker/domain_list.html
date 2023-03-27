@@ -1,9 +1,13 @@
-{% extends 'base.html' %}
+{% extends 'layout/default.html' %}
 
-{% load static %}
+{% load i18n %}
 
-{% block title %}
-Domains
+{% block title %}{% translate "Domain List" %}{% endblock %}
+
+{% block javascript %}
+<script>
+    $("#kt_datatable_zero_configuration").DataTable();
+</script>
 {% endblock %}
 
 {% block content %}
@@ -13,7 +17,7 @@ Domains
 
 {% if items %}
     <div class="table-responsive">
-        <table class="table table-striped table-sm">
+        <table id="kt_datatable_zero_configuration" class="table table-row-bordered gy-5">
         <thead>
             <tr>
             <th scope="col">ID</th>
@@ -51,4 +55,5 @@ Domains
     <p>No domains available.</p>
 {% endif %}
 
-{% endblock %}
+
+{% endblock content %}

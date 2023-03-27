@@ -14,7 +14,7 @@ db.sqlite3
 mydatabase
 
 # Static folder at project root
-/static/
+/static_collected/
 
 # macOS
 ._*
