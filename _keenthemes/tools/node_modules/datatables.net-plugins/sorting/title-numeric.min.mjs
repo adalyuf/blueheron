@@ -1,2 +1,0 @@
-/*! © SpryMedia Ltd - datatables.net/license */
-import $ from"jquery";import DataTable from"datatables.net";DataTable.ext.order["title-numeric-pre"]=function(t){t=t.match(/title="*(-?[0-9\.]+)/)[1];return parseFloat(t)};export default DataTable;
