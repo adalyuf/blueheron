@@ -10,7 +10,9 @@
         sortable = Sortable.create(document.getElementById('productList'), {
             onEnd: function (evt) {
                 updateOrder();
-            }
+            },
+            handle: '.handle',
+            animation: 200,
         });
       });
 
@@ -51,7 +53,7 @@ Product Detail - {{product.product}}
 <ul id="productList" class="list-group">
 {% for product_template in product_templates %}
     <li data-id="{{product_template.id}}" class="list-group-item d-flex justify-content-between align-items-start">
-        <i class="bi bi-grip-vertical"></i>
+        <i class="bi bi-grip-vertical handle"></i>
         <!-- <i class="fa-solid fa-lg fa-grip-vertical"></i> -->
         <div class="ms-2 me-auto">
             <div class="fw-bold">{{product_template.prompt1}}</div>

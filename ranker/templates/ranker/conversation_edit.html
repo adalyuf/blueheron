@@ -10,7 +10,9 @@
         sortable = Sortable.create(document.getElementById('messageList'), {
             onEnd: function (evt) {
                 updateOrder();
-            }
+            },
+            handle: '.handle',
+            animation: 200,
         });
       });
 
@@ -52,11 +54,10 @@ Edit Conversation ({{conversation.product.product}} - {{conversation.domain.doma
 <ul id="messageList" class="list-group">
 {% for message in messages %}
     <li data-id="{{message.id}}" class="list-group-item d-flex justify-content-between align-items-start">
-        <i class="bi bi-grip-vertical"></i>
+        <i class="bi bi-grip-vertical handle"></i>
         <!-- <i class="fa-solid fa-lg fa-grip-vertical"></i> -->
         <div class="ms-2 me-auto">
             <div class="fw-bold">{{message.prompt}}</div>
-            View more...
         </div>
         <form action="{% url 'message_delete' message.id %}" method="post">
             {% csrf_token %}

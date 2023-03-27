@@ -53,28 +53,28 @@ class Command(BaseCommand):
         pt.save()
                 
         pt = ProductTemplate(
-            prompt1 = "What are some strategies for @currentDomain to increase their revenue? For each of these strategies, suggest one specific, detailed, tactic they could take",
+            prompt1 = "What are some strategies for @currentDomain to increase their revenue? For each of these strategies, suggest one specific, detailed, tactic they could take and if appropriate a vendor that could help implement this tactic",
             order = 4,
             product = market_research,
         )
         pt.save()
                 
         pt = ProductTemplate(
-            prompt1 = "What are some strategies for @currentDomain to reduce costs? For each of these strategies, suggest one specific, detailed, tactic they could take",
+            prompt1 = "What are some strategies for @currentDomain to reduce their costs? For each of these strategies, suggest one specific, detailed, tactic they could take and if appropriate a vendor that could help implement this tactic",
             order = 5,
             product = market_research,
         )
         pt.save()
                 
         pt = ProductTemplate(
-            prompt1 = "What are some ideas for @currentDomain to improve their processes? For each of these ideas, recommend a few companies that help companies of their size and industry implement these ideas",
+            prompt1 = "What are some ideas for @currentDomain to improve their processes? For each of these strategies, suggest one specific, detailed, tactic they could take and if appropriate a vendor that could help implement this tactic",
             order = 6,
             product = market_research,
         )
         pt.save()
                 
         pt = ProductTemplate(
-            prompt1 = "What are some ideas for @currentDomain improve their employee experience",
+            prompt1 = "What are some ideas for @currentDomain to improve their employee experience? For each of these strategies, suggest one specific, detailed, tactic they could take and if appropriate a vendor that could help implement this tactic",
             order = 7,
             product = market_research,
         )
@@ -98,64 +98,71 @@ class Command(BaseCommand):
         pt.save()
                                 
         pt = ProductTemplate(
-            prompt1 = "If I run @currentDomain, How does my product or service compare to my competitors' offerings in terms of features, quality, and price?",
+            prompt1 = "Can you compare the features of @currentDomain to the features of its competitors",
             order = 3,
             product = competitive_analysis,
         )
         pt.save()
                                         
         pt = ProductTemplate(
-            prompt1 = "If I run @currentDomain, How do my competitors market their products or services?",
+            prompt1 = "Can you compare the marketing strategy of @currentDomain to the marketing strategy of its competitors",
             order = 4,
             product = competitive_analysis,
         )
         pt.save()
                                         
         pt = ProductTemplate(
-            prompt1 = "If I run @currentDomain, How do my competitors distribute their products or services?",
+            prompt1 = "Which of @currentDomain's competitors has a unique distribution strategy",
             order = 5,
             product = competitive_analysis,
         )
         pt.save()
                                         
         pt = ProductTemplate(
-            prompt1 = "If I run @currentDomain, What is my competitors' reputation in the industry?",
+            prompt1 = "Can you provide information on the reputations of each of @currentDomain's competitors",
             order = 6,
             product = competitive_analysis,
         )
         pt.save()
                                                 
         pt = ProductTemplate(
-            prompt1 = "If I run @currentDomain, How do my competitors handle customer service and support?",
+            prompt1 = "Which of @currentDomain's competitors has exceptional customer support?",
             order = 7,
             product = competitive_analysis,
         )
         pt.save()
                                                 
         pt = ProductTemplate(
-            prompt1 = "If I run @currentDomain, What are the opportunities and threats that my competitors pose to my business?",
+            prompt1 = "What opportunities could @currentDomain take advantage of?",
             order = 8,
             product = competitive_analysis,
         )
         pt.save()
                                                 
         pt = ProductTemplate(
-            prompt1 = "If I run @currentDomain, What are the gaps in the market that my competitors have not yet addressed?",
+            prompt1 = "What threats should @currentDomain be on the lookout for?",
             order = 9,
             product = competitive_analysis,
         )
         pt.save()
                                                 
         pt = ProductTemplate(
-            prompt1 = "If I run @currentDomain, What are the emerging trends in the industry that my competitors are not taking advantage of?",
+            prompt1 = "What are some gaps in the market that @currentDomain could explore?",
             order = 10,
             product = competitive_analysis,
         )
         pt.save()
                                                   
         pt = ProductTemplate(
-            prompt1 = "If I run @currentDomain, what might be some of my competitors' long-term goals and how might they work to achieve them?",
+            prompt1 = "What might be the long-term strategy of each of @currentDomain's competitors?",
             order = 11,
+            product = competitive_analysis,
+        )
+        pt.save()
+                                                          
+        pt = ProductTemplate(
+            prompt1 = "Which companies could @currentDomain acquire to address emerging trends in the industry?",
+            order = 12,
             product = competitive_analysis,
         )
         pt.save()
