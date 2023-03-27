@@ -32,3 +32,9 @@ $RECYCLE.BIN/
 .vscode/
 .history/
 *.code-workspace
+
+static
+node_modules
+yarn.lock
+_keenthemes/src/**/webpack
+_keenthemes/tools/webpack
