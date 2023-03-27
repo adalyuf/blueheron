@@ -5,6 +5,8 @@ from django.core.files.storage import FileSystemStorage
 from django.utils import timezone, html
 from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
 from django.core.management import call_command
+from _keenthemes.__init__ import KTLayout
+from _keenthemes.libs.theme import KTTheme
 
 from .models import Domain, KeywordFile, Conversation, Product, ProductTemplate, Message
 from .forms import KeywordFileForm, ProductTemplateForm, MessageForm, ProductForm
@@ -18,7 +20,7 @@ import json
 def domain_list(request):
     default_page = 1
     page_number = request.GET.get('page', default_page)
-
+    KTTheme.addVendor('datatables')
     # Get queryset of items to paginate
     domain_list = Domain.objects.filter(adult_content__exact=False).order_by('rank')
 
