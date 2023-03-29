@@ -156,6 +156,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 USE_NGROK = os.environ.get("USE_NGROK", "False")
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 

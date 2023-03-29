@@ -3,7 +3,7 @@ from ranker import views
 
 urlpatterns = [
     path("", views.domain_list, name="home"),
-    path("domains", views.domain_list, name="domain_list"),
+    path("domains/", views.domain_list, name="domain_list"),
     path('domains/<int:domain_id>/', views.domain_detail, name='domain_detail'),
 
     path('keywordfile_make_primary/<int:domain_id>/<int:keywordfile_id>', views.keywordfile_make_primary, name='keywordfile_make_primary'),
@@ -18,7 +18,7 @@ urlpatterns = [
     path('messages/delete/<int:message_id>/', views.message_delete, name='message_delete'),
 
 
-    path("products", views.product_list, name="product_list"),
+    path("products/", views.product_list, name="product_list"),
     path("products/<int:product_id>/", views.product_detail, name="product_detail"),
     path("products/<int:product_id>/update_order/", views.product_template_order, name="product_template_order"),
     path("product_templates/delete/<int:producttemplate_id>", views.product_template_delete, name="product_template_delete"),

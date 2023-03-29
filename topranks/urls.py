@@ -18,7 +18,8 @@ from django.urls import include, path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
-    path("", include("ranker.urls")),
+    path("", include("ranker.urls")),    
+    path("accounts/", include("accounts.urls")),
     path("dashboard/", include("dashboards.urls")),
     path("admin/", admin.site.urls)
 ]

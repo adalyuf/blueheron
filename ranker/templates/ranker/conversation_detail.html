@@ -3,14 +3,30 @@
 {% load i18n %}
 
 {% block title %}{% translate "Conversation Detail ({{conversation.product.product}} - {{conversation.domain.domain}})" %}{% endblock %}
+{% block newtitle %}Test Blocks{% endblock newtitle %}
+
 
 {% block content %}
 <h1>Conversation Detail ({{conversation.product.product}} - {{conversation.domain.domain}})</h1>
 
 {% for message in items %}
-    <h3>{{message.prompt}}</h3>
-    {{message.formatted_response|safe}}
-    <br>
+<div class="container">
+    <div class="row justify-content-md-center">
+
+        <div class="col col-lg-10">
+            <h3>{{message.prompt}}</h3>
+        </div>
+
+    </div>
+    <div class="row justify-content-md-center">
+
+        <div class="col col-lg-10 message-response">
+            {{message.formatted_response|safe}}
+        </div>
+
+    </div>
+</div>
+<br>
 {% endfor %}
 {% include 'ranker/partials/_pagination.html' %}
 

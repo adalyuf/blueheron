@@ -1,11 +1,36 @@
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import PermissionsMixin, UserManager
+from django.contrib.auth.models import PermissionsMixin, BaseUserManager
 from django.contrib.auth.validators import ASCIIUsernameValidator
 from django.contrib.postgres.fields import CICharField, CIEmailField
 from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+class UserManager(BaseUserManager):
+    def create_user(self, **kwargs):
+        user = self.model(
+            email=self.normalize_email(kwargs['email']),
+            first_name=kwargs['first_name'],
+            last_name=kwargs['last_name'],
+            phone_number=kwargs['phone_number'],
+            gender=kwargs['gender'],
+        )
+
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, **kwargs):
+        user = self.model(
+            email=self.normalize_email(kwargs['email']),
+            username=kwargs['username'],
+        )
+        user.is_superuser = True
+        user.is_staff = True
+        user.set_password(kwargs['password'])
+        user.save(using=self._db)
+        return user
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -72,3 +97,4 @@ class User(AbstractBaseUser, PermissionsMixin):
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
+

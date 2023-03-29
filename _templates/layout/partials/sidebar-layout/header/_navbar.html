@@ -41,6 +41,7 @@
 		{% include 'partials/theme-mode/_main.html' %}
 	</div>
 	<!--end::Theme mode-->
+	{% if user.is_authenticated %}
 	<!--begin::User menu-->
 	<div class="app-navbar-item ms-1 ms-md-3" id="kt_header_user_menu_toggle">
 		<!--begin::Menu wrapper-->
@@ -51,6 +52,18 @@
 		<!--end::Menu wrapper-->
 	</div>
 	<!--end::User menu-->
+	{% else %}
+	<!--begin::Actions-->
+	<div class="d-flex align-items-center gap-2 gap-lg-3">
+		<!--begin::Secondary button-->
+		<a href="{% url 'login' %}" class="btn btn-sm fw-bold bg-body btn-color-gray-700 btn-active-color-primary">Login</a>
+		<!--end::Secondary button-->
+		<!--begin::Primary button-->
+		<a href="{% url 'signup' %}" class="btn btn-sm fw-bold btn-primary">Signup</a>
+		<!--end::Primary button-->
+	</div>
+	<!--end::Actions-->
+	{% endif %}
 	<!--begin::Header menu toggle-->
 	<div class="app-navbar-item d-lg-none ms-2 me-n3" title="Show header menu">
 		<div class="btn btn-icon btn-active-color-primary w-30px h-30px w-md-35px h-md-35px" id="kt_app_header_menu_toggle">{% getIcon 'text-align-left' 'fs-2 fs-md-1' %}</div>
