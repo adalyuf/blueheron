@@ -16,6 +16,9 @@ class Domain(models.Model):
     adult_content = models.BooleanField(default=False)
     def __str__(self):
         return self.domain
+    
+    class Meta:
+        ordering = ['rank']
 
 def keyword_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
@@ -64,6 +67,9 @@ class ProductTemplate(models.Model):
     def __str__(self):
         return self.prompt1
     
+    class Meta:
+        ordering = ['product', 'order']
+
 class Conversation(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, null=True)
@@ -74,7 +80,7 @@ class Conversation(models.Model):
             UniqueConstraint(name='unique_product_domain', fields=['product', 'domain'], include=['answered_at']),
         ]
     def __str__(self):
-        return f"Conversation for {self.product.product} and {self.domain.domain}"
+        return f"{self.product.product}: {self.domain.domain}"
 
 
 class Message(models.Model):
@@ -89,3 +95,6 @@ class Message(models.Model):
     answered_at = models.DateTimeField(null=True)
     def __str__(self):
         return self.prompt 
+    
+    class Meta:
+        ordering = ['order']

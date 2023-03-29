@@ -17,7 +17,7 @@ class UserManager(BaseUserManager):
             gender=kwargs['gender'],
         )
 
-        user.set_password(password)
+        user.set_password(kwargs['password'])
         user.save(using=self._db)
         return user
 
