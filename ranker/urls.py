@@ -3,6 +3,9 @@ from ranker import views
 
 urlpatterns = [
     path("", views.domain_list, name="home"),
+
+    path('dashboard/', views.DashboardsView.as_view(template_name = 'pages/dashboards/index.html'), name='dashboard'),
+
     path("domains/", views.domain_list, name="domain_list"),
     path('domains/<int:domain_id>/', views.domain_detail, name='domain_detail'),
 
@@ -14,9 +17,7 @@ urlpatterns = [
     path('conversations/edit/<int:conversation_id>/update_order/', views.conversation_update_order, name='conversation_update_order'),
     path('conversations/edit/<int:conversation_id>/get_responses/', views.conversation_get_responses, name='conversation_get_responses'),
 
-
     path('messages/delete/<int:message_id>/', views.message_delete, name='message_delete'),
-
 
     path("products/", views.product_list, name="product_list"),
     path("products/<int:product_id>/", views.product_detail, name="product_detail"),
