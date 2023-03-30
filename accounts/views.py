@@ -7,7 +7,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 
-from accounts.forms import SignUpForm
+from accounts.forms import SignUpForm, LoginForm
 from .models import User
 
 from django.contrib import messages
@@ -17,8 +17,10 @@ def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
+            user = form.save(commit=False)
+            user.username = form.cleaned_data.get('email')
+            user.save()
+            username = user.username
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
@@ -29,9 +31,9 @@ def signup(request):
 
 def login_request(request):
 	if request.method == "POST":
-		form = AuthenticationForm(request, data=request.POST)
+		form = LoginForm(request, data=request.POST)
 		if form.is_valid():
-			username = form.cleaned_data.get('username')
+			username = form.cleaned_data.get('email')
 			password = form.cleaned_data.get('password')
 			user = authenticate(username=username, password=password)
 			if user is not None:
@@ -42,7 +44,7 @@ def login_request(request):
 				messages.error(request,"Invalid username or password.")
 		else:
 			messages.error(request,"Invalid username or password.")
-	form = AuthenticationForm()
+	form = LoginForm()
 	return render(request=request, template_name="pages/auth/basic-login.html", context={"form":form})
 
 def logout_request(request):
