@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account', 
     'allauth.socialaccount', 
+    'allauth.socialaccount.providers.google',
     "ranker",
     "accounts",
 ]
@@ -145,6 +146,18 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_UNIQUE_EMAIL = True
 LOGIN_REDIRECT_URL = 'domain_list'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'domain_list'
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

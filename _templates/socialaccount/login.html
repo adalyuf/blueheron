@@ -1,0 +1,55 @@
+{% extends "layout/auth.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}
+Login
+{% endblock %}
+{% block content %}
+
+<!--begin::Heading-->
+<div class="text-center mb-11">
+{% if process == "connect" %}
+<h1 class="text-dark fw-bolder mb-3">Connect {{ provider.name }}</h1>
+
+<p class="text-gray-500 fw-semibold fs-6">You are about to connect a new third party account from {{ provider.name }}.</p>
+{% else %}
+<h1 class="text-dark fw-bolder mb-3">Sign In Via {{ provider.name }}</h1>
+
+<p class="text-gray-500 fw-semibold fs-6">You are about to sign in using a third party account from {{ provider.name }}.</p>
+{% endif %}
+</div>
+<!--begin::Heading-->
+
+<form method="post">
+  {% csrf_token %}
+  <!--begin::Submit button-->
+  <div class="d-grid mb-10">
+    <button type="submit" id="kt_sign_in_submit" class="btn btn-primary">
+        {% include 'partials/general/_button-indicator.html' with label='Log In' %}
+    </button>
+  </div>
+  <!--end::Submit button-->
+</form>
+<!--begin::Wrapper-->
+<div class="text-center gap-3 fs-base fw-semibold mb-8">
+  <div></div>
+
+  <!--begin::Link-->
+  <a href="{% url 'account_reset_password' %}" class="link-primary">
+      Forgot Password ?
+  </a>
+  <!--end::Link-->
+</div>
+<!--end::Wrapper--> 
+
+<!--begin::Sign up-->
+<div class="text-gray-500 text-center fw-semibold fs-6">
+    Not a Member yet?
+
+    <a href="{% url 'account_signup' %}" class="link-primary">
+        Sign up
+    </a>
+</div>
+<!--end::Sign up-->
+{% endblock %}
