@@ -4,7 +4,43 @@
 
 {% block title %}{% translate "Edit Conversation ({{conversation.product.product}} - {{conversation.domain.domain}})" %}{% endblock %}
 
-{% block javascript %}
+{% block content %}
+<h1>Edit Conversation ({{conversation.product.product}} - {{conversation.domain.domain}})</h1>
+
+<ul id="messageList" class="list-group">
+{% for message in messages %}
+    <li data-id="{{message.id}}" class="list-group-item d-flex justify-content-between align-items-start">
+        <i class="bi bi-grip-vertical handle"></i>
+        <!-- <i class="fa-solid fa-lg fa-grip-vertical"></i> -->
+        <div class="ms-2 me-auto">
+            <div class="fw-bold">{{message.prompt}}</div>
+        </div>
+        <form action="{% url 'message_delete' message.id %}" method="post">
+            {% csrf_token %}
+            <button class="btn btn-danger btn-sm rounded-2" type="submit" data-toggle="tooltip" data-placement="top" title="Delete"><i class="bi bi-trash"></i></button>
+        </form>
+      <span class="badge bg-primary rounded-pill">{{message.order}}</span>
+    </li>
+{% endfor %}
+</ul>
+<br>
+<h3>Get responses</h3>
+<form action="{% url 'conversation_get_responses' conversation.id %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Get Responses">
+</form>
+<br>
+<h3>Create new message</h3>
+<form action="{% url 'conversation_edit' conversation.id %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+</form>
+
+
+{% endblock content %}
+
+{% block pagejs %}
 {% csrf_token %}
 <script src="{% static '/ranker/sortable.js' %}"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
@@ -47,40 +83,4 @@
     }
 </script>
 
-{% endblock %}
-
-{% block content %}
-<h1>Edit Conversation ({{conversation.product.product}} - {{conversation.domain.domain}})</h1>
-
-<ul id="messageList" class="list-group">
-{% for message in messages %}
-    <li data-id="{{message.id}}" class="list-group-item d-flex justify-content-between align-items-start">
-        <i class="bi bi-grip-vertical handle"></i>
-        <!-- <i class="fa-solid fa-lg fa-grip-vertical"></i> -->
-        <div class="ms-2 me-auto">
-            <div class="fw-bold">{{message.prompt}}</div>
-        </div>
-        <form action="{% url 'message_delete' message.id %}" method="post">
-            {% csrf_token %}
-            <button class="btn btn-danger btn-sm rounded-2" type="submit" data-toggle="tooltip" data-placement="top" title="Delete"><i class="bi bi-trash"></i></button>
-        </form>
-      <span class="badge bg-primary rounded-pill">{{message.order}}</span>
-    </li>
-{% endfor %}
-</ul>
-<br>
-<h3>Get responses</h3>
-<form action="{% url 'conversation_get_responses' conversation.id %}" method="post">
-    {% csrf_token %}
-    <input type="submit" value="Get Responses">
-</form>
-<br>
-<h3>Create new message</h3>
-<form action="{% url 'conversation_edit' conversation.id %}" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Submit">
-</form>
-
-
-{% endblock %}
+{% endblock pagejs %}

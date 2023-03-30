@@ -4,7 +4,7 @@
     <ul class="pagination justify-content-center">
     {% if items.has_previous %}
         <li class="page-item">
-        <a class="page-link" href="?page={{ items.previous_page_number }}">Previous</a>
+        <a class="page-link" id="prev-page-link" href="?page={{ items.previous_page_number }}">Previous</a>
     </li>
     {% else %}
         <li class="page-item disabled">
@@ -37,7 +37,7 @@
 
     {% if items.has_next %}
         <li class="page-item">
-        <a class="page-link" href="?page={{ items.next_page_number }}">Next</a>
+        <a class="page-link" id="next-page-link" href="?page={{ items.next_page_number }}">Next</a>
     </li>
     {% else %}
         <li class="page-item disabled">
