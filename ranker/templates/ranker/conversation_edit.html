@@ -8,7 +8,7 @@
 <h1>Edit Conversation ({{conversation.product.product}} - {{conversation.domain.domain}})</h1>
 
 <ul id="messageList" class="list-group">
-{% for message in messages %}
+{% for message in chat_messages %}
     <li data-id="{{message.id}}" class="list-group-item d-flex justify-content-between align-items-start">
         <i class="bi bi-grip-vertical handle"></i>
         <!-- <i class="fa-solid fa-lg fa-grip-vertical"></i> -->

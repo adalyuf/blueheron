@@ -7,6 +7,7 @@ from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
 from django.core.management import call_command
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
+from django.contrib import messages as djmessages
 from _keenthemes.__init__ import KTLayout
 from _keenthemes.libs.theme import KTTheme
 
@@ -71,11 +72,11 @@ def keywordfile_make_primary(request, domain_id, keywordfile_id):
 @login_required
 def conversation_detail(request, conversation_id):
     conversation = get_object_or_404(Conversation, pk=conversation_id)
-    messages = conversation.message_set.filter(visible=True).order_by('order')
+    chat_messages = conversation.message_set.filter(visible=True).order_by('order')
     if request.method == 'POST':
         openai.api_key = os.getenv("OPENAI_API_KEY")
         message_array = [{"role": "system", "content": "You are a helpful assistant."}]
-        for message in messages:
+        for message in chat_messages:
             message_array.append({"role": "user", "content": message.prompt})
             o = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
@@ -86,13 +87,14 @@ def conversation_detail(request, conversation_id):
             message_array.append({"role": "assistant", "content": message.response})
             message.formatted_response = html.format_html(markdown.markdown(message.response, extensions=['tables']))
             message.save()
+        djmessages.success(request, "Messages retrieved.")
     
     default_page = 1
     page_number = request.GET.get('page', default_page)
 
     # Paginate items
     items_per_page = 1
-    paginator = Paginator(messages, items_per_page)
+    paginator = Paginator(chat_messages, items_per_page)
 
     try:
         items = paginator.get_page(page_number)
@@ -100,8 +102,7 @@ def conversation_detail(request, conversation_id):
         items = paginator.get_page(default_page)
     except EmptyPage:
         items = paginator.get_page(paginator.num_pages)
-
-    return render(request, 'ranker/conversation_detail.html', {'conversation': conversation, 'messages': messages, 'items': items})
+    return render(request, 'ranker/conversation_detail.html', {'conversation': conversation, 'chat_messages': chat_messages, 'items': items})
 
 @login_required
 def conversation_add(request, product_id, domain_id):
@@ -129,7 +130,7 @@ def conversation_add(request, product_id, domain_id):
 @login_required
 def conversation_edit(request, conversation_id):
     conversation = get_object_or_404(Conversation, pk=conversation_id)
-    messages = conversation.message_set.all().order_by('order')
+    chat_messages = conversation.message_set.all().order_by('order')
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = MessageForm(request.POST)
@@ -139,16 +140,17 @@ def conversation_edit(request, conversation_id):
             message.conversation = conversation
             message.order = 100
             message.save()
+            djmessages.success(request, "Message updated.")
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = MessageForm()
-    return render(request, 'ranker/conversation_edit.html', {'messages': messages, 'conversation': conversation, 'form': form})
+    return render(request, 'ranker/conversation_edit.html', {'chat_messages': chat_messages, 'conversation': conversation, 'form': form})
 
 @login_required
 def conversation_update_order(request, conversation_id):
     conversation = get_object_or_404(Conversation, pk=conversation_id)
-    messages = conversation.message_set.all().order_by('order')
+    chat_messages = conversation.message_set.all().order_by('order')
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -161,16 +163,15 @@ def conversation_update_order(request, conversation_id):
             index += 1
 
     form = MessageForm()
-
-    return render(request, 'ranker/conversation_edit.html', {'conversation': conversation, 'messages': messages, 'form': form})
+    #Note that we are calling these "chat_messages" this is to namespace them from django 'messages' which we also want to use
+    return render(request, 'ranker/conversation_edit.html', {'conversation': conversation, 'chat_messages': chat_messages, 'form': form})
 
 @login_required
 def conversation_get_responses(request, conversation_id):
     conversation = get_object_or_404(Conversation, pk=conversation_id)
-    messages = conversation.message_set.all().order_by('order')
 
     if request.method == 'POST':
-        print(f"We'll get responses in this function.")
+        djmessages.info(request, "Requesting responses.")
         call_command('mpresponses', '--conversation', conversation.id)
 
     return redirect('conversation_detail', conversation_id=conversation.id)
@@ -182,6 +183,7 @@ def message_delete(request, message_id):
 
     if request.method == 'POST':
         message.delete()
+        djmessages.error(request, "Message deleted.")
     
     return redirect('conversation_edit', conversation_id=conversation.id)
 
