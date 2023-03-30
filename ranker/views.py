@@ -5,6 +5,8 @@ from django.core.files.storage import FileSystemStorage
 from django.utils import timezone, html
 from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
 from django.core.management import call_command
+from django.contrib.auth.decorators import login_required
+from django.views.generic import TemplateView
 from _keenthemes.__init__ import KTLayout
 from _keenthemes.libs.theme import KTTheme
 
@@ -20,7 +22,6 @@ import json
 def domain_list(request):
     default_page = 1
     page_number = request.GET.get('page', default_page)
-    KTTheme.addVendor('datatables')
     # Get queryset of items to paginate
     domain_list = Domain.objects.filter(adult_content__exact=False).order_by('rank')
 
@@ -38,6 +39,7 @@ def domain_list(request):
     context = { 'items': items}
     return render(request, 'ranker/domain_list.html', context)
 
+@login_required
 def domain_detail(request, domain_id):
     domain = get_object_or_404(Domain, pk=domain_id)
     keyword_files = domain.keywordfile_set.all()
@@ -54,6 +56,7 @@ def domain_detail(request, domain_id):
         form = KeywordFileForm()
     return render(request, 'ranker/domain_detail.html', {'domain': domain, 'keyword_files': keyword_files, 'form': form, 'notice': notice, 'conversations': conversations, 'products': products})
 
+@login_required
 def keywordfile_make_primary(request, domain_id, keywordfile_id):
     domain = get_object_or_404(Domain, pk=domain_id)
     keywordfile = get_object_or_404(KeywordFile, pk=keywordfile_id)
@@ -65,6 +68,7 @@ def keywordfile_make_primary(request, domain_id, keywordfile_id):
     keywordfile.save()
     return redirect('domain_detail', domain_id=domain_id)
 
+@login_required
 def conversation_detail(request, conversation_id):
     conversation = get_object_or_404(Conversation, pk=conversation_id)
     messages = conversation.message_set.filter(visible=True).order_by('order')
@@ -99,6 +103,7 @@ def conversation_detail(request, conversation_id):
 
     return render(request, 'ranker/conversation_detail.html', {'conversation': conversation, 'messages': messages, 'items': items})
 
+@login_required
 def conversation_add(request, product_id, domain_id):
     product = get_object_or_404(Product, pk=product_id)
     domain = get_object_or_404(Domain, pk=domain_id)
@@ -121,7 +126,7 @@ def conversation_add(request, product_id, domain_id):
         #TODO: Add combined unique requirement on conversation(product, domain) and figure out how to do this better
     return redirect('conversation_edit', conversation_id=conversation.id)
 
-
+@login_required
 def conversation_edit(request, conversation_id):
     conversation = get_object_or_404(Conversation, pk=conversation_id)
     messages = conversation.message_set.all().order_by('order')
@@ -140,6 +145,7 @@ def conversation_edit(request, conversation_id):
         form = MessageForm()
     return render(request, 'ranker/conversation_edit.html', {'messages': messages, 'conversation': conversation, 'form': form})
 
+@login_required
 def conversation_update_order(request, conversation_id):
     conversation = get_object_or_404(Conversation, pk=conversation_id)
     messages = conversation.message_set.all().order_by('order')
@@ -158,6 +164,7 @@ def conversation_update_order(request, conversation_id):
 
     return render(request, 'ranker/conversation_edit.html', {'conversation': conversation, 'messages': messages, 'form': form})
 
+@login_required
 def conversation_get_responses(request, conversation_id):
     conversation = get_object_or_404(Conversation, pk=conversation_id)
     messages = conversation.message_set.all().order_by('order')
@@ -168,7 +175,7 @@ def conversation_get_responses(request, conversation_id):
 
     return redirect('conversation_detail', conversation_id=conversation.id)
 
-
+@login_required
 def message_delete(request, message_id):
     message = get_object_or_404(Message, pk=message_id)
     conversation = message.conversation
@@ -178,8 +185,7 @@ def message_delete(request, message_id):
     
     return redirect('conversation_edit', conversation_id=conversation.id)
 
-
-
+@login_required
 def product_list(request):
     products = Product.objects.all()
     if request.method == 'POST':
@@ -190,6 +196,7 @@ def product_list(request):
         form = ProductForm
     return render(request, 'ranker/product_list.html', {'products': products, 'form': form})
 
+@login_required
 def product_detail(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     product_templates = product.producttemplate_set.all().order_by('order')
@@ -210,6 +217,7 @@ def product_detail(request, product_id):
 
     return render(request, 'ranker/product_detail.html', {'product':product, 'product_templates':product_templates, 'form': form})
 
+@login_required
 def product_template_order(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     product_templates = product.producttemplate_set.all().order_by('order')
@@ -227,6 +235,7 @@ def product_template_order(request, product_id):
 
     return render(request, 'ranker/product_detail.html', {'product':product, 'product_templates':product_templates, 'form': form})
 
+@login_required
 def product_template_delete(request, producttemplate_id):
     product_template = get_object_or_404(ProductTemplate, pk=producttemplate_id)
     product = product_template.product
@@ -235,3 +244,33 @@ def product_template_delete(request, producttemplate_id):
         product_template.delete()
     
     return redirect('product_detail', product_id=product.id)
+
+class DashboardsView(TemplateView):
+    # Default template file
+    # Refer to dashboards/urls.py file for more pages and template files
+    template_name = 'pages/dashboards/index.html'
+
+
+    # Predefined function
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+
+        """
+        # Example to get page name. Refer to dashboards/urls.py file.
+        url_name = resolve(self.request.path_info).url_name
+
+        if url_name == 'dashboard-2':
+            # Example to override settings at the runtime
+            settings.KT_THEME_DIRECTION = 'rtl'
+        else:
+            settings.KT_THEME_DIRECTION = 'ltr'
+        """
+
+        # A function to init the global layout. It is defined in _keenthemes/__init__.py file
+        context = KTLayout.init(context)
+
+        # Include vendors and javascript files for dashboard widgets
+        KTTheme.addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock'])
+
+        return context
