@@ -1,13 +1,17 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.utils import timezone, html
-from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
+from django.core.paginator import (Paginator, EmptyPage, PageNotAnInteger,)
 from django.core.management import call_command
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView
+from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView, FormView
+from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages as djmessages
+from django.views import generic, View
+from django.urls import reverse
 from _keenthemes.__init__ import KTLayout
 from _keenthemes.libs.theme import KTTheme
 
@@ -20,25 +24,17 @@ import openai
 import markdown
 import json
 
-def domain_list(request):
-    default_page = 1
-    page_number = request.GET.get('page', default_page)
-    # Get queryset of items to paginate
-    domain_list = Domain.objects.filter(adult_content__exact=False).order_by('rank')
+class DomainListView(generic.ListView):
+    model = Domain
+    queryset = Domain.objects.filter(adult_content__exact=False).order_by('rank')
+    paginate_by = 100
 
-    # Paginate items
-    items_per_page = 100
-    paginator = Paginator(domain_list, items_per_page)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context = KTLayout.init(context) # A function to init the global layout. It is defined in _keenthemes/__init__.py file
+        KTTheme.addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']) # Include vendors and javascript files for dashboard widgets
+        return context
 
-    try:
-        items = paginator.get_page(page_number)
-    except PageNotAnInteger:
-        items = paginator.get_page(default_page)
-    except EmptyPage:
-        items = paginator.get_page(paginator.num_pages)
-
-    context = { 'items': items}
-    return render(request, 'ranker/domain_list.html', context)
 
 @login_required
 def domain_detail(request, domain_id):
@@ -73,21 +69,6 @@ def keywordfile_make_primary(request, domain_id, keywordfile_id):
 def conversation_detail(request, conversation_id):
     conversation = get_object_or_404(Conversation, pk=conversation_id)
     chat_messages = conversation.message_set.filter(visible=True).order_by('order')
-    if request.method == 'POST':
-        openai.api_key = os.getenv("OPENAI_API_KEY")
-        message_array = [{"role": "system", "content": "You are a helpful assistant."}]
-        for message in chat_messages:
-            message_array.append({"role": "user", "content": message.prompt})
-            o = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=message_array,
-                temperature=0.6,
-            )
-            message.response = o['choices'][0]['message']['content']
-            message_array.append({"role": "assistant", "content": message.response})
-            message.formatted_response = html.format_html(markdown.markdown(message.response, extensions=['tables']))
-            message.save()
-        djmessages.success(request, "Messages retrieved.")
     
     default_page = 1
     page_number = request.GET.get('page', default_page)
@@ -97,12 +78,12 @@ def conversation_detail(request, conversation_id):
     paginator = Paginator(chat_messages, items_per_page)
 
     try:
-        items = paginator.get_page(page_number)
+        page_obj = paginator.get_page(page_number)
     except PageNotAnInteger:
-        items = paginator.get_page(default_page)
+        page_obj = paginator.get_page(default_page)
     except EmptyPage:
-        items = paginator.get_page(paginator.num_pages)
-    return render(request, 'ranker/conversation_detail.html', {'conversation': conversation, 'chat_messages': chat_messages, 'items': items})
+        page_obj = paginator.get_page(paginator.num_pages)
+    return render(request, 'ranker/conversation_detail.html', {'conversation': conversation, 'chat_messages': chat_messages, 'page_obj': page_obj})
 
 @login_required
 def conversation_add(request, template_id, domain_id):
@@ -187,37 +168,94 @@ def message_delete(request, message_id):
     
     return redirect('conversation_edit', conversation_id=conversation.id)
 
-@login_required
-def template_list(request):
-    templates = Template.objects.all()
-    if request.method == 'POST':
-        form = TemplateForm(request.POST)
+@method_decorator(login_required, name='dispatch')
+class GetTemplateListView(generic.ListView):
+    model = Template
+
+    def get(self, request, *args, **kwargs):
+        view = TemplateListView.as_view()
+        return view(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        view = TemplateListFormView.as_view()
+        return view(request, *args, **kwargs)
+
+class TemplateListView(generic.ListView):
+    model = Template
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context = KTLayout.init(context) # A function to init the global layout. It is defined in _keenthemes/__init__.py file
+        KTTheme.addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']) # Include vendors and javascript files for dashboard widgets
+        
+        context['form'] = TemplateForm()
+        return context
+
+class TemplateListFormView(SingleObjectMixin, FormView):
+    template_name = 'ranker/template_list.html'
+    form_class = TemplateForm
+    model = Template
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
         if form.is_valid():
             form.save()
-    else:
-        form = TemplateForm
-    return render(request, 'ranker/template_list.html', {'templates': templates, 'form': form})
+        return self.form_valid(form)
 
-@login_required
-def template_detail(request, template_id):
-    template = get_object_or_404(Template, pk=template_id)
-    template_items = template.templateitem_set.all().order_by('order')
+    def get_success_url(self):
+        return reverse('template_list')
 
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = TemplateItemForm(request.POST)
-        # check whether it's valid:
+    # How this generic view works:
+    # Calls the template at .templates/<app>/<model>_list.html (templates/ranker/template_list.html)
+    # Passes the object <model>_list (template_list)
+    # queryset = Template.objects.all()
+    # context = {'context_object_name': queryset}
+
+    # Below are examples of how to override the defaults for generic list views
+    # context_object_name = 'book_list'   # your own name for the list as a template variable
+    # queryset = Book.objects.filter(title__icontains='war')[:5] # Get 5 books containing the title war
+    # template_name = 'books/my_arbitrary_template_name_list.html'  # Specify your own template name/location
+
+
+class GetTemplateView(View):
+
+    def get(self, request, *args, **kwargs):
+        view = TemplateDetailView.as_view()
+        return view(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        view = TemplateDetailFormView.as_view()
+        return view(request, *args, **kwargs)
+
+class TemplateDetailView(generic.DetailView):
+    model = Template
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context = KTLayout.init(context) # A function to init the global layout. It is defined in _keenthemes/__init__.py file
+        KTTheme.addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']) # Include vendors and javascript files for dashboard widgets
+
+        context['form'] = TemplateItemForm()
+        return context
+
+class TemplateDetailFormView(SingleObjectMixin, FormView):
+    template_name = 'ranker/template_detail.html'
+    form_class = TemplateItemForm #We display the template item form
+    model = Template #But look up things by the template class
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        template = self.get_object()
+        form = self.get_form()
         if form.is_valid():
             template_item = form.save(commit=False)
             template_item.template = template
             template_item.order = 100
             template_item.save()
+        return self.form_valid(form)
 
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = TemplateItemForm()
-
-    return render(request, 'ranker/template_detail.html', {'template':template, 'template_items':template_items, 'form': form})
+    def get_success_url(self):
+        return reverse('template_detail', kwargs={'pk': self.object.pk})
 
 @login_required
 def template_item_order(request, template_id):
@@ -248,26 +286,12 @@ def template_item_delete(request, TemplateItem_id):
     return redirect('template_detail', template_id=template.id)
 
 class DashboardsView(TemplateView):
-    # Default template file
-    # Refer to dashboards/urls.py file for more pages and template files
     template_name = 'pages/dashboards/index.html'
-
 
     # Predefined function
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
-
-        """
-        # Example to get page name. Refer to dashboards/urls.py file.
-        url_name = resolve(self.request.path_info).url_name
-
-        if url_name == 'dashboard-2':
-            # Example to override settings at the runtime
-            settings.KT_THEME_DIRECTION = 'rtl'
-        else:
-            settings.KT_THEME_DIRECTION = 'ltr'
-        """
 
         # A function to init the global layout. It is defined in _keenthemes/__init__.py file
         context = KTLayout.init(context)

@@ -8,7 +8,7 @@
 <h1>Templates</h1>
 
 <ul>
-{% for template in templates %}
+{% for template in template_list %}
 
 <li><a href="{% url 'template_detail' template.id %}">{{template.template}}</a></li>
 

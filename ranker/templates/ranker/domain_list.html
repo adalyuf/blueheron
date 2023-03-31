@@ -4,15 +4,13 @@
 
 {% block title %}{% translate "Domain List" %}{% endblock %}
 
-{% block newtitle %}Domains{% endblock newtitle %}
-{% block buttonlabel %}New Button{% endblock buttonlabel %}
 
 {% block content %}
 
 <h1>Domains</h1>
 <p>All domains</p>
 
-{% if items %}
+{% if domain_list %}
     <div class="table-responsive">
         <table id="kt_datatable_zero_configuration" class="table table-row-bordered gy-5">
         <thead>
@@ -30,7 +28,7 @@
             </tr>
         </thead>
         <tbody>
-    {% for domain in items %}
+    {% for domain in domain_list %}
             <tr>
                 <td>{{domain.id}}</td>
                 <td>{{domain.rank}}</td>
