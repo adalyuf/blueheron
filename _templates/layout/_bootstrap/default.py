@@ -16,7 +16,7 @@ class KTBootstrapDefault:
         Below layout function need to included with the particular HTML layout file.
         """
         # 1) Light sidebar layout (default.html)
-        #KTBootstrapDefault.initLightSidebarLayout(context)
+        # KTBootstrapDefault.initLightSidebarLayout(context)
 
         # 2) Dark sidebar layout (default.html)
         KTBootstrapDefault.initDarkSidebarLayout(context)
