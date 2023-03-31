@@ -2,7 +2,7 @@
 
 {% load i18n %}
 
-{% block title %}{% translate "Product Detail - {{product.product}}" %}{% endblock %}
+{% block title %}{% translate "Template Detail - {{template.template}}" %}{% endblock %}
 
 {% block javascript %}
 {% csrf_token %}
@@ -11,7 +11,7 @@
 <script>
     var sortable
     document.addEventListener("DOMContentLoaded", () => {
-        sortable = Sortable.create(document.getElementById('productList'), {
+        sortable = Sortable.create(document.getElementById('templateList'), {
             onEnd: function (evt) {
                 updateOrder();
             },
@@ -49,28 +49,28 @@
 {% endblock %}
 
 {% block content %}
-<h1>Product Detail - {{product.product}}</h1>
+<h1>Template Detail - {{template.template}}</h1>
 
-<ul id="productList" class="list-group">
-{% for product_template in product_templates %}
-    <li data-id="{{product_template.id}}" class="list-group-item d-flex justify-content-between align-items-start">
+<ul id="templateList" class="list-group">
+{% for template_item in template_items %}
+    <li data-id="{{template_item.id}}" class="list-group-item d-flex justify-content-between align-items-start">
         <i class="bi bi-grip-vertical handle"></i>
         <!-- <i class="fa-solid fa-lg fa-grip-vertical"></i> -->
         <div class="ms-2 me-auto">
-            <div class="fw-bold">{{product_template.prompt1}}</div>
+            <div class="fw-bold">{{template_item.prompt1}}</div>
             View more...
         </div>
-        <form action="{% url 'product_template_delete' product_template.id %}" method="post">
+        <form action="{% url 'template_item_delete' template_item.id %}" method="post">
             {% csrf_token %}
             <button class="btn btn-danger btn-sm rounded-2" type="submit" data-toggle="tooltip" data-placement="top" title="Delete"><i class="bi bi-trash"></i></button>
         </form>
-      <span class="badge bg-primary rounded-pill">{{product_template.order}}</span>
+      <span class="badge bg-primary rounded-pill">{{template_item.order}}</span>
     </li>
 {% endfor %}
 </ul>
 <br>
-<h3>Create new product template item</h3>
-<form action="{% url 'product_detail' product.id %}" method="post">
+<h3>Create new template item</h3>
+<form action="{% url 'template_detail' template.id %}" method="post">
     {% csrf_token %}
     {{ form }}
     <input type="submit" value="Submit">

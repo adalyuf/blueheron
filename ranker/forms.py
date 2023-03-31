@@ -1,5 +1,5 @@
 from django import forms
-from .models import KeywordFile, ProductTemplate, Message, Product
+from .models import KeywordFile, TemplateItem, Message, Template
 from django.forms import ModelForm
 
 class KeywordFileForm(forms.ModelForm):
@@ -7,14 +7,14 @@ class KeywordFileForm(forms.ModelForm):
         model = KeywordFile
         fields = ('filepath',)
 
-class ProductForm(ModelForm):
+class TemplateForm(ModelForm):
     class Meta:
-        model = Product
-        fields = ['product', 'scope']
+        model = Template
+        fields = ['template', 'scope']
 
-class ProductTemplateForm(ModelForm):
+class TemplateItemForm(ModelForm):
     class Meta:
-        model = ProductTemplate
+        model = TemplateItem
         fields = ['prompt1', 'token1', 'prompt2']
 
 class MessageForm(ModelForm):

@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone, html
 
-from ranker.models import Domain, TokenType, Token, Product, ProductTemplate, Conversation, Message
+from ranker.models import Domain, TokenType, Token, Template, TemplateItem, Conversation, Message
 
 import os, openai, markdown
 

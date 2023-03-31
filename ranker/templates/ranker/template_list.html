@@ -1,0 +1,25 @@
+{% extends 'layout/default.html' %}
+
+{% load i18n %}
+
+{% block title %}{% translate "Template List" %}{% endblock %}
+
+{% block content %}
+<h1>Templates</h1>
+
+<ul>
+{% for template in templates %}
+
+<li><a href="{% url 'template_detail' template.id %}">{{template.template}}</a></li>
+
+{% endfor %}
+</ul>
+
+<h3>Create new template</h3>
+<form action="{% url 'template_list' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+</form>
+
+{% endblock content %}

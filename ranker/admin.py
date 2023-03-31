@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Domain, KeywordFile, Product, ProductTemplate, Conversation, Message
+from .models import Domain, KeywordFile, Template, TemplateItem, Conversation, Message
 
 @admin.register(Domain)
 class DomainAdmin(admin.ModelAdmin):
@@ -12,19 +12,19 @@ class DomainAdmin(admin.ModelAdmin):
 class KeywordFileAdmin(admin.ModelAdmin):
     list_display = ('domain', 'filepath', 'uploaded_at', 'primary')
 
-class PTInline(admin.TabularInline):
-    model = ProductTemplate
+class TemplateItemInlineAdmin(admin.TabularInline):
+    model = TemplateItem
     extra = 0
 
-@admin.register(Product)
-class ThisDoesntMatter(admin.ModelAdmin):
-    list_display = ('product', 'scope')
-    inlines = [PTInline]
+@admin.register(Template)
+class TemplateAdmin(admin.ModelAdmin):
+    list_display = ('template', 'scope')
+    inlines = [TemplateItemInlineAdmin]
 
-@admin.register(ProductTemplate)
-class PTAdmin(admin.ModelAdmin):
-    list_display = ( 'prompt1', 'token1', 'prompt2', 'title', 'order', 'visible', 'product',)
-    list_filter = ('product',)
+@admin.register(TemplateItem)
+class TemplateItemAdmin(admin.ModelAdmin):
+    list_display = ( 'prompt1', 'token1', 'prompt2', 'title', 'order', 'visible', 'template',)
+    list_filter = ('template',)
 
 class MessageInline(admin.TabularInline):
     model = Message
@@ -32,7 +32,7 @@ class MessageInline(admin.TabularInline):
 
 @admin.register(Conversation)
 class ConversationAdmin(admin.ModelAdmin):
-    list_display = ('product', 'domain', 'requested_at', 'answered_at')
+    list_display = ('template', 'domain', 'requested_at', 'answered_at')
     inlines = [MessageInline]
 
 @admin.register(Message)

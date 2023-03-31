@@ -11,8 +11,8 @@ from django.contrib import messages as djmessages
 from _keenthemes.__init__ import KTLayout
 from _keenthemes.libs.theme import KTTheme
 
-from .models import Domain, KeywordFile, Conversation, Product, ProductTemplate, Message
-from .forms import KeywordFileForm, ProductTemplateForm, MessageForm, ProductForm
+from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message
+from .forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm
 
 import csv
 import os
@@ -45,7 +45,7 @@ def domain_detail(request, domain_id):
     domain = get_object_or_404(Domain, pk=domain_id)
     keyword_files = domain.keywordfile_set.all()
     conversations = domain.conversation_set.all()
-    products = Product.objects.filter(scope__exact='per_domain')
+    templates = Template.objects.filter(scope__exact='per_domain')
     notice = ''
     if request.method == 'POST':
         form = KeywordFileForm(request.POST, request.FILES)
@@ -55,7 +55,7 @@ def domain_detail(request, domain_id):
             notice = "File uploaded successfully."
     else:
         form = KeywordFileForm()
-    return render(request, 'ranker/domain_detail.html', {'domain': domain, 'keyword_files': keyword_files, 'form': form, 'notice': notice, 'conversations': conversations, 'products': products})
+    return render(request, 'ranker/domain_detail.html', {'domain': domain, 'keyword_files': keyword_files, 'form': form, 'notice': notice, 'conversations': conversations, 'templates': templates})
 
 @login_required
 def keywordfile_make_primary(request, domain_id, keywordfile_id):
@@ -105,26 +105,26 @@ def conversation_detail(request, conversation_id):
     return render(request, 'ranker/conversation_detail.html', {'conversation': conversation, 'chat_messages': chat_messages, 'items': items})
 
 @login_required
-def conversation_add(request, product_id, domain_id):
-    product = get_object_or_404(Product, pk=product_id)
+def conversation_add(request, template_id, domain_id):
+    template = get_object_or_404(Template, pk=template_id)
     domain = get_object_or_404(Domain, pk=domain_id)
-    if Conversation.objects.filter(product_id__exact=product.id).filter(domain_id__exact=domain.id).count() == 0:
-        conversation = Conversation(domain=domain, product=product)
+    if Conversation.objects.filter(template_id__exact=template.id).filter(domain_id__exact=domain.id).count() == 0:
+        conversation = Conversation(domain=domain, template=template)
         conversation.save()
-        templates = product.producttemplate_set.all()
-        for template in templates:
+        template_items = template.templateitem_set.all()
+        for template_item in template_items:
             m = Message(
-                prompt = template.prompt1, #TODO: Add logic that uses tokens and concatenates with other parts of prompt
-                title = template.title,
-                visible = template.visible,
-                order = template.order,
+                prompt = template_item.prompt1, #TODO: Add logic that uses tokens and concatenates with other parts of prompt
+                title = template_item.title,
+                visible = template_item.visible,
+                order = template_item.order,
                 conversation = conversation
             )
             m.prompt = m.prompt.replace("@currentDomain", conversation.domain.domain)
             m.save()
     else:
-        conversation = Conversation.objects.filter(product_id__exact=product.id).filter(domain_id__exact=domain.id).first()
-        #TODO: Add combined unique requirement on conversation(product, domain) and figure out how to do this better
+        conversation = Conversation.objects.filter(template_id__exact=template.id).filter(domain_id__exact=domain.id).first()
+        #TODO: Add combined unique requirement on conversation(template, domain) and figure out how to do this better
     return redirect('conversation_edit', conversation_id=conversation.id)
 
 @login_required
@@ -188,64 +188,64 @@ def message_delete(request, message_id):
     return redirect('conversation_edit', conversation_id=conversation.id)
 
 @login_required
-def product_list(request):
-    products = Product.objects.all()
+def template_list(request):
+    templates = Template.objects.all()
     if request.method == 'POST':
-        form = ProductForm(request.POST)
+        form = TemplateForm(request.POST)
         if form.is_valid():
             form.save()
     else:
-        form = ProductForm
-    return render(request, 'ranker/product_list.html', {'products': products, 'form': form})
+        form = TemplateForm
+    return render(request, 'ranker/template_list.html', {'templates': templates, 'form': form})
 
 @login_required
-def product_detail(request, product_id):
-    product = get_object_or_404(Product, pk=product_id)
-    product_templates = product.producttemplate_set.all().order_by('order')
+def template_detail(request, template_id):
+    template = get_object_or_404(Template, pk=template_id)
+    template_items = template.templateitem_set.all().order_by('order')
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = ProductTemplateForm(request.POST)
+        form = TemplateItemForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            template = form.save(commit=False)
-            template.product = product
-            template.order = 100
-            template.save()
+            template_item = form.save(commit=False)
+            template_item.template = template
+            template_item.order = 100
+            template_item.save()
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = ProductTemplateForm()
+        form = TemplateItemForm()
 
-    return render(request, 'ranker/product_detail.html', {'product':product, 'product_templates':product_templates, 'form': form})
+    return render(request, 'ranker/template_detail.html', {'template':template, 'template_items':template_items, 'form': form})
 
 @login_required
-def product_template_order(request, product_id):
-    product = get_object_or_404(Product, pk=product_id)
-    product_templates = product.producttemplate_set.all().order_by('order')
+def template_item_order(request, template_id):
+    template = get_object_or_404(Template, pk=template_id)
+    template_items = template.templateitem_set.all().order_by('order')
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        product_template_ids = json.loads(request.body) 
+        template_item_ids = json.loads(request.body) 
         index = 0
-        while index < len(product_template_ids):
-            pt = get_object_or_404(ProductTemplate, pk=int(product_template_ids[index]))
+        while index < len(template_item_ids):
+            pt = get_object_or_404(TemplateItem, pk=int(template_item_ids[index]))
             pt.order = index
             pt.save()
             index += 1
-    form = ProductTemplateForm()
+    form = TemplateItemForm()
 
-    return render(request, 'ranker/product_detail.html', {'product':product, 'product_templates':product_templates, 'form': form})
+    return render(request, 'ranker/template_detail.html', {'template':template, 'template_items':template_items, 'form': form})
 
 @login_required
-def product_template_delete(request, producttemplate_id):
-    product_template = get_object_or_404(ProductTemplate, pk=producttemplate_id)
-    product = product_template.product
+def template_item_delete(request, TemplateItem_id):
+    template_item = get_object_or_404(TemplateItem, pk=TemplateItem_id)
+    template = template_item.template
 
     if request.method == 'POST':
-        product_template.delete()
+        template_item.delete()
     
-    return redirect('product_detail', product_id=product.id)
+    return redirect('template_detail', template_id=template.id)
 
 class DashboardsView(TemplateView):
     # Default template file

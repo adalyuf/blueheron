@@ -2,10 +2,10 @@
 
 {% load i18n %}
 
-{% block title %}{% translate "Edit Conversation ({{conversation.product.product}} - {{conversation.domain.domain}})" %}{% endblock %}
+{% block title %}{% translate "Edit Conversation ({{conversation.template.template}} - {{conversation.domain.domain}})" %}{% endblock %}
 
 {% block content %}
-<h1>Edit Conversation ({{conversation.product.product}} - {{conversation.domain.domain}})</h1>
+<h1>Edit Conversation ({{conversation.template.template}} - {{conversation.domain.domain}})</h1>
 
 <ul id="messageList" class="list-group">
 {% for message in chat_messages %}

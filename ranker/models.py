@@ -46,41 +46,41 @@ class Token(models.Model):
     def __str__(self):
         return self.value
 
-class Product(models.Model):
+class Template(models.Model):
     scope_choices = [
         ('global', 'global'),
         ('per_domain', 'per_domain')
     ]
-    product = models.CharField(max_length=200, unique=True)
+    template = models.CharField(max_length=200, unique=True)
     scope = models.CharField(max_length=200,choices=scope_choices, default='per_domain')
     def __str__(self):
-        return self.product
+        return self.template
 
-class ProductTemplate(models.Model):
+class TemplateItem(models.Model):
     prompt1 = models.TextField()
     token1 = models.ForeignKey(TokenType, on_delete=models.SET_NULL, null=True, blank=True)
     prompt2 = models.CharField(max_length=200, null=True, blank=True)
     title = models.CharField(max_length=200, null=True, blank=True)
     order = models.IntegerField(default=100)
     visible = models.BooleanField(default=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    template = models.ForeignKey(Template, on_delete=models.CASCADE)
     def __str__(self):
         return self.prompt1
     
     class Meta:
-        ordering = ['product', 'order']
+        ordering = ['template', 'order']
 
 class Conversation(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    template = models.ForeignKey(Template, on_delete=models.CASCADE)
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, null=True)
     requested_at = models.DateTimeField(null=True)
     answered_at = models.DateTimeField(null=True)
     class Meta:
         constraints = [ #Apparently SQLLite doesn't support unique constraints on anything other than primary key columns. So... this won't be enforced
-            UniqueConstraint(name='unique_product_domain', fields=['product', 'domain'], include=['answered_at']),
+            UniqueConstraint(name='unique_template_domain', fields=['template', 'domain'], include=['answered_at']),
         ]
     def __str__(self):
-        return f"{self.product.product}: {self.domain.domain}"
+        return f"{self.template.template}: {self.domain.domain}"
 
 
 class Message(models.Model):
