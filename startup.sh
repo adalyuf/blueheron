@@ -1,6 +1,7 @@
 #!/bin/bash
 # JS/CSS Asset build
 cd _keenthemes/tools/
+. /usr/local/share/nvm/nvm.sh
 nvm install 18
 nvm use 18
 npm install
