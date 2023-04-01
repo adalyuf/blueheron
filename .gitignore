@@ -33,7 +33,7 @@ $RECYCLE.BIN/
 .history/
 *.code-workspace
 
-static
+/static/
 node_modules
 yarn.lock
 _keenthemes/src/*
