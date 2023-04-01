@@ -35,4 +35,5 @@ $RECYCLE.BIN/
 
 /static/
 _keenthemes/tools/node_modules
-yarn.lock
+_keenthemes/tools/yarn.lock
+_keenthemes/tools/package-lock.json

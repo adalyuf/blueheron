@@ -1,4 +1,13 @@
 #!/bin/bash
+# JS/CSS Asset build
+cd _keenthemes/tools/
+nvm install 18
+nvm use 18
+npm install
+npm run build
+cd ../..
+mv assets static
+#Python setup
 pip install -r requirements.txt
 python manage.py makemigrations
 python manage.py migrate accounts #run first to ensure installation of postgres extension and creating unique index on email
