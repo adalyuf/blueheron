@@ -14,9 +14,10 @@ code .
 Ask the author for the .env file with secrets and add this into the main (blueheron) directory.
 
 The .env file has the following:
-OPENAI_API_KEY=
-DJANGO_SECRET_KEY=
-USE_NGROK=True
+
+- OPENAI_API_KEY=
+- DJANGO_SECRET_KEY=
+- USE_NGROK=True
 
 In VSCode press `F1` and `Rebuild and reopen in container`
 
