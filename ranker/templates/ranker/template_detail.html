@@ -2,9 +2,14 @@
 
 {% load i18n %}
 
-{% block title %}{% translate "Template Detail - {{template.template}}" %}{% endblock %}
+{% block   title %}{% blocktranslate with template=template.template %}Template Detail - {{template}}{% endblocktranslate %}{% endblock %}
+{% block bctitle %}{% blocktranslate with template=template.template %}Template Detail - {{template}}{% endblocktranslate %}{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'template_list' %}" class="text-muted text-hover-primary">Templates</a></li>
+{% endblock breadcrumbs %}
 
-{% block javascript %}
+{% block pagejs %}
 {% csrf_token %}
 <script src="{% static '/ranker/sortable.js' %}"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
@@ -46,7 +51,7 @@
     }
 </script>
 
-{% endblock %}
+{% endblock pagejs %}
 
 {% block content %}
 <h1>Template Detail - {{template.template}}</h1>

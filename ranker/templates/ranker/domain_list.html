@@ -2,13 +2,14 @@
 
 {% load i18n %}
 
-{% block title %}{% translate "Domain List" %}{% endblock %}
-
+{% block   title %}{% blocktranslate with template=template.template %}Domains{% endblocktranslate %}{% endblock %}
+{% block bctitle %}{% blocktranslate with template=template.template %}Domains{% endblocktranslate %}{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'domain_list' %}" class="text-muted text-hover-primary">Domains</a></li>
+{% endblock breadcrumbs %}
 
 {% block content %}
-
-<h1>Domains</h1>
-<p>All domains</p>
 
 {% if domain_list %}
     <div class="table-responsive">

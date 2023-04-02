@@ -2,7 +2,12 @@
 
 {% load i18n %}
 
-{% block title %}{% translate "Template List" %}{% endblock %}
+{% block title %}{% translate "Templates" %}{% endblock %}
+{% block bctitle %}{% translate "Templates" %}{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'template_list' %}" class="text-muted text-hover-primary">Templates</a></li>
+{% endblock breadcrumbs %}
 
 {% block content %}
 <h1>Templates</h1>

@@ -2,7 +2,14 @@
 
 {% load i18n %}
 
-{% block title %}{% translate "Edit Conversation ({{conversation.template.template}} - {{conversation.domain.domain}})" %}{% endblock %}
+{% block   title %}{% blocktranslate with template=conversation.template.template domain=conversation.domain.domain %}Edit Conversation ({{template}} - {{domain}}){% endblocktranslate %}{% endblock %}
+{% block bctitle %}{% blocktranslate with template=conversation.template.template domain=conversation.domain.domain %}Edit Conversation ({{template}} - {{domain}}){% endblocktranslate %}{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'domain_list' %}" class="text-muted text-hover-primary">Domains</a></li>
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'domain_detail' conversation.domain.id %}" class="text-muted text-hover-primary">{{conversation.domain.domain}}</a></li>
+{% endblock breadcrumbs %}
 
 {% block content %}
 <h1>Edit Conversation ({{conversation.template.template}} - {{conversation.domain.domain}})</h1>
