@@ -1,0 +1,32 @@
+{% extends 'layout/default.html' %}
+
+{% load i18n %}
+
+{% block title %}{% translate "My Projects" %}{% endblock %}
+{% block bctitle %}{% translate "My Projects" %}{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'project_list' %}" class="text-muted text-hover-primary">My Projects</a></li>
+{% endblock breadcrumbs %}
+
+{% block content %}
+<h1>My Projects</h1>
+
+<ul>
+{% for project in project_list %}
+
+<li>
+    <a href="{% url 'project_detail' project.id %}">{{project.project}}</a>
+      (
+    <a href="{% url 'project_update' project.id %}" class="text-muted text-hover-primary">edit</a> - 
+    <a href="{% url 'project_delete' project.id %}" class="text-muted text-hover-danger">delete</a>
+      )
+</li>
+
+{% endfor %}
+</ul>
+
+<a href="{% url 'project_create' %}">Create new project</a>
+
+
+{% endblock content %}

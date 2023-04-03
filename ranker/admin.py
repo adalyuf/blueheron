@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Domain, KeywordFile, Template, TemplateItem, Conversation, Message
+from .models import Domain, KeywordFile, Template, TemplateItem, Conversation, Message, AIModel, Project, ProjectUser, ProjectDomain
 
 @admin.register(Domain)
 class DomainAdmin(admin.ModelAdmin):
@@ -18,7 +18,7 @@ class TemplateItemInlineAdmin(admin.TabularInline):
 
 @admin.register(Template)
 class TemplateAdmin(admin.ModelAdmin):
-    list_display = ('template', 'scope')
+    list_display = ('template', 'scope', 'project')
     inlines = [TemplateItemInlineAdmin]
 
 @admin.register(TemplateItem)
@@ -32,9 +32,25 @@ class MessageInline(admin.TabularInline):
 
 @admin.register(Conversation)
 class ConversationAdmin(admin.ModelAdmin):
-    list_display = ('template', 'domain', 'requested_at', 'answered_at')
+    list_display = ('template', 'domain', 'requested_at', 'answered_at', 'ai_model')
     inlines = [MessageInline]
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
     list_display = ( 'prompt', 'title', 'visible', 'order', 'answered_at', 'conversation')
+
+@admin.register(AIModel)
+class AIModelAdmin(admin.ModelAdmin):
+    list_display = ('ai_model', 'api_identifier')
+
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ('project', 'requests_used')
+
+@admin.register(ProjectUser)
+class ProjectUserAdmin(admin.ModelAdmin):
+    list_display = ('project', 'user')
+
+@admin.register(ProjectDomain)
+class ProjectDomainAdmin(admin.ModelAdmin):
+    list_display = ('project', 'domain')

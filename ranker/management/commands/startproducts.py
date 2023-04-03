@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
-from ranker.models import Template, TemplateItem
+from ranker.models import Template, TemplateItem, AIModel
 
 class Command(BaseCommand):
     help = "Initialize a few templates and templates when a fresh environment launches"
@@ -13,6 +13,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         #handle is a special method that the django manage command will run, with the args and options provided
+
+        ai_model = AIModel(
+            ai_model = "ChatGPT 3.5",
+            api_identifier = "gpt-3.5-turbo"
+        )
+        ai_model.save()
 
         if Template.objects.count() > 0:
             self.stderr.write(f"There are already {Template.objects.count()} templates in the database. Skipping creation.")

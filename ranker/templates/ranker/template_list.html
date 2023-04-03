@@ -15,13 +15,20 @@
 <ul>
 {% for template in template_list %}
 
-<li><a href="{% url 'template_detail' template.id %}">{{template.template}}</a></li>
-
+<li>
+    <form action="{% url 'template_delete' template.id %}" method="post" class="form-inline">
+        {% csrf_token %}
+        <a href="{% url 'template_detail' template.id %}">{{template.template}}</a>
+        ( 
+            <input type="submit" value="delete" class="btn btn-link text-muted text-hover-danger fs-8">
+        )
+    </form>
+</li>
 {% endfor %}
 </ul>
 
 <h3>Create new template</h3>
-<form action="{% url 'template_list' %}" method="post">
+<form action="{% url 'template_create' %}" method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Submit">

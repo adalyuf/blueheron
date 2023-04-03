@@ -10,6 +10,10 @@
 {% endblock breadcrumbs %}
 
 {% block content %}
+<form class="d-flex justify-content-center" role="search" method="get" action="{% url 'domain_search' %}"">
+    <input name="user_search" class="form-control me-2" style="max-width: 600px;" type="search" placeholder="Search by domain" aria-label="Search">
+    <button class="btn btn-outline-success" type="submit">Search</button>
+</form>
 
 {% if domain_list %}
     <div class="table-responsive">

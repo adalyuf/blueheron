@@ -1,5 +1,5 @@
 from django import forms
-from .models import KeywordFile, TemplateItem, Message, Template
+from .models import KeywordFile, TemplateItem, Message, Template, Project, Domain
 from django.forms import ModelForm
 
 class KeywordFileForm(forms.ModelForm):
@@ -21,3 +21,13 @@ class MessageForm(ModelForm):
     class Meta:
         model = Message
         fields = ['prompt']
+
+class ProjectForm(ModelForm):
+    class Meta:
+        model = Project
+        fields = ['project']
+
+class AddDomainToProjectForm(ModelForm):
+    class Meta:
+        model = Domain
+        fields = ['domain']

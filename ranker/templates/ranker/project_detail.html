@@ -1,0 +1,79 @@
+{% extends 'layout/default.html' %}
+
+{% load i18n %}
+
+{% block title %}{% translate "Project Detail" %}{% endblock %}
+{% block bctitle %}{% translate "Project Detail" %}{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'project_list' %}" class="text-muted text-hover-primary">Project Detail</a></li>
+{% endblock breadcrumbs %}
+
+{% block content %}
+<h1>Project Detail</h1>
+
+{{project}}
+
+{% if project_template_list %}
+<h2>Project Templates</h2>
+    <ul>
+    {% for project_template in project_template_list %}
+    <li>
+        <form action="{% url 'template_delete' project_template.id %}" method="post" class="form-inline">
+            {% csrf_token %}
+            <a href="{% url 'template_detail' project_template.id %}">{{project_template.template}}</a>
+            ( 
+                <input type="submit" value="delete" class="btn btn-link text-muted text-hover-danger fs-8">
+            )
+        </form>
+    </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+<h3>Create new template</h3>
+<form action="{% url 'template_create' project.id  %}" method="post">
+    {% csrf_token %}
+    {{ template_form.as_p }}
+    <input type="submit" value="Submit">
+</form>
+
+{% if global_template_list %}
+<h2>Global Templates</h2>
+    <ul>
+    {% for global_template in global_template_list %}
+        <li><a href="#">{{global_template.template}}</a>
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{% if project_domain_list %}
+<h2>Project Domains</h2>
+<ul>
+    {% for domain in project_domain_list %}
+    <form action="{% url 'project_remove_domain' project.id %}" method="post" class="form-inline">
+        {% csrf_token %}
+        {{domain.domain}}
+        (   <input name="domain" type="hidden" value="{{domain.id}}">
+            <input type="submit" value="delete" class="btn btn-link text-muted text-hover-danger fs-8">
+        )
+    </form>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<h3>Add domain to project</h3>
+<form action="{% url 'project_add_domain' project.id  %}" method="post">
+    {% csrf_token %}
+    <select name="domain" class="form-select" data-control="select2" data-placeholder="Select an option">
+        {% if global_domain_list %}
+            {% for domain in global_domain_list %}
+                <option value="{{domain.id}}">{{domain.domain}}</option>
+            {% endfor %}
+        {% endif %}
+    </select>
+    <input type="submit" value="Add domain">
+</form>
+
+{% endblock content %}

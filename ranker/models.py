@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils import timezone
+from django.urls import reverse
 from django.db.models import UniqueConstraint
-
+from accounts.models import User 
 # Create your models here.
 
 class Domain(models.Model):
@@ -46,6 +47,43 @@ class Token(models.Model):
     def __str__(self):
         return self.value
 
+class AIModel(models.Model):
+    ai_model = models.CharField(max_length=200)
+    api_identifier = models.CharField(max_length=200, null=True)
+    def __str__(self):
+        return self.ai_model 
+
+class Project(models.Model):
+    project = models.CharField(max_length=200)
+    requests_used = models.IntegerField(default=0)
+    user = models.ManyToManyField(
+        User,
+        through='ProjectUser',
+        through_fields=('project', 'user'),
+    )
+    domain = models.ManyToManyField(
+        Domain,
+        through='ProjectDomain',
+        through_fields=('project', 'domain'),
+    )
+    def __str__(self):
+        return self.project
+    def get_absolute_url(self):
+        """Returns the URL to access a particular instance of the model."""
+        return reverse('project_detail', args=[str(self.id)])
+
+class ProjectUser(models.Model):
+    project = models.ForeignKey(Project , on_delete=models.CASCADE)
+    user    = models.ForeignKey(User    , on_delete=models.CASCADE)
+    def __str__(self):
+        return f"{self.project}: {self.user}"
+    
+class ProjectDomain(models.Model):
+    project = models.ForeignKey(Project , on_delete=models.CASCADE)
+    domain  = models.ForeignKey(Domain  , on_delete=models.CASCADE)
+    def __str__(self):
+        return f"{self.project}: {self.domain}"
+    
 class Template(models.Model):
     scope_choices = [
         ('global', 'global'),
@@ -53,6 +91,9 @@ class Template(models.Model):
     ]
     template = models.CharField(max_length=200, unique=True)
     scope = models.CharField(max_length=200,choices=scope_choices, default='per_domain')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    helper_text_before = models.TextField(null=True)
+    helper_text_after = models.TextField(null=True)
     def __str__(self):
         return self.template
 
@@ -73,6 +114,7 @@ class TemplateItem(models.Model):
 class Conversation(models.Model):
     template = models.ForeignKey(Template, on_delete=models.CASCADE)
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, null=True)
+    ai_model = models.ForeignKey(AIModel, on_delete=models.CASCADE)
     requested_at = models.DateTimeField(null=True)
     answered_at = models.DateTimeField(null=True)
     class Meta:
