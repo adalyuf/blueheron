@@ -17,7 +17,7 @@ from _keenthemes.__init__ import KTLayout
 from _keenthemes.libs.theme import KTTheme
 
 from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel
-from .forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm, AddDomainToProjectForm
+from .forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm, AddDomainToProjectForm, CreateConversationsForm
 
 import csv
 import os
@@ -49,7 +49,27 @@ def template_create(request, project_id=None):
             return redirect('template_detail', template.id)
     return redirect('template_list')
 
-
+def template_create_conversations(request):
+    if request.method == 'POST':
+        template = get_object_or_404(Template, id = request.session.get('template'))
+        project = get_object_or_404(Project, id = request.session.get('project') )
+        ai_model = get_object_or_404(AIModel, id = request.POST['ai_model'])
+        domains = project.domain.all()
+        for domain in domains:
+            conversation = Conversation(domain=domain, template=template, ai_model=ai_model, project=project)
+            conversation.save()
+            template_items = template.templateitem_set.all()
+            for template_item in template_items:
+                m = Message(
+                    prompt = template_item.prompt1, #TODO: Add logic that uses tokens and concatenates with other parts of prompt
+                    title = template_item.title,
+                    visible = template_item.visible,
+                    order = template_item.order,
+                    conversation = conversation
+                )
+                m.prompt = m.prompt.replace("@currentDomain", conversation.domain.domain)
+                m.save()
+    return redirect('project_detail', project.id)    
 
     # How this generic view works:
     # Calls the template at .templates/<app>/<model>_list.html (templates/ranker/template_list.html)
@@ -79,8 +99,17 @@ class TemplateDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context = KTLayout.init(context) # A function to init the global layout. It is defined in _keenthemes/__init__.py file
-        KTTheme.addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']) # Include vendors and javascript files for dashboard widgets
-
+        template = self.get_object()
+        context['ai_model_list'] = AIModel.objects.all()
+        if template.project:
+            self.request.session['template'] = template.id
+            self.request.session['project'] = template.project.id
+            domain_array = []
+            domains = template.project.domain.all()
+            for domain in domains:
+                domain_array.append(domain.id)
+            self.request.session['domains'] = domain_array
+            context['create_conversations_form'] = CreateConversationsForm()
         context['form'] = TemplateItemForm()
         return context
 

@@ -114,11 +114,12 @@ class TemplateItem(models.Model):
 class Conversation(models.Model):
     template = models.ForeignKey(Template, on_delete=models.CASCADE)
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
     ai_model = models.ForeignKey(AIModel, on_delete=models.CASCADE)
     requested_at = models.DateTimeField(null=True)
     answered_at = models.DateTimeField(null=True)
     class Meta:
-        constraints = [ #Apparently SQLLite doesn't support unique constraints on anything other than primary key columns. So... this won't be enforced
+        constraints = [ 
             UniqueConstraint(name='unique_template_domain', fields=['template', 'domain'], include=['answered_at']),
         ]
     def __str__(self):

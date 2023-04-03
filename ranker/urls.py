@@ -26,6 +26,7 @@ urlpatterns = [
     path("templates/"                                   , views.TemplateListView.as_view()   , name="template_list"),
     path("templates/create/"                            , views.template_create                 , name="template_create"),
     path("templates/create/<int:project_id>/"           , views.template_create                 , name="template_create"),
+    path("templates/create_conversations/"              , views.template_create_conversations   , name="template_create_conversations"),
     path("templates/<int:pk>/"                          , views.GetTemplateView.as_view()       , name="template_detail"),
     path("templates/delete/<int:template_id>/"          , views.template_delete                 , name="template_delete"),
     path("templates/<int:template_id>/update_order/"    , views.template_item_order             , name="template_item_order"),

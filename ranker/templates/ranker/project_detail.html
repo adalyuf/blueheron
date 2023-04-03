@@ -14,6 +14,20 @@
 
 {{project}}
 
+{% if conversation_list %}
+<h2>Project Conversations</h2>
+    <ul>
+    {% for conversation in conversation_list %}
+        <li><ul class="list-inline">
+            <li class="list-inline-item">{{conversation}}</li>
+            <li class="list-inline-item"><a href="{% url 'conversation_detail' conversation.id %}">View Conversation</a></li>
+            <li class="list-inline-item"><a href="{% url 'conversation_edit' conversation.id %}">Edit Conversation</a></li>
+            <li class="list-inline-item"><a href="{% url 'conversation_get_responses' conversation.id %}">Get Responses</a></li>
+        </ul></li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
 {% if project_template_list %}
 <h2>Project Templates</h2>
     <ul>

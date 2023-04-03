@@ -41,6 +41,7 @@ def project_detail(request, project_id):
     global_domain_list = Domain.objects.all()
     template_form = TemplateForm()
     domain_form = AddDomainToProjectForm()
+    conversation_list = Conversation.objects.filter(project=project)
     context = {}
     context['project'] = project
     context['global_template_list'] = global_template_list
@@ -49,6 +50,7 @@ def project_detail(request, project_id):
     context['global_domain_list'] = global_domain_list
     context['template_form'] = template_form
     context['domain_form'] = domain_form
+    context['conversation_list'] = conversation_list
     return render(request, 'ranker/project_detail.html', context)
 
 def project_add_domain(request, project_id):
