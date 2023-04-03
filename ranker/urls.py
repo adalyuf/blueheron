@@ -2,6 +2,7 @@ from django.urls import path
 from ranker import views
 from ranker.domains import views as domain_views
 from ranker.conversations import views as conv_views
+from ranker.projects import views as project_views
 
 urlpatterns = [
     path("", domain_views.DomainListView.as_view(), name="home"),
@@ -30,12 +31,12 @@ urlpatterns = [
     path("templates/<int:template_id>/update_order/"    , views.template_item_order             , name="template_item_order"),
     path("template_items/delete/<int:TemplateItem_id>/" , views.template_item_delete            , name="template_item_delete"),
 
-    path("projects/"                                    , views.ProjectListView.as_view()       , name="project_list"),
-    path("projects/<int:project_id>/"                   , views.project_detail                  , name="project_detail"),
-    path("projects/<int:project_id>/add_domain/"        , views.project_add_domain              , name="project_add_domain"),
-    path("projects/<int:project_id>/remove_domain/"     , views.project_remove_domain           , name="project_remove_domain"),
-    path('projects/create/'                             , views.ProjectCreate.as_view()         , name='project_create'),
-    path('projects/<int:pk>/update/'                    , views.ProjectUpdate.as_view()         , name='project_update'),
-    path('projects/<int:pk>/delete/'                    , views.ProjectDelete.as_view()         , name='project_delete'),
+    path("projects/"                                    , project_views.ProjectListView.as_view()       , name="project_list"),
+    path("projects/<int:project_id>/"                   , project_views.project_detail                  , name="project_detail"),
+    path("projects/<int:project_id>/add_domain/"        , project_views.project_add_domain              , name="project_add_domain"),
+    path("projects/<int:project_id>/remove_domain/"     , project_views.project_remove_domain           , name="project_remove_domain"),
+    path('projects/create/'                             , project_views.ProjectCreate.as_view()         , name='project_create'),
+    path('projects/<int:pk>/update/'                    , project_views.ProjectUpdate.as_view()         , name='project_update'),
+    path('projects/<int:pk>/delete/'                    , project_views.ProjectDelete.as_view()         , name='project_delete'),
 
 ]
