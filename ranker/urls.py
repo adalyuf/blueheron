@@ -16,7 +16,7 @@ urlpatterns = [
     path('keywordfile_make_primary/<int:domain_id>/<int:keywordfile_id>/', domain_views.keywordfile_make_primary, name='keywordfile_make_primary'),
 
     path('conversations/<int:conversation_id>/'                     , conv_views.conversation_detail                 , name='conversation_detail'),
-    path('conversations/add/<int:template_id>/<int:domain_id>/'     , conv_views.conversation_add                    , name='conversation_add'),
+    path('conversations/add/<int:template_id>/<int:domain_id>/<int:ai_model_id>/', conv_views.conversation_add       , name='conversation_add'),
     path('conversations/edit/<int:conversation_id>/'                , conv_views.conversation_edit                   , name='conversation_edit'),
     path('conversations/edit/<int:conversation_id>/update_order/'   , conv_views.conversation_update_order           , name='conversation_update_order'),
     path('conversations/edit/<int:conversation_id>/get_responses/'  , conv_views.conversation_get_responses          , name='conversation_get_responses'),

@@ -50,6 +50,7 @@ def domain_detail(request, domain_id):
     domain = get_object_or_404(Domain, pk=domain_id)
     keyword_files = domain.keywordfile_set.all()
     conversations = domain.conversation_set.all()
+    ai_models = AIModel.objects.all()
     templates = Template.objects.filter(scope__exact='per_domain').filter(project__isnull=True)
     notice = ''
     if request.method == 'POST':
@@ -60,7 +61,7 @@ def domain_detail(request, domain_id):
             notice = "File uploaded successfully."
     else:
         form = KeywordFileForm()
-    return render(request, 'ranker/domain_detail.html', {'domain': domain, 'keyword_files': keyword_files, 'form': form, 'notice': notice, 'conversations': conversations, 'templates': templates})
+    return render(request, 'ranker/domain_detail.html', {'domain': domain, 'keyword_files': keyword_files, 'form': form, 'notice': notice, 'conversations': conversations, 'templates': templates, 'ai_models': ai_models })
 
 @login_required
 def keywordfile_make_primary(request, domain_id, keywordfile_id):

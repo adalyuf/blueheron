@@ -45,7 +45,11 @@
 <h2>Templates</h2>
     <ul>
     {% for template in templates %}
-        <li><a href="{% url 'conversation_add' template.id domain.id %}">{{template.template}}</a>
+        <li>{{template.template}}: Create conversation with ( 
+            {% for ai_model in ai_models %}
+            <a href="{% url 'conversation_add' template.id domain.id ai_model.id %}">{{ai_model}}</a>
+            {% endfor %}
+        )
         </li>
     {% endfor %}
     </ul>

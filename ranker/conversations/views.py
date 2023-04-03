@@ -47,11 +47,12 @@ def conversation_detail(request, conversation_id):
     return render(request, 'ranker/conversation_detail.html', {'conversation': conversation, 'chat_messages': chat_messages, 'page_obj': page_obj})
 
 @login_required
-def conversation_add(request, template_id, domain_id):
+def conversation_add(request, template_id, domain_id, ai_model_id):
     template = get_object_or_404(Template, pk=template_id)
     domain = get_object_or_404(Domain, pk=domain_id)
-    if Conversation.objects.filter(template_id__exact=template.id).filter(domain_id__exact=domain.id).count() == 0:
-        conversation = Conversation(domain=domain, template=template)
+    ai_model = get_object_or_404(AIModel, pk=ai_model_id)
+    if Conversation.objects.filter(template_id__exact=template.id).filter(domain_id__exact=domain.id).filter(ai_model_id__exact=ai_model.id).count() == 0:
+        conversation = Conversation(domain=domain, template=template, ai_model=ai_model)
         conversation.save()
         template_items = template.templateitem_set.all()
         for template_item in template_items:
