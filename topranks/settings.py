@@ -146,6 +146,10 @@ AUTHENTICATION_BACKENDS = (
 #django-allauth config options
 SITE_ID = 1
 
+ACCOUNT_FORMS = {
+'signup': 'accounts.forms.CustomSignupForm',
+}
+
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False

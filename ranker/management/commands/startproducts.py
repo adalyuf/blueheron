@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
-from ranker.models import Template, TemplateItem, AIModel
+from ranker.models import Template, TemplateItem, AIModel, Project, Domain
+from accounts.models import User
 
 class Command(BaseCommand):
     help = "Initialize a few templates and templates when a fresh environment launches"
@@ -14,15 +15,39 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         #handle is a special method that the django manage command will run, with the args and options provided
 
+        if Template.objects.count() > 0:
+            self.stderr.write(f"There are already {Template.objects.count()} templates in the database. Skipping creation.")
+            return
+
         ai_model = AIModel(
             ai_model = "ChatGPT 3.5",
             api_identifier = "gpt-3.5-turbo"
         )
         ai_model.save()
 
-        if Template.objects.count() > 0:
-            self.stderr.write(f"There are already {Template.objects.count()} templates in the database. Skipping creation.")
-            return
+        user = User( username='sample_user', first_name='Test', last_name='User', email='test@example.com')
+        user.save()
+        user.set_password('samplepass')
+
+        project = Project( project='Structured Domain Information')
+        project.save()
+
+        project.user.add(user)
+
+        domain = Domain.objects.get(domain='fanatics.com')
+        project.domain.add(domain)
+
+        domain = Domain.objects.get(domain='hayneedle.com')
+        project.domain.add(domain)
+
+        domain = Domain.objects.get(domain='nastygal.com')
+        project.domain.add(domain)
+
+        domain = Domain.objects.get(domain='teladoc.com')
+        project.domain.add(domain)
+
+        domain = Domain.objects.get(domain='healthline.com')
+        project.domain.add(domain)
 
         market_research = Template(
             template = "Market Research",
@@ -35,6 +60,9 @@ class Command(BaseCommand):
             scope = "per_domain",
         )
         competitive_analysis.save()
+
+        project_template = Template(template = "Structured Data", scope = "per_domain", project = project,)
+        project_template.save()
 
         #Market Research Product Templates
         template_item = TemplateItem(
@@ -170,6 +198,36 @@ class Command(BaseCommand):
             prompt1 = "Which companies could @currentDomain acquire to address emerging trends in the industry?",
             order = 12,
             template = competitive_analysis,
+        )
+        template_item.save()
+
+        # Template items for project template
+
+        template_item = TemplateItem(
+            prompt1 = "What is the business name, industry, largest competitor, and closest competitor of @currentDomain",
+            order = 1,
+            template = project_template,
+        )
+        template_item.save()
+
+        template_item = TemplateItem(
+            prompt1 = "What is the business name, industry, largest competitor, and closest competitor of @currentDomain. Please provide results in a table format.",
+            order = 1,
+            template = project_template,
+        )
+        template_item.save()
+
+        template_item = TemplateItem(
+            prompt1 = "What is the business name, industry, largest competitor, and closest competitor of @currentDomain. Please provide results in a list with “Business Name:”, “Industry:”, “Largest Competitor:”, and “Closest Competitor:” at the beginning of each item.",
+            order = 1,
+            template = project_template,
+        )
+        template_item.save()
+
+        template_item = TemplateItem(
+            prompt1 = "What is the business name, industry, largest competitor, and closest competitor of @currentDomain. See an example: Business Name: Wayfair Industry: Home Furnishings Largest Competitor: Amazon Closest Competitor: Hayneedle",
+            order = 1,
+            template = project_template,
         )
         template_item.save()
 
