@@ -2,92 +2,133 @@
 
 {% load i18n %}
 
-{% block title %}{% translate "Project Detail" %}{% endblock %}
-{% block bctitle %}{% translate "Project Detail" %}{% endblock %}
+{% block title %}{{project}}{% endblock %}
+{% block bctitle %}{{project}}{% endblock %}
 {% block breadcrumbs %}
 <li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
-<li class="breadcrumb-item text-muted"><a href="{% url 'project_list' %}" class="text-muted text-hover-primary">Project Detail</a></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'project_list' %}" class="text-muted text-hover-primary">My Projects</a></li>
 {% endblock breadcrumbs %}
 
 {% block content %}
-<h1>Project Detail</h1>
-
-{{project}}
-
-{% if conversation_list %}
-<h2>Project Conversations</h2>
-    <ul>
-    {% for conversation in conversation_list %}
-        <li><ul class="list-inline">
-            <li class="list-inline-item">{{conversation}}</li>
-            <li class="list-inline-item"><a href="{% url 'conversation_detail' conversation.id %}">View Conversation</a></li>
-            <li class="list-inline-item"><a href="{% url 'conversation_edit' conversation.id %}">Edit Conversation</a></li>
-            <li class="list-inline-item"><a href="{% url 'conversation_get_responses' conversation.id %}">Get Responses</a></li>
-        </ul></li>
-    {% endfor %}
-    </ul>
-{% endif %}
-
-{% if project_template_list %}
-<h2>Project Templates</h2>
-    <ul>
-    {% for project_template in project_template_list %}
-    <li>
-        <form action="{% url 'template_delete' project_template.id %}" method="post" class="form-inline">
-            {% csrf_token %}
-            <a href="{% url 'template_detail' project_template.id %}">{{project_template.template}}</a>
-            ( 
-                <input type="submit" value="delete" class="btn btn-link text-muted text-hover-danger fs-8">
-            )
-        </form>
-    </li>
-    {% endfor %}
-    </ul>
-{% endif %}
-
-<h3>Create new template</h3>
-<form action="{% url 'template_create' project.id  %}" method="post">
-    {% csrf_token %}
-    {{ template_form.as_p }}
-    <input type="submit" value="Submit">
-</form>
-
-{% if global_template_list %}
-<h2>Global Templates</h2>
-    <ul>
-    {% for global_template in global_template_list %}
-        <li><a href="#">{{global_template.template}}</a>
-        </li>
-    {% endfor %}
-    </ul>
-{% endif %}
-
-{% if project_domain_list %}
-<h2>Project Domains</h2>
-<ul>
-    {% for domain in project_domain_list %}
-    <form action="{% url 'project_remove_domain' project.id %}" method="post" class="form-inline">
-        {% csrf_token %}
-        {{domain.domain}}
-        (   <input name="domain" type="hidden" value="{{domain.id}}">
-            <input type="submit" value="delete" class="btn btn-link text-muted text-hover-danger fs-8">
-        )
-    </form>
-    {% endfor %}
-</ul>
-{% endif %}
-
-<h3>Add domain to project</h3>
-<form action="{% url 'project_add_domain' project.id  %}" method="post">
-    {% csrf_token %}
-    <select name="domain" class="form-select" data-control="select2" data-placeholder="Select an option">
-        {% if global_domain_list %}
-            {% for domain in global_domain_list %}
-                <option value="{{domain.id}}">{{domain.domain}}</option>
-            {% endfor %}
+<div class="row mx-0">
+    <div class="col-10">
+        {% if create_conversations_form %}
+            <div class="d-flex justify-content-center">
+                <form action="{% url 'template_create_conversations' %}" method="post"  class="row row-cols-lg-auto g-3 align-items-center">
+                {% csrf_token %}
+                    <div class="col-12">
+                        <select name="template_id" class="form-select">
+                            {% for project_template in project_template_list %}
+                            <option value="{{project_template.id}}">{{project_template}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <select name="ai_model_id" class="form-select">
+                            {% for ai_model in ai_model_list %}
+                                <option value="{{ai_model.id}}">{{ai_model}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <input type="submit" value="Create Conversations" class="btn btn-primary">
+                    </div>
+                </form>
+            </div>
         {% endif %}
-    </select>
-    <input type="submit" value="Add domain">
-</form>
-
+        {% if conversation_list %}
+        <h2>Project Conversations</h2>
+            <table id="kt_datatable_zero_configuration" class="table table-row-bordered gy-5">
+                <thead>
+                    <tr class="fw-semibold fs-6 text-gray-800">
+                        <th>Template</th>
+                        <th>Conversation</th>
+                        <th>View</th>
+                        <th>Edit</th>
+                        <th>Get Responses</th>
+                    </tr>
+                </thead>
+            {% for conversation in conversation_list %}
+                <tr>
+                    <td>{{conversation.template}}</td>
+                    <td>{{conversation}}</td>
+                    <td><a href="{% url 'conversation_detail' conversation.id %}">View Conversation</a></td>
+                    <td><a href="{% url 'conversation_edit' conversation.id %}">Edit Conversation</a></td>
+                    <td>
+                        <form action="{% url 'conversation_get_responses' conversation.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="submit" class="btn btn-light-primary" value="Get Responses">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </table>
+        {% endif %}
+    </div>
+    <div class="col-2">
+        <!--Project domains-->
+        <div class="card card-stretch card-bordered mb-5">
+            <div class="card-header">
+                <h3 class="card-title">Project Domains</h3>
+                <div class="card-toolbar">
+                    <a href="{% url 'project_settings' project.id %}"><i class="bi bi-gear-fill fs-2"></i></a>
+                </div>
+            </div>
+                    <div class="card-body">
+            {% if project_domain_list %}
+                {% for domain in project_domain_list %}
+                    <p>{{domain.domain}}</p>
+                {% endfor %}
+            {% else %}
+                <p>Add domains in project settings.</p>
+            {% endif %}
+            </div>  
+        </div>
+        <!--Project domains-->
+        <!--Project templates-->
+        <div class="card card-stretch card-bordered mb-5">
+            <div class="card-header">
+                <h3 class="card-title">Project Templates</h3>
+                <div class="card-toolbar">
+                    <a href="{% url 'project_settings' project.id %}"><i class="bi bi-gear fs-2"></i></a>
+                </div>
+            </div>
+            <div class="card-body">
+            {% if project_template_list %}
+                {% for project_template in project_template_list %}
+                    <p><a href="{% url 'template_detail' project_template.id %}">{{project_template}}</a></p>
+                {% endfor %}
+            {% else %}
+                <p>Add templates in project settings.</p>
+            {% endif %}
+            </div>  
+        </div>
+        <!--Project templates-->
+        <!--Project users-->
+        <div class="card card-stretch card-bordered mb-5">
+            <div class="card-header">
+                <h3 class="card-title">Project Users</h3>
+                <div class="card-toolbar">
+                    <a href="{% url 'project_settings' project.id %}"><i class="bi bi-sliders fs-2"></i></a>
+                </div>
+            </div>
+            <div class="card-body">
+            {% if project_user_list %}
+                {% for project_user in project_user_list %}
+                    <p>{{project_user.email}}</p>
+                {% endfor %}
+            {% else %}
+                <p>Add users in project settings.</p>
+            {% endif %}
+            </div>  
+        </div>
+        <!--Project users-->
+    </div>
+</div>
 {% endblock content %}
+
+{% block pagejs %}
+<script>
+    $("#kt_datatable_zero_configuration").DataTable();
+</script>
+{% endblock pagejs %}

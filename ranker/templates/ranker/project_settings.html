@@ -1,0 +1,142 @@
+{% extends 'layout/default.html' %}
+
+{% load i18n %}
+
+{% block title %}Project Settings: {{project}}{% endblock %}
+{% block bctitle %}Project Settings: {{project}}{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'project_list' %}" class="text-muted text-hover-primary">My Projects</a></li>
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'project_detail' project.id %}" class="text-muted text-hover-primary">{{project}}</a></li>
+{% endblock breadcrumbs %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+
+<div class="col-lg-4">
+    <div class="card card-stretch card-bordered mb-5">
+        <div class="card-header">
+            <h3 class="card-title">Project Users</h3>
+        </div>
+        <div class="card-body min-h-250px">
+            {% for user in project_user_list %}
+                <div class="row">
+                    <!-- <li class="list-inline-item">
+                        {{user.first_name}} {{user.last_name}}
+                    </li> -->
+                    <div class="col-7">
+                        {{user.email}}
+                    </div>
+                    <div class="col-5">
+                        <form action="{% url 'project_remove_user' project.id %}" method="post" class="form-inline">
+                        {% csrf_token %}      
+                        ( 
+                            <input name="user" type="hidden" value="{{user.id}}">
+                            <input type="submit" value="remove" class="btn btn-link text-muted text-hover-danger fs-8">
+                        )
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="card-footer">
+            <p class="text-gray-400 pb-5 fw-semibold fs-6">Add user to project</p>
+            <form action="{% url 'project_add_user' project.id  %}" method="post">
+                {% csrf_token %}
+                {{ user_form.as_p }}
+                <input type="submit"  class="btn btn-secondary" value="Add User">
+            </form>
+        </div>
+    </div>
+</div>
+    
+<div class="col-lg-4">
+    <div class="card card-stretch card-bordered mb-5">
+        <div class="card-header">
+            <h3 class="card-title">Project Templates</h3>
+        </div>
+        <div class="card-body min-h-250px">
+            <ul>{% if project_template_list %}
+                    {% for project_template in project_template_list %}
+                    <li>
+                        <ul class="list-inline">
+                            <li class="list-inline-item">
+                                <a href="{% url 'template_detail' project_template.id %}">{{project_template.template}}</a>
+                            </li>
+                            <li class="list-inline-item">
+                                <form action="{% url 'template_delete' project_template.id %}" method="post" class="form-inline">
+                                {% csrf_token %}      
+                                ( 
+                                    <input type="submit" value="delete" class="btn btn-link text-muted text-hover-danger fs-8">
+                                )
+                                </form>
+                            </li>
+                        <ul>
+                    </li>
+                    {% endfor %}
+                {% else %}
+                    Add a template below.
+                {% endif %}
+            </ul>
+        </div>
+        <div class="card-footer">
+            <p class="text-gray-400 mb-5 fw-semibold fs-6">Create new conversation template</p>
+            <form action="{% url 'template_create' project.id  %}" method="post">
+                {% csrf_token %}
+                {{ template_form.as_p }}
+                <input type="submit"  class="btn btn-secondary" value="Create New Template">
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="col-lg-4">
+    <div class="card card-stretch card-bordered mb-5">
+        <div class="card-header">
+            <h3 class="card-title">Project Domains</h3>
+        </div>
+        <div class="card-body min-h-250px">
+            {% if project_domain_list %}
+                {% for domain in project_domain_list %}
+                <form action="{% url 'project_remove_domain' project.id %}" method="post" class="form-inline">
+                    {% csrf_token %}
+                    {{domain.domain}}
+                    (   <input name="domain" type="hidden" value="{{domain.id}}">
+                        <input type="submit" value="delete" class="btn btn-link text-muted text-hover-danger fs-8">
+                    )
+                </form>
+                {% endfor %}
+            {% else %}
+                Add domains below.
+            {% endif %}
+        </div>
+        <div class="card-footer">
+            <p class="text-gray-400 mt-1 fw-semibold fs-6">Add domain to project</p>
+            <form action="{% url 'project_add_domain' project.id  %}" method="post">
+                {% csrf_token %}
+                <div class="input-group flex-nowrap">
+                     <div class="overflow-hidden flex-grow-1">
+                        <select name="domain" class="form-select" data-control="select2" data-placeholder="Select an option">
+                        {% if global_domain_list %}
+                            {% for domain in global_domain_list %}
+                                <option value="{{domain.id}}">{{domain.domain}}</option>
+                            {% endfor %}
+                        {% endif %}
+                        </select>
+                    </div>
+                    <input class="btn btn-secondary" type="submit" value="Add">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+    </div>
+</div>
+{% endblock content %}

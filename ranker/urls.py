@@ -34,8 +34,11 @@ urlpatterns = [
 
     path("projects/"                                    , project_views.ProjectListView.as_view()       , name="project_list"),
     path("projects/<int:project_id>/"                   , project_views.project_detail                  , name="project_detail"),
+    path("projects/<int:project_id>/settings/"          , project_views.project_settings                , name="project_settings"),
     path("projects/<int:project_id>/add_domain/"        , project_views.project_add_domain              , name="project_add_domain"),
     path("projects/<int:project_id>/remove_domain/"     , project_views.project_remove_domain           , name="project_remove_domain"),
+    path("projects/<int:project_id>/add_user/"          , project_views.project_add_user                , name="project_add_user"),
+    path("projects/<int:project_id>/remove_user/"       , project_views.project_remove_user             , name="project_remove_user"),
     path('projects/create/'                             , project_views.ProjectCreate.as_view()         , name='project_create'),
     path('projects/<int:pk>/update/'                    , project_views.ProjectUpdate.as_view()         , name='project_update'),
     path('projects/<int:pk>/delete/'                    , project_views.ProjectDelete.as_view()         , name='project_delete'),

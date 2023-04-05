@@ -12,18 +12,6 @@
 {% block content %}
 <h1>Template Detail - {{template.template}}</h1>
 
-{% if create_conversations_form %}
-    <form action="{% url 'template_create_conversations' %}" method="post" class="form-inline">
-        {% csrf_token %}
-        <select name="ai_model" class="form-select" data-control="select2" data-placeholder="Select an AI model">
-            {% for ai_model in ai_model_list %}
-                <option value="{{ai_model.id}}">{{ai_model}}</option>
-            {% endfor %}
-        </select>
-        <input type="submit" value="Create Conversations" class="btn btn-primary">
-    </form>
-{% endif %}
-
 <ul id="templateList" class="list-group">
 {% for template_item in template.templateitem_set.all %}
     <li data-id="{{template_item.id}}" class="list-group-item d-flex justify-content-between align-items-start">

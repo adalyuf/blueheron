@@ -1,6 +1,7 @@
 from django import forms
-from .models import KeywordFile, TemplateItem, Message, Template, Project, Domain
+from .models import KeywordFile, TemplateItem, Message, Template, Project, Domain, Conversation
 from django.forms import ModelForm, Form
+from accounts.models import User
 
 class KeywordFileForm(forms.ModelForm):
     class Meta:
@@ -33,4 +34,12 @@ class AddDomainToProjectForm(ModelForm):
         fields = ['domain']
 
 class CreateConversationsForm(Form):
-    pass
+    class Meta:
+        model = Conversation
+        fields = ['template', 'ai_model']
+
+class AddUserToProjectForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ['email']
+

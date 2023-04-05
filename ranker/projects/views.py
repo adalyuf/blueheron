@@ -17,7 +17,8 @@ from _keenthemes.__init__ import KTLayout
 from _keenthemes.libs.theme import KTTheme
 
 from ranker.models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel
-from ranker.forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm, AddDomainToProjectForm
+from ranker.forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm, AddDomainToProjectForm, AddUserToProjectForm, CreateConversationsForm
+from accounts.models import User
 
 import csv
 import os
@@ -35,37 +36,56 @@ class ProjectListView(generic.ListView):
     
 def project_detail(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
-    global_template_list = Template.objects.filter(scope__exact='per_domain').filter(project__isnull=True)
-    project_template_list = project.template_set.all()
-    project_domain_list = project.domain.all()
-    global_domain_list = Domain.objects.all()
-    template_form = TemplateForm()
-    domain_form = AddDomainToProjectForm()
-    conversation_list = Conversation.objects.filter(project=project)
     context = {}
     context['project'] = project
-    context['global_template_list'] = global_template_list
-    context['project_template_list'] = project_template_list
-    context['project_domain_list'] = project_domain_list
-    context['global_domain_list'] = global_domain_list
-    context['template_form'] = template_form
-    context['domain_form'] = domain_form
-    context['conversation_list'] = conversation_list
+    context['project_template_list']= project.template_set.all()
+    context['project_domain_list']  = project.domain.all()
+    context['conversation_list']    = Conversation.objects.filter(project=project)
+    context['project_user_list']    = project.user.all()
+    context['ai_model_list']        = AIModel.objects.all()
+    context['create_conversations_form'] = CreateConversationsForm()
     return render(request, 'ranker/project_detail.html', context)
+
+def project_settings(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    context = {}
+    context['project'] = project
+    context['project_template_list']= project.template_set.all()
+    context['project_domain_list']  = project.domain.all()
+    context['project_user_list']    = project.user.all()
+    context['global_domain_list']   = Domain.objects.filter(adult_content=False)
+    context['template_form']        = TemplateForm()
+    context['domain_form']          = AddDomainToProjectForm()
+    context['user_form']            = AddUserToProjectForm()
+    return render(request, 'ranker/project_settings.html', context)
 
 def project_add_domain(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     domain_id = request.POST['domain']
     domain = get_object_or_404(Domain, pk=domain_id)
     project.domain.add(domain)
-    return redirect('project_detail', project.id)
+    return redirect('project_settings', project.id)
 
 def project_remove_domain(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     domain_id = request.POST['domain']
     domain = get_object_or_404(Domain, pk=domain_id)
     project.domain.remove(domain)
-    return redirect('project_detail', project.id)
+    return redirect('project_settings', project.id)
+
+def project_add_user(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    email = request.POST['email']
+    user = get_object_or_404(User, email=email)
+    project.user.add(user)
+    return redirect('project_settings', project.id)
+
+def project_remove_user(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    user_id = request.POST['user']
+    user = get_object_or_404(User, pk=user_id)
+    project.user.remove(user)
+    return redirect('project_settings', project.id)
 
 class ProjectCreate(CreateView):
     model = Project
