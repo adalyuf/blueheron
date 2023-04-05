@@ -12,8 +12,15 @@
 {% block content %}
 <div class="row mx-0">
     <div class="col-10">
-        {% if create_conversations_form %}
-            <div class="d-flex justify-content-center">
+        <!-- Begin top toolbar -->
+        <div class="d-flex justify-content-between mb-5">
+            <div>
+                <!-- Empty space for left button if needed -->
+            </div>
+        
+            <div>
+                <!-- Middle buttons -->
+                {% if create_conversations_form %}
                 <form action="{% url 'template_create_conversations' %}" method="post"  class="row row-cols-lg-auto g-3 align-items-center">
                 {% csrf_token %}
                     <div class="col-12">
@@ -34,8 +41,20 @@
                         <input type="submit" value="Create Conversations" class="btn btn-primary">
                     </div>
                 </form>
+            {% endif %}
             </div>
-        {% endif %}
+
+            <div>
+                <!-- Right button -->
+                {% if conversation_list %}
+                    <form action="{% url 'project_get_all_responses' project.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" value="Get All Responses" class="btn btn-success">
+                    </form>
+                {% endif %}
+            </div>
+        </div> 
+        <!-- End top toolbar -->
         {% if conversation_list %}
         <h2>Project Conversations</h2>
             <table id="kt_datatable_zero_configuration" class="table table-row-bordered gy-5">

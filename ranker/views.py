@@ -171,7 +171,7 @@ def template_item_delete(request, TemplateItem_id):
     if request.method == 'POST':
         template_item.delete()
     
-    return redirect('template_detail', template_id=template.id)
+    return redirect('template_detail', template.id)
 
 class DashboardsView(TemplateView):
     template_name = 'pages/dashboards/index.html'

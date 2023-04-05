@@ -7,6 +7,10 @@
 {% block breadcrumbs %}
 <li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
 <li class="breadcrumb-item text-muted"><a href="{% url 'template_list' %}" class="text-muted text-hover-primary">Templates</a></li>
+{% if template.project %}
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'project_detail' template.project.id %}" class="text-muted text-hover-primary">{{template.project}}</a></li>
+{% endif %}
 {% endblock breadcrumbs %}
 
 {% block content %}

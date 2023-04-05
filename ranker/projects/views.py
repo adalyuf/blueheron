@@ -104,3 +104,13 @@ class ProjectUpdate(UpdateView):
 class ProjectDelete(DeleteView):
     model = Project
     success_url = reverse_lazy('project_list')
+
+@login_required
+def project_get_all_responses(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+
+    if request.method == 'POST':
+        for conversation in project.conversation_set.all():
+            call_command('mpresponses', '--conversation', conversation.id)
+
+    return redirect('conversation_detail', conversation_id=conversation.id)
