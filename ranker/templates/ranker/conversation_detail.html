@@ -5,10 +5,17 @@
 {% block   title %}{% blocktranslate with template=conversation.template.template domain=conversation.domain.domain %}View Conversation ({{template}} - {{domain}}){% endblocktranslate %}{% endblock %}
 {% block bctitle %}{% blocktranslate with template=conversation.template.template domain=conversation.domain.domain %}View Conversation ({{template}} - {{domain}}){% endblocktranslate %}{% endblock %}
 {% block breadcrumbs %}
+{% if conversation.project %}
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'project_list' %}" class="text-muted text-hover-primary">My Projects</a></li>
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'project_detail' conversation.project.id %}" class="text-muted text-hover-primary">{{conversation.project}}</a></li>
+{% else %}
 <li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
 <li class="breadcrumb-item text-muted"><a href="{% url 'domain_list' %}" class="text-muted text-hover-primary">Domains</a></li>
 <li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
 <li class="breadcrumb-item text-muted"><a href="{% url 'domain_detail' conversation.domain.id %}" class="text-muted text-hover-primary">{{conversation.domain.domain}}</a></li>
+{% endif %}
 {% endblock breadcrumbs %}
 
 {% block content %}
@@ -24,11 +31,15 @@
 
     </div>
     <div class="row justify-content-md-center">
-
+        {% if message.json_response %}
         <div class="col col-lg-9 message-response fs-3 fw-light text-gray-700 mb-3">
-            {{message.formatted_response|safe}}
+            <pre><code class="language-json">{{message.json_response|pprint}}</code></pre>
         </div>
-
+        {% else %}
+        <div class="col col-lg-9 message-response fs-3 fw-light text-gray-700 mb-3">
+            {{message.markdown_response|safe}}
+        </div>
+        {% endif %}
     </div>
 </div>
 <br>

@@ -23,7 +23,7 @@ class TemplateAdmin(admin.ModelAdmin):
 
 @admin.register(TemplateItem)
 class TemplateItemAdmin(admin.ModelAdmin):
-    list_display = ( 'prompt1', 'token1', 'prompt2', 'title', 'order', 'visible', 'template',)
+    list_display = ( 'prompt1', 'token1', 'prompt2', 'title', 'order', 'visible', 'template', 'mode')
     list_filter = ('template',)
 
 class MessageInline(admin.TabularInline):

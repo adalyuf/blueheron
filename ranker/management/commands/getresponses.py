@@ -30,11 +30,11 @@ class Command(BaseCommand):
                 o = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=message_array, temperature=0.6,)
                 message.response = o['choices'][0]['message']['content']
                 # message_array.append({"role": "assistant", "content": message.response})
-                message.formatted_response = html.format_html(markdown.markdown(message.response, extensions=['tables']))
+                message.markdown_response = html.format_html(markdown.markdown(message.response, extensions=['tables']))
                 # message.save()
                 message.answered_at = timezone.now()
                 # self.stdout.write(f"Message: {message.prompt} took {(message.answered_at-message.requested_at).total_seconds()} seconds.")
-            Message.objects.bulk_update(messages, ['response','formatted_response', 'requested_at', 'answered_at'])
+            Message.objects.bulk_update(messages, ['response','markdown_response', 'requested_at', 'answered_at'])
             conversation.answered_at = timezone.now()
             conversation.save()
 

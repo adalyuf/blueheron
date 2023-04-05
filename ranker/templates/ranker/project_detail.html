@@ -20,7 +20,7 @@
         
             <div>
                 <!-- Middle buttons -->
-                {% if create_conversations_form %}
+                {% if create_conversations_form and project_template_list %}
                 <form action="{% url 'template_create_conversations' %}" method="post"  class="row row-cols-lg-auto g-3 align-items-center">
                 {% csrf_token %}
                     <div class="col-12">

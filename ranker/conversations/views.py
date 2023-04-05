@@ -51,22 +51,23 @@ def conversation_add(request, template_id, domain_id, ai_model_id):
     template = get_object_or_404(Template, pk=template_id)
     domain = get_object_or_404(Domain, pk=domain_id)
     ai_model = get_object_or_404(AIModel, pk=ai_model_id)
-    if Conversation.objects.filter(template_id__exact=template.id).filter(domain_id__exact=domain.id).filter(ai_model_id__exact=ai_model.id).count() == 0:
+    if Conversation.objects.filter(template_id__exact=template.id).filter(domain_id__exact=domain.id).filter(ai_model_id__exact=ai_model.id).filter(project_id__isnull=True).count() == 0:
         conversation = Conversation(domain=domain, template=template, ai_model=ai_model)
         conversation.save()
         template_items = template.templateitem_set.all()
         for template_item in template_items:
             m = Message(
-                prompt = template_item.prompt1, #TODO: Add logic that uses tokens and concatenates with other parts of prompt
-                title = template_item.title,
-                visible = template_item.visible,
-                order = template_item.order,
-                conversation = conversation
+                prompt      = template_item.prompt1, #TODO: Add logic that uses tokens and concatenates with other parts of prompt
+                title       = template_item.title,
+                visible     = template_item.visible,
+                order       = template_item.order,
+                conversation = conversation,
+                template_item = template_item,
             )
             m.prompt = m.prompt.replace("@currentDomain", conversation.domain.domain)
             m.save()
     else:
-        conversation = Conversation.objects.filter(template_id__exact=template.id).filter(domain_id__exact=domain.id).first()
+        conversation = Conversation.objects.get(template=template, domain=domain, ai_model=ai_model, project=None)
         #TODO: Add combined unique requirement on conversation(template, domain) and figure out how to do this better
     return redirect('conversation_edit', conversation_id=conversation.id)
 

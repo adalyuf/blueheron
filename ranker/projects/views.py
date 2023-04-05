@@ -39,7 +39,7 @@ def project_detail(request, project_id):
     context = {}
     context['project'] = project
     context['project_template_list']= project.template_set.all()
-    context['project_domain_list']  = project.domain.all()
+    context['project_domain_list']  = project.domain.all().order_by('domain')
     context['conversation_list']    = Conversation.objects.filter(project=project)
     context['project_user_list']    = project.user.all()
     context['ai_model_list']        = AIModel.objects.all()
@@ -51,7 +51,7 @@ def project_settings(request, project_id):
     context = {}
     context['project'] = project
     context['project_template_list']= project.template_set.all()
-    context['project_domain_list']  = project.domain.all()
+    context['project_domain_list']  = project.domain.all().order_by('domain')
     context['project_user_list']    = project.user.all()
     context['global_domain_list']   = Domain.objects.filter(adult_content=False)
     context['template_form']        = TemplateForm()

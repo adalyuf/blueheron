@@ -52,8 +52,8 @@ def template_create(request, project_id=None):
 def template_create_conversations(request):
     if request.method == 'POST':
         template = get_object_or_404(Template, id = request.POST['template_id'])
-        project = template.project
         ai_model = get_object_or_404(AIModel, id = request.POST['ai_model_id'])
+        project = template.project
         domains = project.domain.all()
         for domain in domains:
             try:
@@ -65,11 +65,12 @@ def template_create_conversations(request):
             template_items = template.templateitem_set.all()
             for template_item in template_items:
                 m = Message(
-                    prompt = template_item.prompt1, #TODO: Add logic that uses tokens and concatenates with other parts of prompt
-                    title = template_item.title,
-                    visible = template_item.visible,
-                    order = template_item.order,
-                    conversation = conversation
+                    prompt      = template_item.prompt1, #TODO: Add logic that uses tokens and concatenates with other parts of prompt
+                    title       = template_item.title,
+                    visible     = template_item.visible,
+                    order       = template_item.order,
+                    conversation = conversation,
+                    template_item = template_item,
                 )
                 m.prompt = m.prompt.replace("@currentDomain", conversation.domain.domain)
                 m.save()

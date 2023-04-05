@@ -16,7 +16,7 @@ async def getresponse(message):
     message_array.append({"role": "user", "content": message.prompt})
     o = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=message_array, temperature=0.6,)
     message.response = o['choices'][0]['message']['content']
-    message.formatted_response = html.format_html(markdown.markdown(message.response, extensions=['tables']))
+    message.markdown_response = html.format_html(markdown.markdown(message.response, extensions=['tables']))
     message.answered_at = timezone.now()
     print(f"Message: {message.prompt} took {(message.answered_at-message.requested_at).total_seconds()} seconds.")
 
@@ -73,7 +73,7 @@ class Command(BaseCommand):
         run_in_parallel(messages)
         # messages = asyncio.run(get_conversations(messages))
             
-        Message.objects.bulk_update(messages, ['response','formatted_response', 'requested_at', 'answered_at'])
+        Message.objects.bulk_update(messages, ['response','markdown_response', 'requested_at', 'answered_at'])
         end_time = timezone.now()
         for conversation in conversations:
             conversation.requested_at = start_time

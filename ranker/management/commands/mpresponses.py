@@ -3,7 +3,7 @@ from django.utils import timezone, html
 
 from ranker.models import Domain, TokenType, Token, Template, TemplateItem, Conversation, Message
 
-import os, openai, markdown
+import os, openai, markdown, json
 
 import asyncio
 import concurrent.futures              # Allows creating new processes
@@ -46,7 +46,17 @@ def get_response(message, proc_num):
     message.requested_at = timezone.now()
     response = call_openai(message.prompt, proc_num)
     message.response = response['choices'][0]['message']['content']
-    message.formatted_response = html.format_html(markdown.markdown(message.response, extensions=['tables']))
+    if message.template_item.mode == 'markdown':
+        message.markdown_response = html.format_html(markdown.markdown(message.response, extensions=['tables']))
+    elif message.template_item.mode == 'json':
+        try:
+            start_pos   = message.response.find('{')
+            end_pos     = message.response.rfind('}')
+            json_string = message.response[start_pos:end_pos+1]
+            json_object = json.loads(json_string)
+            message.json_response = json_object
+        except:
+            print("Error in json parsing.")
     message.answered_at = timezone.now()
     message.save()
     print(f"[Process {proc_num}] Message: {message.prompt} took {(message.answered_at-message.requested_at).total_seconds()} seconds.")
@@ -63,7 +73,10 @@ def run_in_parallel(messages):
     else: 
         NUM_CORES = cpu_count()
 
-    chunksize =int(floor(len(messages) / (NUM_CORES-1)))
+    if len(messages) == 1:
+        chunksize = 1
+    else:
+        chunksize =int(floor(len(messages) / (NUM_CORES-1)))
 
     with concurrent.futures.ProcessPoolExecutor(NUM_CORES) as executor:
         for core in range(NUM_CORES-1):

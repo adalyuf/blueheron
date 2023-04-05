@@ -89,22 +89,27 @@ class Template(models.Model):
         ('global', 'global'),
         ('per_domain', 'per_domain')
     ]
-    template = models.CharField(max_length=200, unique=True)
-    scope = models.CharField(max_length=200,choices=scope_choices, default='per_domain')
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
-    helper_text_before = models.TextField(null=True)
-    helper_text_after = models.TextField(null=True)
+    template    = models.CharField(max_length=200, unique=True)
+    scope       = models.CharField(max_length=200, choices=scope_choices, default='per_domain')
+    project     = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    helper_text_before  = models.TextField(null=True, blank=True)
+    helper_text_after   = models.TextField(null=True, blank=True)
     def __str__(self):
         return self.template
 
 class TemplateItem(models.Model):
-    prompt1 = models.TextField()
-    token1 = models.ForeignKey(TokenType, on_delete=models.SET_NULL, null=True, blank=True)
-    prompt2 = models.CharField(max_length=200, null=True, blank=True)
-    title = models.CharField(max_length=200, null=True, blank=True)
-    order = models.IntegerField(default=100)
-    visible = models.BooleanField(default=True)
-    template = models.ForeignKey(Template, on_delete=models.CASCADE)
+    mode_choices = [
+        ('markdown', 'markdown'),
+        ('json', 'json')
+    ]
+    prompt1     = models.TextField()
+    token1      = models.ForeignKey(TokenType, on_delete=models.SET_NULL, null=True, blank=True)
+    prompt2     = models.CharField(max_length=200, null=True, blank=True)
+    title       = models.CharField(max_length=200, null=True, blank=True)
+    order       = models.IntegerField(default=100)
+    visible     = models.BooleanField(default=True)
+    template    = models.ForeignKey(Template, on_delete=models.CASCADE)
+    mode        = models.CharField(max_length=200, choices=mode_choices, default='markdown')
     def __str__(self):
         return self.prompt1
     
@@ -112,10 +117,10 @@ class TemplateItem(models.Model):
         ordering = ['template', 'order']
 
 class Conversation(models.Model):
-    template = models.ForeignKey(Template, on_delete=models.CASCADE)
-    domain = models.ForeignKey(Domain, on_delete=models.CASCADE, null=True)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
-    ai_model = models.ForeignKey(AIModel, on_delete=models.CASCADE)
+    template    = models.ForeignKey(Template, on_delete=models.CASCADE)
+    domain      = models.ForeignKey(Domain, on_delete=models.CASCADE, null=True)
+    project     = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    ai_model    = models.ForeignKey(AIModel, on_delete=models.CASCADE)
     requested_at = models.DateTimeField(null=True)
     answered_at = models.DateTimeField(null=True)
     class Meta:
@@ -127,15 +132,17 @@ class Conversation(models.Model):
 
 
 class Message(models.Model):
-    prompt = models.TextField()
-    title = models.CharField(max_length=200, null=True)
-    response = models.TextField(null=True)
-    formatted_response = models.TextField(null=True)
-    visible = models.BooleanField(default=True)
-    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
-    order = models.IntegerField(default=100)
-    requested_at = models.DateTimeField(null=True)
-    answered_at = models.DateTimeField(null=True)
+    prompt  = models.TextField()
+    title   = models.CharField(max_length=200, null=True)
+    response = models.TextField(null=True, blank=True)
+    markdown_response = models.TextField(null=True, blank=True)
+    json_response   = models.JSONField(null=True)
+    visible         = models.BooleanField(default=True)
+    conversation    = models.ForeignKey(Conversation, on_delete=models.CASCADE)
+    order           = models.IntegerField(default=100)
+    requested_at    = models.DateTimeField(null=True)
+    answered_at     = models.DateTimeField(null=True)
+    template_item   = models.ForeignKey(TemplateItem, on_delete=models.SET_NULL, null=True)
     def __str__(self):
         return self.prompt 
     
