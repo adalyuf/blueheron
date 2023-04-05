@@ -120,7 +120,7 @@ class Conversation(models.Model):
     answered_at = models.DateTimeField(null=True)
     class Meta:
         constraints = [ 
-            UniqueConstraint(name='unique_template_domain', fields=['template', 'domain'], include=['answered_at']),
+            UniqueConstraint(name='unique_template_domain', fields=['template', 'domain', 'project', 'ai_model'], include=['answered_at']),
         ]
     def __str__(self):
         return f"{self.template.template}: {self.domain.domain}"

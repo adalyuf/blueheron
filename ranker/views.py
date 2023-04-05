@@ -51,13 +51,17 @@ def template_create(request, project_id=None):
 
 def template_create_conversations(request):
     if request.method == 'POST':
-        template = get_object_or_404(Template, id = request.session.get('template'))
-        project = get_object_or_404(Project, id = request.session.get('project') )
-        ai_model = get_object_or_404(AIModel, id = request.POST['ai_model'])
+        template = get_object_or_404(Template, id = request.POST['template_id'])
+        project = template.project
+        ai_model = get_object_or_404(AIModel, id = request.POST['ai_model_id'])
         domains = project.domain.all()
         for domain in domains:
-            conversation = Conversation(domain=domain, template=template, ai_model=ai_model, project=project)
-            conversation.save()
+            try:
+                conversation = Conversation.objects.get(domain=domain, template=template, ai_model=ai_model, project=project)
+                conversation.message_set.all().delete() #TODO: confirm that we actually want to delete all existing messages when rebuilding conversations from a template
+            except:
+                conversation = Conversation(domain=domain, template=template, ai_model=ai_model, project=project)
+                conversation.save() 
             template_items = template.templateitem_set.all()
             for template_item in template_items:
                 m = Message(
