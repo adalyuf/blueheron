@@ -61,8 +61,18 @@ class Command(BaseCommand):
         )
         competitive_analysis.save()
 
+        domain_data = Template(template = "Domain Data", scope = "per_domain",)
+        domain_data.save()
+
         project_template = Template(template = "Structured Data", scope = "per_domain", project = project,)
         project_template.save()
+
+        #Domain Data Template Items
+        template_item = TemplateItem(prompt1 = "For @currentDomain, provide their Business Name, 6-digit NAICS code, Brands, Domains of Competitors, Products in a simple JSON object. In your response, use \"business_name\", \"naics_6\", \"company_brands\", \"competitor_domains\", and \"company_products\" as keys in the JSON.",
+            order = 1,
+            template = domain_data,
+        )
+        template_item.save()
 
         #Market Research Product Templates
         template_item = TemplateItem(

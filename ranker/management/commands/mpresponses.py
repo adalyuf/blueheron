@@ -44,22 +44,27 @@ def call_openai(prompt, proc_num):
 
 def get_response(message, proc_num):
     message.requested_at = timezone.now()
-    response = call_openai(message.prompt, proc_num)
-    message.response = response['choices'][0]['message']['content']
-    if message.template_item.mode == 'markdown':
-        message.markdown_response = html.format_html(markdown.markdown(message.response, extensions=['tables']))
-    elif message.template_item.mode == 'json':
-        try:
-            start_pos   = message.response.find('{')
-            end_pos     = message.response.rfind('}')
-            json_string = message.response[start_pos:end_pos+1]
-            json_object = json.loads(json_string)
-            message.json_response = json_object
-        except:
-            print("Error in json parsing.")
-    message.answered_at = timezone.now()
-    message.save()
-    print(f"[Process {proc_num}] Message: {message.prompt} took {(message.answered_at-message.requested_at).total_seconds()} seconds.")
+    try:
+        response = call_openai(message.prompt, proc_num)
+        message.response = response['choices'][0]['message']['content']
+        if message.template_item.mode == 'markdown':
+            message.markdown_response = html.format_html(markdown.markdown(message.response, extensions=['tables']))
+        elif message.template_item.mode == 'json':
+            try:
+                start_pos   = message.response.find('{')
+                end_pos     = message.response.rfind('}')
+                json_string = message.response[start_pos:end_pos+1]
+                json_object = json.loads(json_string)
+                message.json_response = json_object
+            except:
+                print("Error in json parsing.")
+        message.answered_at = timezone.now()
+        message.save()
+        print(f"[Process {proc_num}] Message: {message.prompt} took {(message.answered_at-message.requested_at).total_seconds()} seconds.")
+    except:
+        message.requested_at = None
+        message.save()
+        print(f"Couldn't get response from OpenAI API. Resetting requested_at to null.")
 
 def start_run(messages, proc_num):
     print(f"Starting process {proc_num} with {len(messages)} messages")
@@ -103,19 +108,22 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--start', nargs=1, type=int)
         parser.add_argument('--end', nargs=1, type=int) 
-        parser.add_argument('--conversation', action='append', type=int)
+        parser.add_argument('--conversation', action='store', type=int)
+        parser.add_argument('--template', action='store', type=int)
 
 
     def handle(self, *args, **options):
         openai.api_key = os.getenv("OPENAI_API_KEY")
-        start_time = timezone.now()
 
-        if options['conversation']:
-            conversations = Conversation.objects.filter(id__exact=options['conversation'][0])
+        if options['template']:
+            template = Template.objects.get(id = options['template'])
+            conversations = template.conversation_set.all()
+        elif options['conversation']:
+            conversations = Conversation.objects.filter(id__exact=options['conversation'])
         elif options['start'] and options['end']:
             conversations = Conversation.objects.filter(answered_at__isnull=True)[options["start"][0]:options["end"][0]]
         else:
-            print("Command needs either --conversation or --start and --end arguments")
+            print("Command needs either --conversation, --template, or --start and --end arguments")
             return
 
         print(f"Processing {len(conversations)} conversations")
@@ -124,15 +132,22 @@ class Command(BaseCommand):
             print("All messages have already been processed, canceling operation.")
             return
 
-        print(f"Processing {len(messages)} messages") 
+        print(f"Processing {len(messages)} messages")
+
+        start_time = timezone.now()
+
+        for conversation in conversations:
+            conversation.requested_at = start_time
+        Conversation.objects.bulk_update(conversations, ['requested_at'])
+
 
         messages = run_in_parallel(messages)
             
+            
         end_time = timezone.now()
         for conversation in conversations:
-            conversation.requested_at = start_time
             conversation.answered_at = end_time
-        Conversation.objects.bulk_update(conversations, ['requested_at', 'answered_at'])
+        Conversation.objects.bulk_update(conversations, ['answered_at'])
 
         self.stdout.write(
             self.style.SUCCESS(

@@ -33,8 +33,9 @@ class KeywordFile(models.Model):
     filepath = models.FileField(upload_to=keyword_directory_path)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     primary = models.BooleanField(default=False)
+    processed_at = models.DateTimeField(default=None, null=True)
     def __str__(self):
-        return self.filepath
+        return f"{self.filepath}"
     
 class TokenType(models.Model):
     type = models.CharField(max_length=200, unique=True)
@@ -91,7 +92,7 @@ class Template(models.Model):
     ]
     template    = models.CharField(max_length=200, unique=True)
     scope       = models.CharField(max_length=200, choices=scope_choices, default='per_domain')
-    project     = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    project     = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
     helper_text_before  = models.TextField(null=True, blank=True)
     helper_text_after   = models.TextField(null=True, blank=True)
     def __str__(self):
@@ -148,3 +149,35 @@ class Message(models.Model):
     
     class Meta:
         ordering = ['order']
+
+class Keyword(models.Model):
+    keyword     = models.CharField(max_length=200, unique=True)
+    user_intent = models.TextField(null=True)
+    natural_language_question   = models.TextField(null=True)
+    ai_answer   = models.TextField(null=True)
+    likely_previous_queries     = models.JSONField(null=True)
+    likely_next_queries         = models.JSONField(null=True)
+    def __str__(self):
+        return self.keyword
+    
+class KeywordPosition(models.Model):
+    domain  = models.ForeignKey(Domain, on_delete=models.SET_NULL, null=True)
+    keyword = models.ForeignKey(Keyword, on_delete=models.SET_NULL, null=True)
+    domain_text         = models.TextField()
+    keyword_text        = models.TextField()
+    position            = models.IntegerField(null=True)
+    previous_position   = models.IntegerField(null=True)
+    search_volume       = models.IntegerField(null=True)
+    keyword_difficulty  = models.IntegerField(null=True)
+    cpc                 = models.DecimalField(max_digits=19, decimal_places=2,null=True)
+    url                 = models.TextField(null=True)
+    traffic             = models.IntegerField(null=True)
+    traffic_percent     = models.DecimalField(max_digits=19, decimal_places=2,null=True)
+    traffic_cost        = models.DecimalField(max_digits=19, decimal_places=2,null=True)
+    competitive_difficulty = models.DecimalField(max_digits=19, decimal_places=2,null=True)
+    results             = models.BigIntegerField(null=True)
+    trends              = models.TextField(null=True)
+    retrieved_at        = models.DateTimeField(null=True)
+    serp                = models.TextField(null=True)
+    intents             = models.TextField(null=True)
+    type                = models.TextField(null=True)

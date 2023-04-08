@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Domain, KeywordFile, Template, TemplateItem, Conversation, Message, AIModel, Project, ProjectUser, ProjectDomain
+from .models import Domain, KeywordFile, Template, TemplateItem, Conversation, Message, AIModel, Project, ProjectUser, ProjectDomain, Keyword, KeywordPosition
 
 @admin.register(Domain)
 class DomainAdmin(admin.ModelAdmin):
@@ -54,3 +54,11 @@ class ProjectUserAdmin(admin.ModelAdmin):
 @admin.register(ProjectDomain)
 class ProjectDomainAdmin(admin.ModelAdmin):
     list_display = ('project', 'domain')
+
+@admin.register(Keyword)
+class KeywordAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(KeywordPosition)
+class KeywordPositionAdmin(admin.ModelAdmin):
+    pass
