@@ -10,6 +10,8 @@ import concurrent.futures              # Allows creating new processes
 from math import floor                 # Helps divide up our requests evenly across our CPU cores
 from multiprocessing import cpu_count  # Returns our number of CPU cores
 
+#THIS IS OBSOLETE, USE MPRESPONSES, KEEPING AROUND IN CASE WE NEED TO THINK ABOUT BRINGING ASYNCIO INTO METHODS
+
 async def getresponse(message):
     message.requested_at = timezone.now()
     message_array = [{"role": "system", "content": "You are a helpful assistant."}] #by using async we forgo ability to have each message be dependent on previous messages and there is no guarantee of time order

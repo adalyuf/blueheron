@@ -29,10 +29,10 @@ def keyword_directory_path(instance, filename):
     return f"documents/{d.id}-{d.domain}/{filename}"
 
 class KeywordFile(models.Model):
-    domain = models.ForeignKey(Domain, on_delete=models.CASCADE)
-    filepath = models.FileField(upload_to=keyword_directory_path)
+    domain      = models.ForeignKey(Domain, on_delete=models.CASCADE)
+    filepath    = models.FileField(upload_to=keyword_directory_path)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    primary = models.BooleanField(default=False)
+    primary     = models.BooleanField(default=False)
     processed_at = models.DateTimeField(default=None, null=True)
     def __str__(self):
         return f"{self.filepath}"
@@ -122,7 +122,7 @@ class Conversation(models.Model):
     domain      = models.ForeignKey(Domain, on_delete=models.CASCADE, null=True)
     project     = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
     ai_model    = models.ForeignKey(AIModel, on_delete=models.CASCADE)
-    requested_at = models.DateTimeField(null=True)
+    requested_at= models.DateTimeField(null=True)
     answered_at = models.DateTimeField(null=True)
     class Meta:
         constraints = [ 
@@ -151,12 +151,15 @@ class Message(models.Model):
         ordering = ['order']
 
 class Keyword(models.Model):
-    keyword     = models.CharField(max_length=200, unique=True)
-    user_intent = models.TextField(null=True)
+    keyword                     = models.CharField(max_length=200, unique=True)
+    user_intent                 = models.TextField(null=True)
     natural_language_question   = models.TextField(null=True)
-    ai_answer   = models.TextField(null=True)
+    ai_answer                   = models.TextField(null=True)
     likely_previous_queries     = models.JSONField(null=True)
     likely_next_queries         = models.JSONField(null=True)
+    requested_at                = models.DateTimeField(null=True)
+    answered_at                 = models.DateTimeField(null=True)
+    json_response               = models.JSONField(null=True)
     def __str__(self):
         return self.keyword
     

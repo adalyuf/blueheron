@@ -57,8 +57,9 @@ class ProjectDomainAdmin(admin.ModelAdmin):
 
 @admin.register(Keyword)
 class KeywordAdmin(admin.ModelAdmin):
-    pass
-
+    list_display = ('keyword', 'user_intent', 'likely_previous_queries', 'likely_next_queries', 'requested_at', 'answered_at')
+    list_filter = ('answered_at',)
+    
 @admin.register(KeywordPosition)
 class KeywordPositionAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('keyword_text', 'domain_text', 'keyword', 'domain', 'position')

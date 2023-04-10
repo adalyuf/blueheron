@@ -16,7 +16,7 @@ from tenacity import (
 )  # for exponential backoff
 
 class Command(BaseCommand):
-    help = "Get responses for every message"
+    help = "Import keywords from all primary files that have not yet been processed."
 
     def add_arguments(self, parser):
         parser.add_argument('--start', nargs=1, type=int)
