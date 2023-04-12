@@ -100,10 +100,10 @@ WSGI_APPLICATION = "topranks.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': '127.0.0.1',
+        'NAME':     os.getenv("POSTGRES_DATABASE"),
+        'USER':     os.getenv("POSTGRES_USER"),
+        'PASSWORD': os.getenv("POSTGRES_PASS"),
+        'HOST':     os.getenv("POSTGRES_HOST"),
         'PORT': '5432',
     }
 }
@@ -205,8 +205,8 @@ USE_NGROK = os.environ.get("USE_NGROK", "False")
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Celery settings
-CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://redis:6379/0")
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://localhost:6379/0")
 CELERY_TIME_ZONE = "America/New_York"
 
 ######################

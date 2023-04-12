@@ -3,7 +3,7 @@
 curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
 sudo apt-get update
-sudo apt-get install redis
+sudo apt-get install redis -y
 # JS/CSS Asset build
 cd _keenthemes/tools/
 . /usr/local/share/nvm/nvm.sh
@@ -30,7 +30,7 @@ celery --app=topranks worker --loglevel=info --detach
 ps aux | grep celery
 
 #For celery-flower dashboard, run following:
-#celery --app=topranks --broker=redis://redis:6379/0 flower --port=5555
+#celery --app=topranks --broker=redis://localhost:6379 flower --port=5555
 
 #To clear out the database:
 # stop the server, if running

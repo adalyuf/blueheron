@@ -3,6 +3,7 @@ from django.utils import timezone
 
 from ranker.models import Template, TemplateItem, AIModel, Project, Domain
 from accounts.models import User
+from django.contrib.sites.models import Site
 
 class Command(BaseCommand):
     help = "Initialize a few templates and templates when a fresh environment launches"
@@ -18,6 +19,11 @@ class Command(BaseCommand):
         if Template.objects.count() > 0:
             self.stderr.write(f"There are already {Template.objects.count()} templates in the database. Skipping creation.")
             return
+             
+        site = Site.objects.get(id=1)
+        site.domain = 'topranks.ai'
+        site.name = 'TopRanks.ai'
+        site.save()
 
         ai_model = AIModel(
             ai_model = "ChatGPT 3.5",
