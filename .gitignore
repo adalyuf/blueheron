@@ -33,6 +33,9 @@ $RECYCLE.BIN/
 .history/
 *.code-workspace
 
+#redis
+dump.rdb
+
 /static/
 _keenthemes/tools/node_modules
 _keenthemes/tools/yarn.lock

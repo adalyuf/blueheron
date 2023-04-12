@@ -18,6 +18,8 @@ from _keenthemes.libs.theme import KTTheme
 
 from ranker.models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel
 from ranker.forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm
+from ranker.tasks import save_message_response, call_openai
+from celery import chain
 
 import csv
 import os
@@ -116,8 +118,10 @@ def conversation_get_responses(request, conversation_id):
 
     if request.method == 'POST':
         djmessages.info(request, "Requesting responses.")
-        call_command('mpresponses', '--conversation', conversation.id)
-
+        for message in conversation.message_set.all():
+            message.requested_at = timezone.now()
+            message.save()
+            call_openai.apply_async( (message.prompt,), link=save_message_response.s(message.id)) #note the comma in arguments, critical to imply tuple, otherwise thinks array
     return redirect('conversation_detail', conversation_id=conversation.id)
 
 @login_required
