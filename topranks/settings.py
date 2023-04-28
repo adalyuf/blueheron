@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-import os
+import os, json
 from django.contrib.messages import constants as messages
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -48,6 +48,12 @@ USE_NGROK = os.environ.get('USE_NGROK', '') != 'False'
 
 ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '3.132.134.103', '.topranks.ai' ]
 
+if os.getenv('ECS_CONTAINER_METADATA_FILE'):
+    metadata_file_path = os.environ['ECS_CONTAINER_METADATA_FILE']
+    with open(metadata_file_path) as f:
+        metadata = json.load(f)
+    private_ip = metadata["HostPrivateIPv4Address"]
+    ALLOWED_HOSTS.append(private_ip)
 
 # Application definition
 
