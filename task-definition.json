@@ -1,0 +1,149 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:us-east-2:527657145127:task-definition/topranks-prod-app:6",
+    "containerDefinitions": [
+        {
+            "name": "web",
+            "image": "527657145127.dkr.ecr.us-east-2.amazonaws.com/topranks-production:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "web-80-tcp",
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "CELERY_BACKEND",
+                    "value": "redis://127.0.0.1:6379"
+                },
+                {
+                    "name": "POSTGRES_USER",
+                    "value": "dbadmin"
+                },
+                {
+                    "name": "POSTGRES_HOST",
+                    "value": "topranks-db.cocwgqf5m90w.us-east-2.rds.amazonaws.com"
+                },
+                {
+                    "name": "POSTGRES_DATABASE",
+                    "value": "topdb"
+                },
+                {
+                    "name": "POSTGRES_PORT",
+                    "value": "5432"
+                },
+                {
+                    "name": "DJANGO_DEBUG",
+                    "value": "True"
+                },
+                {
+                    "name": "USE_NGROK",
+                    "value": "True"
+                },
+                {
+                    "name": "CELERY_BROKER",
+                    "value": "redis://127.0.0.1:6379"
+                }
+            ],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "secrets": [
+                {
+                    "name": "DJANGO_SECRET_KEY",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:527657145127:secret:topranks-prod-secrets-KZYhJK:DJANGO_SECRET_KEY::"
+                },
+                {
+                    "name": "POSTGRES_PASS",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:527657145127:secret:topranks-prod-secrets-KZYhJK:POSTGRES_PASS::"
+                },
+                {
+                    "name": "OPENAI_API_KEY",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:527657145127:secret:topranks-prod-secrets-KZYhJK:OPENAI_API_KEY::"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/topranks-prod-app",
+                    "awslogs-region": "us-east-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost/ || exit"
+                ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3,
+                "startPeriod": 30
+            }
+        }
+    ],
+    "family": "topranks-prod-app",
+    "taskRoleArn": "arn:aws:iam::527657145127:role/ecs-tasks-access-topranks-prod-secrets",
+    "executionRoleArn": "arn:aws:iam::527657145127:role/ecs-tasks-access-topranks-prod-secrets",
+    "networkMode": "awsvpc",
+    "revision": 6,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "ecs.capability.secrets.asm.environment-variables"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.container-health-check"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "3072",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    },
+    "registeredAt": "2023-04-28T20:11:51.532Z",
+    "registeredBy": "arn:aws:iam::527657145127:root",
+    "tags": []
+}

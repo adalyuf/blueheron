@@ -13,6 +13,24 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_sdk.init(
+    dsn="https://f83ed0dbb3cd4e728a57d29db739e3ee@o4505092597678080.ingest.sentry.io/4505092601675776",
+    integrations=[
+        DjangoIntegration(),
+    ],
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0,
+
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,8 +44,9 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+USE_NGROK = os.environ.get('USE_NGROK', '') != 'False'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '3.132.134.103', '.topranks.ai' ]
 
 
 # Application definition
@@ -100,11 +119,11 @@ WSGI_APPLICATION = "topranks.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME':     os.getenv("POSTGRES_DATABASE"),
-        'USER':     os.getenv("POSTGRES_USER"),
-        'PASSWORD': os.getenv("POSTGRES_PASS"),
-        'HOST':     os.getenv("POSTGRES_HOST"),
-        'PORT':     os.getenv("POSTGRES_PORT"),
+        'NAME':     os.getenv("POSTGRES_DATABASE", 'postgres'),
+        'USER':     os.getenv("POSTGRES_USER", 'postgres'),
+        'PASSWORD': os.getenv("POSTGRES_PASS", 'postgres'),
+        'HOST':     os.getenv("POSTGRES_HOST", '127.0.0.1'),
+        'PORT':     os.getenv("POSTGRES_PORT", '5432'),
     }
 }
 
@@ -199,8 +218,6 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-USE_NGROK = os.environ.get("USE_NGROK", "False")
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 

@@ -13,5 +13,5 @@ RUN apt-get install redis-server -y
 
 RUN pip install -r requirements.txt
 
-EXPOSE 8000
+EXPOSE 80
 ENTRYPOINT ./production.sh
