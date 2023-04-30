@@ -1,7 +1,6 @@
 from django.core.management import call_command
 from django.utils import timezone, html
 from celery import shared_task
-from tenacity import (retry, stop_after_attempt, wait_random_exponential,)  # for exponential backoff
 import os, openai, markdown, json
 
 from ranker.models import Message
@@ -10,7 +9,6 @@ def return_last_value(retry_state):
         """return the result of the last call attempt"""
         return retry_state.outcome.result()
 
-# @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6), retry_error_callback=return_last_value)
 @shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=5, retry_kwargs={'max_retries': 5})
 def call_openai(self, prompt):
     openai.api_key = os.getenv("OPENAI_API_KEY")
