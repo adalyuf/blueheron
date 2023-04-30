@@ -4,16 +4,10 @@ curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyr
 echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
 sudo apt-get update
 sudo apt-get install redis -y
+
 # JS/CSS Asset build
-cd _keenthemes/tools/
-. /usr/local/share/nvm/nvm.sh
-nvm install 18
-nvm use 18
-npm install
-npm run build
-cd ../..
-cp assets/* static/ -r
-rm assets -r
+sh ./build-assets.sh
+
 #Python setup
 pip install -r requirements.txt
 python manage.py makemigrations
@@ -22,9 +16,11 @@ python manage.py migrate account
 python manage.py migrate
 python manage.py importdomains domains.csv
 python manage.py startproducts
+
 #Redis daemon
 redis-server --daemonize yes
 ps aux | grep redis
+
 #Celery detached background processes
 celery --app=topranks worker --loglevel=info --detach
 ps aux | grep celery

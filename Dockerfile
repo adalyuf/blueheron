@@ -11,6 +11,8 @@ WORKDIR $DockerHOME
 RUN apt-get update
 RUN apt-get install redis-server -y
 
+RUN sh ./build-assets.sh
+
 RUN pip install -r requirements.txt
 
 EXPOSE 80
