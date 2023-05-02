@@ -6,7 +6,7 @@ sudo apt-get update
 sudo apt-get install redis -y
 
 # JS/CSS Asset build
-sh ./build-assets.sh
+sh ./install-nvm-locally.sh
 
 #Python setup
 pip install -r requirements.txt
