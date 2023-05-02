@@ -23,5 +23,8 @@ redis-server --daemonize yes
 celery --app=topranks worker --loglevel=info --detach
 
 #Gunicorn web server
-gunicorn topranks.wsgi -b 0.0.0.0:80
+#old slowness
+# gunicorn topranks.wsgi -b 0.0.0.0:80
+# new hotness: https://pythonspeed.com/articles/gunicorn-in-docker/
+gunicorn topranks.wsgi -b 0.0.0.0:80 --worker-tmp-dir /dev/shm --workers=2 --threads=4 --worker-class=gthread
 
