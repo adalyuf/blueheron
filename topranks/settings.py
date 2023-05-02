@@ -217,8 +217,9 @@ STATIC_URL = "static_collected/"
 STATIC_ROOT = BASE_DIR / 'static_collected'
 STATICFILES_DIRS = [
     BASE_DIR / "topranks/static",
-    BASE_DIR / 'static',
+    BASE_DIR / "static_build",
 ]
+
 # STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 # STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
