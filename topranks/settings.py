@@ -213,12 +213,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = "static_collected/"
-STATIC_ROOT = BASE_DIR / 'static_collected'
+# STATIC_URL = "/static_collected/" #This is how the URL is configured in templates
+STATIC_ROOT = BASE_DIR / 'static_collected' #This is the directory where assets are collected
 STATICFILES_DIRS = [
     BASE_DIR / "topranks/static",
     BASE_DIR / "static_build",
 ]
+STATIC_HOST = os.environ.get("DJANGO_STATIC_HOST", "") #Enabled for AWS CloudFront
+STATIC_URL = STATIC_HOST + "/static_collected/"
 
 # STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 # STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
