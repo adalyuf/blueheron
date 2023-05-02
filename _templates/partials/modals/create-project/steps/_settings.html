@@ -20,7 +20,7 @@
 				<!--begin::Message-->
 				<div class="dz-message needsclick">
 				<!--begin::Icon-->
-				{% getSvgIcon 'duotune/files/fil010.svg' 'svg-icon svg-icon-3hx svg-icon-primary' %} 
+				<span class="svg-icon svg-icon-3hx svg-icon-primary"><img src="{% static 'media/icons/duotune/files/fil010.svg' %}"></span> 
 				<!--end::Icon-->
 				<!--begin::Info-->
 				<div class="ms-4">
@@ -77,8 +77,8 @@
 			<!--begin::Wrapper-->
 			<div class="position-relative d-flex align-items-center">
 			<!--begin::Icon-->
-			{% getSvgIcon 'duotune/general/gen014.svg' 'svg-icon svg-icon-2 position-absolute mx-4' %} 
-			<!--end::Icon-->
+			<span class="svg-icon svg-icon-2 position-absolute mx-4"><img src="{% static 'media/icons/duotune/general/gen014.svg' %}"></span>
+ 			<!--end::Icon-->
 			<!--begin::Input-->
 			<input class="form-control form-control-solid ps-12" placeholder="Pick date range" name="settings_release_date" />
 			<!--end::Input--></div>

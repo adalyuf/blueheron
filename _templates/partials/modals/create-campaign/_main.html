@@ -11,7 +11,7 @@
 				<!--end::Modal title-->
 				<!--begin::Close-->
 				<div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
-					{% getSvgIcon 'duotune/arrows/arr061.svg' 'svg-icon svg-icon-1' %}
+					<span class="svg-icon svg-icon-1"><img src="{% static '/media/icons/duotune/arrows/arr061.svg' %}"></span>
 				</div>
 				<!--end::Close-->
 			</div>
@@ -63,18 +63,21 @@
 							<!--begin::Wrapper-->
 							<div class="me-2">
 								<button type="button" class="btn btn-lg btn-light-primary me-3" data-kt-stepper-action="previous">
-									{% getSvgIcon 'duotune/arrows/arr063.svg' 'svg-icon svg-icon-3 me-1' %} Back
+									<span class="svg-icon svg-icon-3 me-1"><img src="{% static '/media/icons/duotune/arrows/arr063.svg' %}"></span>
+									 Back
 								</button>
 							</div>
 							<!--end::Wrapper-->
 							<!--begin::Wrapper-->
 							<div>
 								<button type="button" class="btn btn-lg btn-primary" data-kt-stepper-action="submit">
-									<span class="indicator-label">Submit {% getSvgIcon 'duotune/arrows/arr064.svg' 'svg-icon svg-icon-3 ms-2 me-0' %}</span>
+									<span class="indicator-label">Submit <span class="svg-icon svg-icon-3 ms-2 me-0"><img src="{% static '/media/icons/duotune/arrows/arr064.svg' %}"></span>
+										</span>
 									<span class="indicator-progress">Please wait... 
 									<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
 								</button>
-								<button type="button" class="btn btn-lg btn-primary" data-kt-stepper-action="next">Continue {% getSvgIcon 'duotune/arrows/arr064.svg' 'svg-icon svg-icon-3 ms-1 me-0' %}</button>
+								<button type="button" class="btn btn-lg btn-primary" data-kt-stepper-action="next">Continue <span class="svg-icon svg-icon-3 ms-1 me-0"><img src="{% static '/media/icons/duotune/arrows/arr064.svg' %}"></span>
+									</button>
 							</div>
 							<!--end::Wrapper-->
 						</div>
