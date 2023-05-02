@@ -37,11 +37,11 @@
                 },
                 {
                     "name": "DJANGO_DEBUG",
-                    "value": "True"
+                    "value": "False"
                 },
                 {
                     "name": "USE_NGROK",
-                    "value": "True"
+                    "value": "False"
                 },
                 {
                     "name": "CELERY_BROKER",
