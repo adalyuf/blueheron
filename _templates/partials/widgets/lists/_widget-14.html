@@ -11,7 +11,9 @@
 		<!--begin::Toolbar-->
 		<div class="card-toolbar">
 			<!--begin::Menu-->
-			<button class="btn btn-icon btn-color-gray-400 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">{% getSvgIcon 'duotune/general/gen023.svg' 'svg-icon svg-icon-1 svg-icon-gray-300 me-n1' %}</button>
+			<button class="btn btn-icon btn-color-gray-400 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
+				<span class="svg-icon svg-icon-1 svg-icon-gray-300 me-n1"><img src="{% static 'media/icons/duotune/general/gen023.svg' %}"></span>
+			</button>
 			{% include 'partials/menus/_menu-2.html' %}
 			<!--end::Menu-->
 		</div>

@@ -46,6 +46,10 @@
                 {
                     "name": "CELERY_BROKER",
                     "value": "redis://127.0.0.1:6379"
+                },
+                {
+                    "name": "DJANGO_STATIC_HOST",
+                    "value": "https://d3l7mu0ieyh7bq.cloudfront.net"
                 }
             ],
             "environmentFiles": [],
