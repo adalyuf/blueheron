@@ -21,7 +21,7 @@ class Domain(models.Model):
     class Meta:
         ordering = ['rank']
 
-def keyword_directory_path(instance, filename):
+def keyword_directory_path(instance, filename=None):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     d = Domain.objects.get(pk=instance.domain_id)
     t = timezone.now()
@@ -35,7 +35,7 @@ class KeywordFile(models.Model):
     primary     = models.BooleanField(default=False)
     processed_at = models.DateTimeField(default=None, null=True)
     def __str__(self):
-        return f"{self.filepath}"
+        return f"{keyword_directory_path(self)}"
     
 class TokenType(models.Model):
     type = models.CharField(max_length=200, unique=True)

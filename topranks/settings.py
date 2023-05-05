@@ -226,6 +226,14 @@ STATIC_URL = STATIC_HOST + "/static_collected/"
 # STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
+# Use S3 for media file uploads
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_S3_ADDRESSING_STYLE = "virtual"
+AWS_STORAGE_BUCKET_NAME= "topranks-media-public"
+AWS_DEFAULT_ACL = "public-read"
+AWS_S3_REGION_NAME = 'us-east-2' 
+AWS_S3_SIGNATURE_VERSION = 's3v4'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -237,6 +245,20 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://localhost:6379/0")
 CELERY_TIME_ZONE = "America/New_York"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ######################
 # Keenthemes Settings
