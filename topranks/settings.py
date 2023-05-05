@@ -47,7 +47,7 @@ DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 USE_NGROK = os.environ.get('USE_NGROK', '') != 'False'
 
 ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '3.132.134.103', '.topranks.ai' ]
-# CSRF_TRUSTED_ORIGINS = ['https://topranks.ai']
+CSRF_TRUSTED_ORIGINS = ['https://topranks.ai']
 
 if os.getenv('ECS_CONTAINER_METADATA_FILE'):
     metadata_file_path = os.environ['ECS_CONTAINER_METADATA_FILE']
@@ -135,7 +135,7 @@ DATABASES = {
         'PORT':     os.getenv("POSTGRES_PORT", '5432'),
     }
 }
-# CONN_MAX_AGE = 60 #seconds to keep database connection alive
+CONN_MAX_AGE = 60 #seconds to keep database connection alive
 
 # DATABASES = {
 #     'default': {
@@ -249,8 +249,8 @@ CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://localhost:6379
 CELERY_TIME_ZONE = "America/New_York"
 
 # HTTPS Settings for production
-# CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", False)
-# SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", False)
+CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", False)
+SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", False)
 # SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", False)
 
 
