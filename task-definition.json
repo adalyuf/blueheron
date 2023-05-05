@@ -37,7 +37,7 @@
                 },
                 {
                     "name": "DJANGO_DEBUG",
-                    "value": "False"
+                    "value": "True"
                 },
                 {
                     "name": "USE_NGROK",
@@ -50,6 +50,10 @@
                 {
                     "name": "DJANGO_STATIC_HOST",
                     "value": "https://d3l7mu0ieyh7bq.cloudfront.net"
+                },
+                {
+                    "name": "AWS_S3_ACCESS_KEY_ID",
+                    "value": "AKIAXVWWRCMTSY5S3TV2"
                 }
             ],
             "environmentFiles": [],
@@ -67,6 +71,10 @@
                 {
                     "name": "OPENAI_API_KEY",
                     "valueFrom": "arn:aws:secretsmanager:us-east-2:527657145127:secret:topranks-prod-secrets-KZYhJK:OPENAI_API_KEY::"
+                },
+                {
+                    "name": "AWS_S3_SECRET_ACCESS_KEY",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:527657145127:secret:topranks-prod-secrets-KZYhJK:AWS_S3_SECRET_ACCESS_KEY::"
                 }
             ],
             "logConfiguration": {
