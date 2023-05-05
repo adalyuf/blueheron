@@ -37,7 +37,7 @@
                 },
                 {
                     "name": "DJANGO_DEBUG",
-                    "value": "True"
+                    "value": "False"
                 },
                 {
                     "name": "USE_NGROK",
@@ -50,6 +50,18 @@
                 {
                     "name": "DJANGO_STATIC_HOST",
                     "value": "https://d3l7mu0ieyh7bq.cloudfront.net"
+                },
+                {
+                    "name": "CSRF_COOKIE_SECURE",
+                    "value": "True"
+                },
+                {
+                    "name": "SESSION_COOKIE_SECURE",
+                    "value": "True"
+                },
+                {
+                    "name": "SECURE_SSL_REDIRECT",
+                    "value": "True"
                 },
                 {
                     "name": "AWS_S3_ACCESS_KEY_ID",
