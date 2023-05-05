@@ -47,6 +47,7 @@ DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 USE_NGROK = os.environ.get('USE_NGROK', '') != 'False'
 
 ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '3.132.134.103', '.topranks.ai' ]
+CSRF_TRUSTED_ORIGINS = ['https://topranks.ai']
 
 if os.getenv('ECS_CONTAINER_METADATA_FILE'):
     metadata_file_path = os.environ['ECS_CONTAINER_METADATA_FILE']
