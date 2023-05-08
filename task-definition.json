@@ -16,10 +16,6 @@
             "essential": true,
             "environment": [
                 {
-                    "name": "CELERY_BACKEND",
-                    "value": "redis://127.0.0.1:6379"
-                },
-                {
                     "name": "POSTGRES_USER",
                     "value": "dbadmin"
                 },
@@ -44,8 +40,12 @@
                     "value": "False"
                 },
                 {
+                    "name": "CELERY_BACKEND",
+                    "value": "clustercfg.toprank-redis.1qrt0p.memorydb.us-east-2.amazonaws.com:6379"
+                },
+                {
                     "name": "CELERY_BROKER",
-                    "value": "redis://127.0.0.1:6379"
+                    "value": "clustercfg.toprank-redis.1qrt0p.memorydb.us-east-2.amazonaws.com:6379"
                 },
                 {
                     "name": "DJANGO_STATIC_HOST",
