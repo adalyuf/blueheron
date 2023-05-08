@@ -41,11 +41,11 @@
                 },
                 {
                     "name": "CELERY_BACKEND",
-                    "value": "clustercfg.toprank-redis.1qrt0p.memorydb.us-east-2.amazonaws.com:6379"
+                    "value": "redis://clustercfg.toprank-redis.1qrt0p.memorydb.us-east-2.amazonaws.com:6379"
                 },
                 {
                     "name": "CELERY_BROKER",
-                    "value": "clustercfg.toprank-redis.1qrt0p.memorydb.us-east-2.amazonaws.com:6379"
+                    "value": "redis://clustercfg.toprank-redis.1qrt0p.memorydb.us-east-2.amazonaws.com:6379"
                 },
                 {
                     "name": "DJANGO_STATIC_HOST",
