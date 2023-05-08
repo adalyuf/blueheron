@@ -1,23 +1,17 @@
-# blueheron
+# TopRanks.ai
 
 To get container up and running:
 
 ```
-git clone https://github.com/adalyuf/blueheron.git
+git clone https://github.com/adalyuf/topranks.git
 ```
 
 ```
-cd blueheron
+cd topranks
 code .
 ```
 
-Ask the author for the .env file with secrets and add this into the main (blueheron) directory.
-
-The .env file has the following:
-
-- OPENAI_API_KEY=
-- DJANGO_SECRET_KEY=
-- USE_NGROK=True
+Ask the author for the .env file with secrets and add this into the main (topranks) directory.
 
 In VSCode press `F1` and `Rebuild and reopen in container`
 

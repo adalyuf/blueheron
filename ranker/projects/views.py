@@ -19,6 +19,7 @@ from _keenthemes.libs.theme import KTTheme
 from ranker.models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel
 from ranker.forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm, AddDomainToProjectForm, AddUserToProjectForm, CreateConversationsForm
 from accounts.models import User
+from ranker.tasks import save_message_response, call_openai
 
 import csv
 import os
@@ -110,7 +111,10 @@ def project_get_all_responses(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
 
     if request.method == 'POST':
+        djmessages.info(request, "Requesting responses.")
         for conversation in project.conversation_set.all():
-            call_command('mpresponses', '--conversation', conversation.id)
-
+            for message in conversation.message_set.all():
+                message.requested_at = timezone.now()
+                message.save()
+                call_openai.apply_async( (message.prompt,), link=save_message_response.s(message.id)) #note the comma in arguments, critical to imply tuple, otherwise thinks array
     return redirect('conversation_detail', conversation_id=conversation.id)

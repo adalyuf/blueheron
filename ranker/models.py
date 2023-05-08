@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.urls import reverse
 from django.db.models import UniqueConstraint
+from django.core.validators import FileExtensionValidator
 from accounts.models import User 
 # Create your models here.
 
@@ -30,7 +31,7 @@ def keyword_directory_path(instance, filename=None):
 
 class KeywordFile(models.Model):
     domain      = models.ForeignKey(Domain, on_delete=models.CASCADE)
-    filepath    = models.FileField(upload_to=keyword_directory_path)
+    filepath    = models.FileField(upload_to=keyword_directory_path, validators=[FileExtensionValidator(allowed_extensions=["csv"])])
     uploaded_at = models.DateTimeField(auto_now_add=True)
     primary     = models.BooleanField(default=False)
     processed_at = models.DateTimeField(default=None, null=True)
