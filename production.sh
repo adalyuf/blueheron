@@ -28,3 +28,5 @@ celery --app=topranks worker --loglevel=info --detach
 # new hotness: https://pythonspeed.com/articles/gunicorn-in-docker/
 gunicorn topranks.wsgi -b 0.0.0.0:80 --worker-tmp-dir /dev/shm --workers=2 --threads=4 --worker-class=gthread
 
+#To monitor celery in production, run flower locally with below command.
+#celery --app=topranks --broker=redis://18.216.189.97:6379 flower --port=5555

@@ -26,6 +26,7 @@ celery --app=topranks worker --loglevel=info --detach
 ps aux | grep celery
 
 #For celery-flower dashboard, run following:
+#local
 #celery --app=topranks --broker=redis://localhost:6379 flower --port=5555
 
 #To clear out the database:
