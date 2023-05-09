@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone, html
 
 from ranker.models import Domain, TokenType, Token, Template, TemplateItem, Conversation, Message, KeywordFile, Keyword, KeywordPosition
+from ranker.tasks import call_openai, save_keyword_response
 
 import os, openai, markdown, json, csv
 
@@ -34,23 +35,20 @@ class Command(BaseCommand):
             domain = myfile.domain
             file_start = timezone.now()
 
-            #TODO: See below for a partial attempt at making the file reader a generic function. Decide whether to continue down this path.
+            #Read in Keywords from file
             with myfile.filepath.open(mode='r') as csvfile:
                 item_list = []
                 reader = csv.DictReader(csvfile)
                 for row in reader:
-                    item = Keyword( #This is the only section that needs to be edited in this generic setup
+                    item = Keyword( 
                         keyword = row['Keyword'],
                     )
                     item_list.append(item)
-                    if len(item_list) > 5000:
-                        item_list[0].__class__.objects.bulk_create(item_list, ignore_conflicts=True) #also may want to edit whether to ignore or update conflicts
-                        self.stdout.write(f"Bulk insert completed: {len(item_list)} {type(item_list[0]).__name__} records")
-                        item_list = []
-                if item_list:
-                        item_list[0].__class__.objects.bulk_create(item_list, ignore_conflicts=True)
+                Keyword.objects.bulk_create(item_list, ignore_conflicts=True)
+
                 self.stdout.write(f"Bulk insert completed: {len(item_list)} {type(item_list[0]).__name__} records")
 
+            #Save original data in case useful later
             keyword_position_list = []
             with myfile.filepath.open(mode='r') as csvfile:
                 reader = csv.DictReader(csvfile)

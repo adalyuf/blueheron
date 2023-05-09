@@ -3,7 +3,7 @@ from django.utils import timezone, html
 from celery import shared_task
 import os, openai, markdown, json
 
-from ranker.models import Message
+from ranker.models import Message, Keyword
 
 def return_last_value(retry_state):
         """return the result of the last call attempt"""
@@ -59,3 +59,28 @@ def save_message_response(response, message_id):
         message.requested_at = None
         message.save()
         print(f"Couldn't get response from OpenAI API. Resetting requested_at to null.")
+
+@shared_task()
+def save_keyword_response(api_response, keyword_id):
+    keyword = Keyword.objects.get(id = keyword_id)
+    try:
+        start_pos   = api_response.find('{')
+        end_pos     = api_response.rfind('}')
+        json_string = api_response[start_pos:end_pos+1]
+        json_object = json.loads(json_string)
+
+        keyword.json_response = json_object
+
+        keyword.user_intent                 = keyword.json_response['user_intent']
+        keyword.natural_language_question   = keyword.json_response['natural_language_question']
+        keyword.ai_answer                   = keyword.json_response['ai_answer']
+        keyword.likely_previous_queries     = keyword.json_response['likely_previous_queries']
+        keyword.likely_next_queries         = keyword.json_response['likely_next_queries']
+
+        keyword.answered_at = timezone.now()
+        keyword.save()
+        print(f"{keyword} took {(keyword.answered_at-keyword.requested_at).total_seconds()} seconds.")
+    except:
+        print("Couldn't assign response to columns. Resetting requested_at to null.")
+        keyword.requested_at = None
+        keyword.save()
