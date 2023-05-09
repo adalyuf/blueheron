@@ -36,7 +36,7 @@ class KeywordFile(models.Model):
     primary     = models.BooleanField(default=False)
     processed_at = models.DateTimeField(default=None, null=True)
     def __str__(self):
-        return f"{keyword_directory_path(self)}"
+        return self.filepath.name
     
 class TokenType(models.Model):
     type = models.CharField(max_length=200, unique=True)

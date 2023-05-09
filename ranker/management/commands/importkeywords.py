@@ -19,25 +19,23 @@ class Command(BaseCommand):
     help = "Import keywords from all primary files that have not yet been processed."
 
     def add_arguments(self, parser):
-        parser.add_argument('--start', nargs=1, type=int)
-        parser.add_argument('--end', nargs=1, type=int) 
-        parser.add_argument('--rebuild', action='append', type=bool)
+        parser.add_argument('--kwfile', action='store', type=int)
 
 
     def handle(self, *args, **options):
         start_time = timezone.now()
 
-        if options['rebuild'] == True:
-            pass
-
-        files = KeywordFile.objects.filter(primary=True).filter(processed_at=None)
+        if options['kwfile']:
+            files = KeywordFile.objects.filter(id__exact=options['kwfile']).filter(primary=True).filter(processed_at=None)
+        else:
+            files = KeywordFile.objects.filter(primary=True).filter(processed_at=None)
 
         for myfile in files:
             domain = myfile.domain
             file_start = timezone.now()
 
             #TODO: See below for a partial attempt at making the file reader a generic function. Decide whether to continue down this path.
-            with open(myfile.filepath.name, 'r', newline='') as csvfile:
+            with myfile.filepath.open(mode='r') as csvfile:
                 item_list = []
                 reader = csv.DictReader(csvfile)
                 for row in reader:
@@ -54,7 +52,7 @@ class Command(BaseCommand):
                 self.stdout.write(f"Bulk insert completed: {len(item_list)} {type(item_list[0]).__name__} records")
 
             keyword_position_list = []
-            with open(myfile.filepath.name, 'r', newline='') as csvfile:
+            with myfile.filepath.open(mode='r') as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
                     keyword = Keyword.objects.get(keyword = row['Keyword'])
