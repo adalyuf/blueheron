@@ -13,7 +13,7 @@
 	// This can be used to network with other containers or the host.
 	"forwardPorts": [5000, 5432],
 
-    "postCreateCommand": "./startup.sh"
+    "postCreateCommand": "./build-locally.sh"
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "pip install --user -r requirements.txt",
