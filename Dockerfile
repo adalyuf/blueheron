@@ -16,4 +16,4 @@ RUN sh ./install-nvm-aws.sh
 RUN pip install -r requirements.txt
 
 EXPOSE 80
-ENTRYPOINT ./production.sh
+ENTRYPOINT ./start-production.sh
