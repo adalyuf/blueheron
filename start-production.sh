@@ -17,7 +17,7 @@ python manage.py migrate
 python manage.py collectstatic --noinput
 
 #Redis daemon
-redis-server --daemonize yes
+# redis-server --daemonize yes
 
 #Celery detached background processes
 celery --app=topranks worker --loglevel=info --detach
@@ -29,4 +29,4 @@ celery --app=topranks worker --loglevel=info --detach
 gunicorn topranks.wsgi -b 0.0.0.0:80 --worker-tmp-dir /dev/shm --workers=2 --threads=4 --worker-class=gthread
 
 #To monitor celery in production, run flower locally with below command.
-#celery --app=topranks --broker=redis://18.216.189.97:6379 flower --port=5555
+#celery --app=topranks --broker=redis://:TopRedisPass99@3.145.166.233:6379 flower --port=5555
