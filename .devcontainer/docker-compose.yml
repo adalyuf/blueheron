@@ -16,6 +16,7 @@ services:
     network_mode: service:db
     env_file:
       - ../.env
+      # - ../aws-production.env
     depends_on:
       - db
 
