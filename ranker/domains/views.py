@@ -81,12 +81,16 @@ def keywordfile_make_primary(request, domain_id, keywordfile_id):
 @login_required
 def get_keyword_responses(request):
     
-    keyword_list = Keyword.objects.filter(requested_at=None)[:100]
+    keyword_list = Keyword.objects.filter(requested_at=None)[:10000]
+
+    item_list = []
+    for keyword in keyword_list:
+        keyword.requested_at = timezone.now()
+        item_list.append(keyword)
+    Keyword.objects.bulk_update(item_list, ["requested_at"], batch_size=5000)
 
     #Request responses for each keyword
     for keyword in keyword_list:
-        keyword.requested_at = timezone.now()
-        keyword.save()
         prompt = "If a user searches for @currentKeyword, what is their user intent, how would you rephrase this as a natural language question, please answer the natural language question, what was their likely previous query, and what could be their next query? Provide your response as a simple JSON object, with keys \"user_intent\", \"natural_language_question\", \"ai_answer\", \"likely_previous_queries\", and \"likely_next_queries\". If this is likely to be their first or last query in their journey, answer \"none\" in the field"
         prompt = prompt.replace("@currentKeyword", keyword.keyword)
         call_openai.apply_async( (prompt,), link=save_keyword_response.s(keyword.id)) #note the comma in arguments, critical to imply tuple, otherwise thinks array, passes response as first argument
