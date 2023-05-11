@@ -18,6 +18,8 @@ class Domain(models.Model):
     adult_content = models.BooleanField(default=False)
     def __str__(self):
         return self.domain
+    def get_absolute_url(self):
+        return reverse('domain_detail', args=[str(self.id)])
     
     class Meta:
         ordering = ['rank']
@@ -37,6 +39,8 @@ class KeywordFile(models.Model):
     processed_at = models.DateTimeField(default=None, null=True)
     def __str__(self):
         return self.filepath.name
+    def get_absolute_url(self):
+        return reverse('domain_detail', args=[str(self.domain.id)])
     
 class TokenType(models.Model):
     type = models.CharField(max_length=200, unique=True)
@@ -79,12 +83,16 @@ class ProjectUser(models.Model):
     user    = models.ForeignKey(User    , on_delete=models.CASCADE)
     def __str__(self):
         return f"{self.project}: {self.user}"
+    def get_absolute_url(self):
+        return reverse('project_settings', args=[str(self.project.id)])
     
 class ProjectDomain(models.Model):
     project = models.ForeignKey(Project , on_delete=models.CASCADE)
     domain  = models.ForeignKey(Domain  , on_delete=models.CASCADE)
     def __str__(self):
         return f"{self.project}: {self.domain}"
+    def get_absolute_url(self):
+        return reverse('project_settings', args=[str(self.project.id)])
     
 class Template(models.Model):
     scope_choices = [
@@ -98,6 +106,8 @@ class Template(models.Model):
     helper_text_after   = models.TextField(null=True, blank=True)
     def __str__(self):
         return self.template
+    def get_absolute_url(self):
+        return reverse('template_detail', args=[str(self.id)])
 
 class TemplateItem(models.Model):
     mode_choices = [
@@ -114,6 +124,8 @@ class TemplateItem(models.Model):
     mode        = models.CharField(max_length=200, choices=mode_choices, default='markdown')
     def __str__(self):
         return self.prompt1
+    def get_absolute_url(self):
+        return reverse('template_detail', args=[str(self.template.id)])
     
     class Meta:
         ordering = ['template', 'order']
@@ -131,6 +143,8 @@ class Conversation(models.Model):
         ]
     def __str__(self):
         return f"{self.template.template}: {self.domain.domain}"
+    def get_absolute_url(self):
+        return reverse('conversation_detail', args=[str(self.id)])
 
 
 class Message(models.Model):
@@ -146,7 +160,9 @@ class Message(models.Model):
     answered_at     = models.DateTimeField(null=True)
     template_item   = models.ForeignKey(TemplateItem, on_delete=models.SET_NULL, null=True)
     def __str__(self):
-        return self.prompt 
+        return self.prompt
+    def get_absolute_url(self):
+        return reverse('conversation_edit', args=[str(self.conversation.id)])
     
     class Meta:
         ordering = ['order']
@@ -185,3 +201,5 @@ class KeywordPosition(models.Model):
     serp                = models.TextField(null=True)
     intents             = models.TextField(null=True)
     type                = models.TextField(null=True)
+    def __str__(self):
+        return f"{self.keyword} - {self.domain} - {self.position}"
