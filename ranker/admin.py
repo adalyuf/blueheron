@@ -7,6 +7,7 @@ from .models import Domain, KeywordFile, Template, TemplateItem, Conversation, M
 class DomainAdmin(admin.ModelAdmin):
     list_display = ( 'domain', 'keywords', 'cost', 'rank', 'adult_content')
     fields = ['domain', 'rank', 'adult_content', ('keywords', 'traffic', 'cost'), ('ad_keywords', 'ad_traffic', 'ad_cost')]
+    search_fields = ['domain']
 
 @admin.register(KeywordFile)
 class KeywordFileAdmin(admin.ModelAdmin):
