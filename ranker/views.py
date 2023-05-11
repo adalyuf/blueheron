@@ -16,7 +16,7 @@ from django.urls import reverse, reverse_lazy
 from _keenthemes.__init__ import KTLayout
 from _keenthemes.libs.theme import KTTheme
 
-from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel
+from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword
 from .forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm, AddDomainToProjectForm, CreateConversationsForm
 
 import csv
@@ -35,6 +35,33 @@ class TemplateListView(generic.ListView):
         KTTheme.addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']) # Include vendors and javascript files for dashboard widgets    
         context['form'] = TemplateForm()
         return context
+
+class KeywordListView(generic.ListView):
+    model = Keyword
+    queryset = Keyword.objects.filter(answered_at__isnull=False) 
+    paginate_by = 100
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context = KTLayout.init(context) # A function to init the global layout. It is defined in _keenthemes/__init__.py file
+        KTTheme.addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']) # Include vendors and javascript files for dashboard widgets    
+        context['kwtotal'] = Keyword.objects.count()
+        context['kwavailable'] = Keyword.objects.filter(requested_at__isnull=True).count()
+        context['kwpending'] = Keyword.objects.filter(requested_at__isnull=False).filter(answered_at__isnull=True).count()
+        context['kwcompleted'] = Keyword.objects.filter(answered_at__isnull=False).count()
+        return context
+
+def keyword_search(request):
+    user_search = request.GET['user_search']
+    if user_search:
+        queryset = Keyword.objects.filter(answered_at__isnull=False).filter(ai_answer__icontains=user_search)
+    else:
+        queryset = Keyword.objects.filter(answered_at__isnull=False) 
+    return render(request, 'ranker/keyword_list.html', {'keyword_list': queryset})
+
+class KeywordDetailView(generic.DetailView):
+    model = Keyword
+
 
 def template_create(request, project_id=None):
     template_form = TemplateForm()
