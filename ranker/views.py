@@ -72,7 +72,6 @@ def reset_keyword_queue(request):
     Keyword.objects.bulk_update(item_list, ["requested_at"], batch_size=5000)
     return redirect('keyword_list')
 
-
 class KeywordDetailView(generic.DetailView):
     model = Keyword
 

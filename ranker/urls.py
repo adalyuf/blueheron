@@ -52,4 +52,5 @@ urlpatterns = [
     path("keywords/keyword_search/" , login_required(views.keyword_search)                  , name="keyword_search"),
     path("keywords/reset_keyword_queue/" , login_required(views.reset_keyword_queue)        , name="reset_keyword_queue"),
 
+
 ]
