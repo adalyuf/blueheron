@@ -15,8 +15,8 @@
 <h2>Keyword Statistics</h2>
 <ul>
     <li>Total Keywords: {{kwtotal}}</li>
-    <li>Available to be queued: {{kwavailable}}</li>
-    <li>Queued: {{kwpending}} </li>
+    <li>Available to be queued: {{kwavailable}}  <a href="{% url 'get_keyword_responses' %}">(queue {{kw_batch_size}})</a></li> 
+    <li>Queued: {{kwpending}} <a href="{% url 'reset_keyword_queue' %}">(reset queue)</a></li>
     <li>Completed: {{kwcompleted}} </li>
 </ul>
 

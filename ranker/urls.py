@@ -49,6 +49,7 @@ urlpatterns = [
 
     path("keywords/"                , login_required(views.KeywordListView.as_view())       , name='keyword_list'),
     path("keywords/<int:pk>/"       , login_required(views.KeywordDetailView.as_view())     , name='keyword_detail'),
-    path("keywords/keyword_search/" , login_required(views.keyword_search)                  , name="keyword_search")
+    path("keywords/keyword_search/" , login_required(views.keyword_search)                  , name="keyword_search"),
+    path("keywords/reset_keyword_queue/" , login_required(views.reset_keyword_queue)        , name="reset_keyword_queue"),
 
 ]

@@ -16,6 +16,10 @@
             "essential": true,
             "environment": [
                 {
+                    "name": "ENVIRONMENT",
+                    "value": "production"
+                },
+                {
                     "name": "POSTGRES_USER",
                     "value": "dbadmin"
                 },
