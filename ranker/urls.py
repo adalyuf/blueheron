@@ -47,4 +47,8 @@ urlpatterns = [
     path('projects/<int:pk>/update/'                    , login_required(project_views.ProjectUpdate.as_view())         , name='project_update'),
     path('projects/<int:pk>/delete/'                    , login_required(project_views.ProjectDelete.as_view())         , name='project_delete'),
 
+    path("keywords/"                , login_required(views.KeywordListView.as_view())       , name='keyword_list'),
+    path("keywords/<int:pk>/"       , login_required(views.KeywordDetailView.as_view())     , name='keyword_detail'),
+    path("keywords/keyword_search/" , login_required(views.keyword_search)                  , name="keyword_search")
+
 ]

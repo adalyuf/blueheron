@@ -60,6 +60,7 @@ class ProjectDomainAdmin(admin.ModelAdmin):
 class KeywordAdmin(admin.ModelAdmin):
     list_display = ('keyword', 'user_intent', 'likely_previous_queries', 'likely_next_queries', 'requested_at', 'answered_at')
     list_filter = ('answered_at',)
+    search_fields = ['keyword', 'ai_answer', 'likely_previous_queries', 'likely_next_queries']
     
 @admin.register(KeywordPosition)
 class KeywordPositionAdmin(admin.ModelAdmin):

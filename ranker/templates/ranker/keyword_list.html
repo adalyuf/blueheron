@@ -1,0 +1,54 @@
+{% extends 'layout/default.html' %}
+
+{% load i18n %}
+
+{% block title %}{% translate "Keywords" %}{% endblock %}
+{% block bctitle %}{% translate "Keywords" %}{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'keyword_list' %}" class="text-muted text-hover-primary">Keywords</a></li>
+{% endblock breadcrumbs %}
+
+{% block content %}
+<h1>Keywords</h1>
+
+<h2>Keyword Statistics</h2>
+<ul>
+    <li>Total Keywords: {{kwtotal}}</li>
+    <li>Available to be queued: {{kwavailable}}</li>
+    <li>Queued: {{kwpending}} </li>
+    <li>Completed: {{kwcompleted}} </li>
+</ul>
+
+<form class="d-flex justify-content-center" role="search" method="get" action="{% url 'keyword_search' %}"">
+    <input name="user_search" class="form-control me-2" style="max-width: 600px;" type="search" placeholder="Search responses" aria-label="Search">
+    <button class="btn btn-outline-success" type="submit">Search</button>
+</form>
+
+{% if keyword_list %}
+    <div class="table-responsive">
+        <table id="kt_datatable_zero_configuration" class="table table-row-bordered gy-5">
+        <thead>
+            <tr>
+            <th scope="col">Keyword</th>
+            <th scope="col">User Intent</th>
+            <th scope="col">Natural Language Question</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for keyword in keyword_list %}
+            <tr>
+                <td>{{keyword.keyword}}</td>
+                <td>{{keyword.user_intent}}</td>
+                <td><a href="{% url 'keyword_detail' keyword.id %}">{{keyword.natural_language_question}}</a></td>
+            </tr>
+    {% endfor %}
+        </tbody>
+        </table>
+    </div>
+    {% include 'ranker/partials/_pagination.html' %}
+{% else %}
+    <p>No keywords available.</p>
+{% endif %}
+
+{% endblock content %}
