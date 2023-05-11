@@ -49,6 +49,10 @@ class KeywordListView(generic.ListView):
         context['kwavailable'] = Keyword.objects.filter(requested_at__isnull=True).count()
         context['kwpending'] = Keyword.objects.filter(requested_at__isnull=False).filter(answered_at__isnull=True).count()
         context['kwcompleted'] = Keyword.objects.filter(answered_at__isnull=False).count()
+        if os.getenv("ENVIRONMENT") == "production":
+            context['kw_batch_size'] = 10000
+        else:
+            context['kw_batch_size'] = 100
         return context
 
 def keyword_search(request):
@@ -58,6 +62,15 @@ def keyword_search(request):
     else:
         queryset = Keyword.objects.filter(answered_at__isnull=False) 
     return render(request, 'ranker/keyword_list.html', {'keyword_list': queryset})
+
+def reset_keyword_queue(request):
+    pending_keywords = Keyword.objects.filter(requested_at__isnull=False).filter(answered_at__isnull=True)
+    item_list= []
+    for keyword in pending_keywords:
+        keyword.requested_at = None
+        item_list.append(keyword)
+    Keyword.objects.bulk_update(item_list, ["requested_at"], batch_size=5000)
+    return redirect('keyword_list')
 
 class KeywordDetailView(generic.DetailView):
     model = Keyword

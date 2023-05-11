@@ -80,8 +80,12 @@ def keywordfile_make_primary(request, domain_id, keywordfile_id):
 
 @login_required
 def get_keyword_responses(request):
+    if os.getenv("ENVIRONMENT") == "production":
+        kw_batch_size = 10000
+    else:
+        kw_batch_size = 100
     
-    keyword_list = Keyword.objects.filter(requested_at=None)[:10000]
+    keyword_list = Keyword.objects.filter(requested_at=None)[:kw_batch_size]
 
     item_list = []
     for keyword in keyword_list:
@@ -95,4 +99,4 @@ def get_keyword_responses(request):
         prompt = prompt.replace("@currentKeyword", keyword.keyword)
         call_openai.apply_async( (prompt,), link=save_keyword_response.s(keyword.id)) #note the comma in arguments, critical to imply tuple, otherwise thinks array, passes response as first argument
 
-    return redirect('home')
+    return redirect('keyword_list')
