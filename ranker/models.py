@@ -1,20 +1,20 @@
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse
-from django.db.models import UniqueConstraint
+from django.db.models import UniqueConstraint, Max 
 from django.core.validators import FileExtensionValidator
 from accounts.models import User 
 # Create your models here.
 
 class Domain(models.Model):
     domain = models.CharField(max_length=200, unique=True)
-    keywords = models.BigIntegerField(null=True)
-    traffic = models.BigIntegerField(null=True)
-    cost = models.DecimalField(max_digits=19, decimal_places=2,null=True)
-    rank = models.IntegerField(null=True)
-    ad_keywords = models.BigIntegerField(null=True)
-    ad_traffic = models.BigIntegerField(null=True)
-    ad_cost = models.DecimalField(max_digits=19, decimal_places=2,null=True)
+    rank = models.IntegerField(null=True, default=999999)
+    keywords    = models.BigIntegerField(null=True, blank=True)
+    traffic     = models.BigIntegerField(null=True, blank=True)
+    cost        = models.DecimalField(max_digits=19, decimal_places=2,null=True, blank=True)
+    ad_keywords = models.BigIntegerField(null=True, blank=True)
+    ad_traffic  = models.BigIntegerField(null=True, blank=True)
+    ad_cost     = models.DecimalField(max_digits=19, decimal_places=2,null=True, blank=True)
     adult_content = models.BooleanField(default=False)
     def __str__(self):
         return self.domain
