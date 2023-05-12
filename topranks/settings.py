@@ -67,6 +67,7 @@ DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 USE_NGROK = os.environ.get('USE_NGROK', '') != 'False'
 
 ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '3.132.134.103', '.topranks.ai' ]
+INTERNAL_IPS = ['localhost', "127.0.0.1"]
 CSRF_TRUSTED_ORIGINS = ['https://topranks.ai']
 
 if os.getenv('ECS_CONTAINER_METADATA_FILE'):
@@ -92,12 +93,14 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     "ranker",
     "accounts",
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
     "topranks.middleware.HealthCheckMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
