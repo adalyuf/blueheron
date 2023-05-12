@@ -16,6 +16,8 @@ from django.contrib.messages import constants as messages
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.cloud_resource_context import CloudResourceContextIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
 
 def trace_sample_rate(sampling_context):
     if os.getenv("ENVIRONMENT") == "production":
@@ -34,6 +36,8 @@ sentry_sdk.init(
     integrations=[
         DjangoIntegration(),
         CeleryIntegration(),
+        CloudResourceContextIntegration(),
+        RedisIntegration(),
     ],
     environment=os.getenv("ENVIRONMENT"),
     # Set traces_sample_rate to 1.0 to capture 100%
@@ -63,6 +67,7 @@ DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 USE_NGROK = os.environ.get('USE_NGROK', '') != 'False'
 
 ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '3.132.134.103', '.topranks.ai' ]
+INTERNAL_IPS = ['localhost', "127.0.0.1"]
 CSRF_TRUSTED_ORIGINS = ['https://topranks.ai']
 
 if os.getenv('ECS_CONTAINER_METADATA_FILE'):
@@ -88,12 +93,14 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     "ranker",
     "accounts",
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
     "topranks.middleware.HealthCheckMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",

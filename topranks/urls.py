@@ -23,6 +23,7 @@ def trigger_error(request):
 
 urlpatterns = [
     path('sentry-debug/', trigger_error),
+    path('__debug__/', include('debug_toolbar.urls')),
     path("", include("ranker.urls")),    
     path('account/', include('allauth.urls')),
     path("admin/", admin.site.urls)
