@@ -16,6 +16,8 @@ from django.contrib.messages import constants as messages
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.cloud_resource_context import CloudResourceContextIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
 
 def trace_sample_rate(sampling_context):
     if os.getenv("ENVIRONMENT") == "production":
@@ -34,6 +36,8 @@ sentry_sdk.init(
     integrations=[
         DjangoIntegration(),
         CeleryIntegration(),
+        CloudResourceContextIntegration(),
+        RedisIntegration(),
     ],
     environment=os.getenv("ENVIRONMENT"),
     # Set traces_sample_rate to 1.0 to capture 100%
