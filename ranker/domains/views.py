@@ -75,7 +75,7 @@ def keywordfile_make_primary(request, domain_id, keywordfile_id):
     keywordfile.primary = True 
     keywordfile.save()
     call_command('importkeywords', kwfile=keywordfile.id)
-    djmessages.info(request, 'Loading keywords')
+    djmessages.success(request, 'Keywords loaded')
     return redirect('domain_detail', domain_id=domain_id)
 
 @login_required
