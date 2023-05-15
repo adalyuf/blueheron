@@ -36,7 +36,7 @@ def call_openai(self, prompt):
 
 
 # @shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=5, retry_kwargs={'max_retries': 5})
-@shared_task()
+@shared_task(queue="express")
 def save_message_response(response, message_id):
     message = Message.objects.get(id = message_id)
     try:
@@ -60,7 +60,7 @@ def save_message_response(response, message_id):
         message.save()
         print(f"Couldn't get response from OpenAI API. Resetting requested_at to null.")
 
-@shared_task()
+@shared_task(queue="express")
 def save_keyword_response(api_response, keyword_id):
     keyword = Keyword.objects.get(id = keyword_id)
     try:
