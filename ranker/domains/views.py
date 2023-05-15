@@ -28,7 +28,7 @@ import json
 
 class DomainListView(generic.ListView):
     model = Domain
-    queryset = Domain.objects.filter(adult_content__exact=False).order_by('rank')
+    queryset = Domain.objects.filter(adult_content__exact=False).filter(keywordfile__primary=None).order_by('rank')
     
     paginate_by = 100
 
