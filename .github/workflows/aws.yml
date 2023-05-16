@@ -37,6 +37,7 @@ env:
   ECS_EXPRESS_SERVICE: topranks-prod-web-express-service
   ECS_CLUSTER: topranks-prod                          # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: ./task-definition.json         # set this to the path to your Amazon ECS task definition file, e.g. .aws/task-definition.json
+  ECS_EXPRESS_TASK_DEFINITION: ./task-definition-express.json
   CONTAINER_NAME: web                                 # set this to the name of the container in the containerDefinitions section of your task definition
 
 permissions:
@@ -76,7 +77,7 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
+    - name: Fill in the new image ID in the web app task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
@@ -84,10 +85,18 @@ jobs:
         container-name: ${{ env.CONTAINER_NAME }}
         image: ${{ steps.build-image.outputs.image }}
 
+    - name: Fill in the new image ID in the express task definition
+      id: task-def-express
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.ECS_EXPRESS_TASK_DEFINITION }}
+        container-name: ${{ env.CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+
     - name: Deploy express web container
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        task-definition: ${{ steps.task-def-express.outputs.task-definition }}
         service: ${{ env.ECS_EXPRESS_SERVICE }}
         cluster: ${{ env.ECS_CLUSTER }}
         wait-for-service-stability: false

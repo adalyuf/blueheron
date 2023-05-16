@@ -1,0 +1,133 @@
+{
+    "containerDefinitions": [
+        {
+            "name": "web",
+            "image": "527657145127.dkr.ecr.us-east-2.amazonaws.com/topranks-production:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "web-80-tcp",
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "entryPoint": [
+                "sh",
+                "start-production-express.sh"
+            ],
+            "environment": [
+                {
+                    "name": "ENVIRONMENT",
+                    "value": "production"
+                },
+                {
+                    "name": "POSTGRES_USER",
+                    "value": "dbadmin"
+                },
+                {
+                    "name": "POSTGRES_HOST",
+                    "value": "topranks-db.cocwgqf5m90w.us-east-2.rds.amazonaws.com"
+                },
+                {
+                    "name": "POSTGRES_DATABASE",
+                    "value": "topdb"
+                },
+                {
+                    "name": "POSTGRES_PORT",
+                    "value": "5432"
+                },
+                {
+                    "name": "DJANGO_DEBUG",
+                    "value": "False"
+                },
+                {
+                    "name": "USE_NGROK",
+                    "value": "False"
+                },
+                {
+                    "name": "CELERY_BROKER",
+                    "value": "redis://:TopRedisPass99@18.219.253.102:6379/0"
+                },
+                {
+                    "name": "CELERY_BACKEND",
+                    "value": "redis://:TopRedisPass99@18.219.253.102:6379/1"
+                },
+                {
+                    "name": "DJANGO_STATIC_HOST",
+                    "value": "https://d3l7mu0ieyh7bq.cloudfront.net"
+                },
+                {
+                    "name": "CSRF_COOKIE_SECURE",
+                    "value": "True"
+                },
+                {
+                    "name": "SESSION_COOKIE_SECURE",
+                    "value": "True"
+                },
+                {
+                    "name": "AWS_S3_ACCESS_KEY_ID",
+                    "value": "AKIAXVWWRCMTSY5S3TV2"
+                }
+            ],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "secrets": [
+                {
+                    "name": "DJANGO_SECRET_KEY",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:527657145127:secret:topranks-prod-secrets-KZYhJK:DJANGO_SECRET_KEY::"
+                },
+                {
+                    "name": "POSTGRES_PASS",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:527657145127:secret:topranks-prod-secrets-KZYhJK:POSTGRES_PASS::"
+                },
+                {
+                    "name": "OPENAI_API_KEY",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:527657145127:secret:topranks-prod-secrets-KZYhJK:OPENAI_API_KEY::"
+                },
+                {
+                    "name": "AWS_S3_SECRET_ACCESS_KEY",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:527657145127:secret:topranks-prod-secrets-KZYhJK:AWS_S3_SECRET_ACCESS_KEY::"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/topranks-prod-app",
+                    "awslogs-region": "us-east-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost/ || exit"
+                ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3,
+                "startPeriod": 30
+            }
+        }
+    ],
+    "family": "topranks-prod-app",
+    "taskRoleArn": "arn:aws:iam::527657145127:role/ecs-tasks-access-topranks-prod-secrets",
+    "executionRoleArn": "arn:aws:iam::527657145127:role/ecs-tasks-access-topranks-prod-secrets",
+    "networkMode": "awsvpc",
+    "volumes": [],
+    "placementConstraints": [],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "3072",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    },
+    "tags": []
+}
