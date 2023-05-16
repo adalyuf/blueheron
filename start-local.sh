@@ -5,7 +5,8 @@ redis-server --daemonize yes --requirepass LocalRedisPass
 ps aux | grep redis
 
 #Celery detached background processes
-celery --app=topranks worker --loglevel=info --detach --queues celery,express
+celery --app=topranks worker --loglevel=info --detach --queues express --concurrency=10 -n express1@%d
+celery --app=topranks worker --loglevel=info --detach --queues celery,express --concurrency=50 -n worker1@%d
 ps aux | grep celery
 
 #For celery-flower dashboard, run following:
