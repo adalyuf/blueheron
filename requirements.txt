@@ -1,6 +1,6 @@
 boto3==1.26.127
 celery==5.2.7
-Django==4.1.7
+Django==4.2.1
 django-allauth==0.53.1
 django-debug-toolbar==4.0.0
 django-storages==1.13.2
