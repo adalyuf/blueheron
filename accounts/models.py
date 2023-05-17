@@ -36,9 +36,10 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     username_validator = ASCIIUsernameValidator()
 
-    username = CICharField(
+    username = models.CharField(
         _("username"),
         max_length=150,
+        db_collation="case_insensitive",
         unique=True,
         help_text=_("Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."),
         validators=[username_validator],
@@ -48,8 +49,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     first_name = models.CharField(_("first name"), max_length=150, blank=True)
     last_name = models.CharField(_("last name"), max_length=150, blank=True)
-    email = CIEmailField(
+    email = models.EmailField(
         _("email address"),
+        db_collation="case_insensitive",
         unique=True,
         error_messages={
             "unique": _("A user with that email address already exists."),
