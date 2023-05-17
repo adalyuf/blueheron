@@ -247,12 +247,15 @@ STATICFILES_DIRS = [
 STATIC_HOST = os.environ.get("DJANGO_STATIC_HOST", "") #Enabled for AWS CloudFront
 STATIC_URL = STATIC_HOST + "/static_collected/"
 
-# STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
-# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
-
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage"
+    },
+}
 # Use S3 for media file uploads
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 AWS_S3_ADDRESSING_STYLE = "virtual"
 AWS_STORAGE_BUCKET_NAME= "topranks-media-public"
 AWS_DEFAULT_ACL = "public-read"
