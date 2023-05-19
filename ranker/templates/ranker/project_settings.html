@@ -22,28 +22,18 @@
         </div>
         <div class="card-body min-h-250px">
             {% for user in project_user_list %}
-                <div class="row">
-                    <!-- <li class="list-inline-item">
-                        {{user.first_name}} {{user.last_name}}
-                    </li> -->
-                    <div class="col-7">
-                        {{user.email}}
-                    </div>
-                    <div class="col-5">
-                        <form action="{% url 'project_remove_user' project.id %}" method="post" class="form-inline">
-                        {% csrf_token %}      
-                        ( 
-                            <input name="user" type="hidden" value="{{user.id}}">
-                            <input type="submit" value="remove" class="btn btn-link text-muted text-hover-danger fs-8">
-                        )
-                        </form>
-                    </div>
-                </div>
+                <form action="{% url 'project_remove_user' project.id %}" method="post" class="form-inline">
+                    {% csrf_token %}
+                    {{user.email}}
+                    (   <input name="user" type="hidden" value="{{user.id}}">
+                        <input type="submit" value="remove" class="btn btn-link text-muted text-hover-danger fs-8">
+                    )
+                </form>
             {% endfor %}
         </div>
         <div class="card-footer">
             <p class="text-gray-400 pb-5 fw-semibold fs-6">Add user to project</p>
-            <form action="{% url 'project_add_user' project.id  %}" method="post">
+            <form action="{% url 'project_settings' project.id 'user'  %}" method="post">
                 {% csrf_token %}
                 {{ user_form.as_p }}
                 <input type="submit"  class="btn btn-secondary" value="Add User">
@@ -58,32 +48,23 @@
             <h3 class="card-title">Project Templates</h3>
         </div>
         <div class="card-body min-h-250px">
-            <ul>{% if project_template_list %}
-                    {% for project_template in project_template_list %}
-                    <li>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <a href="{% url 'template_detail' project_template.id %}">{{project_template.template}}</a>
-                            </li>
-                            <li class="list-inline-item">
-                                <form action="{% url 'template_delete' project_template.id %}" method="post" class="form-inline">
-                                {% csrf_token %}      
-                                ( 
-                                    <input type="submit" value="delete" class="btn btn-link text-muted text-hover-danger fs-8">
-                                )
-                                </form>
-                            </li>
-                        <ul>
-                    </li>
-                    {% endfor %}
-                {% else %}
-                    Add a template below.
-                {% endif %}
-            </ul>
+        {% if project_template_list %}
+            {% for project_template in project_template_list %}
+            <form action="{% url 'template_delete' project_template.id %}" method="post" class="form-inline">
+                {% csrf_token %}
+                <a href="{% url 'template_detail' project_template.id %}">{{project_template.template}}</a>
+                (   <input name="domain" type="hidden" value="{{domain.id}}">
+                    <input type="submit" value="delete" class="btn btn-link text-muted text-hover-danger fs-8">
+                )
+            </form>
+            {% endfor %}
+        {% else %}
+            Add a template below.
+        {% endif %}
         </div>
         <div class="card-footer">
             <p class="text-gray-400 mb-5 fw-semibold fs-6">Create new conversation template</p>
-            <form action="{% url 'template_create' project.id  %}" method="post">
+            <form action="{% url 'project_settings' project.id 'template'  %}" method="post">
                 {% csrf_token %}
                 {{ template_form.as_p }}
                 <input type="submit"  class="btn btn-secondary" value="Create New Template">
@@ -107,7 +88,7 @@
                     {% csrf_token %}
                     {{domain.domain}}
                     (   <input name="domain" type="hidden" value="{{domain.id}}">
-                        <input type="submit" value="delete" class="btn btn-link text-muted text-hover-danger fs-8">
+                        <input type="submit" value="remove" class="btn btn-link text-muted text-hover-danger fs-8">
                     )
                 </form>
                 {% endfor %}
@@ -117,7 +98,7 @@
         </div>
         <div class="card-footer">
             <p class="text-gray-400 mt-1 fw-semibold fs-6">Add domain to project</p>
-            <form action="{% url 'project_add_domain' project.id  %}" method="post">
+            <form action="{% url 'project_settings' project.id 'domain'  %}" method="post">
                 {% csrf_token %}
                 <div class="input-group flex-nowrap">
                      <div class="overflow-hidden flex-grow-1">

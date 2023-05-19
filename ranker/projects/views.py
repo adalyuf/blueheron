@@ -47,7 +47,7 @@ def project_detail(request, project_id):
     context['create_conversations_form'] = CreateConversationsForm()
     return render(request, 'ranker/project_detail.html', context)
 
-def project_settings(request, project_id):
+def project_settings(request, project_id, setting=None):
     project = get_object_or_404(Project, pk=project_id)
     context = {}
     context['project'] = project
@@ -55,30 +55,46 @@ def project_settings(request, project_id):
     context['project_domain_list']  = project.domain.all().order_by('domain')
     context['project_user_list']    = project.user.all()
     context['global_domain_list']   = Domain.objects.filter(adult_content=False)
-    context['template_form']        = TemplateForm()
-    context['domain_form']          = AddDomainToProjectForm()
-    context['user_form']            = AddUserToProjectForm()
-    return render(request, 'ranker/project_settings.html', context)
 
-def project_add_domain(request, project_id):
-    project = get_object_or_404(Project, pk=project_id)
-    domain_id = request.POST['domain']
-    domain = get_object_or_404(Domain, pk=domain_id)
-    project.domain.add(domain)
-    return redirect('project_settings', project.id)
+    user_form       = AddUserToProjectForm()
+    template_form   = TemplateForm()
+    domain_form     = AddDomainToProjectForm()
+
+    if request.method == 'POST':
+        if setting == "user":
+            user_form = AddUserToProjectForm(request.POST)
+
+            if user_form.is_valid():
+                email   = user_form.cleaned_data['email']
+                user    = get_object_or_404(User, email=email)
+                project.user.add(user)
+        
+        if setting == 'template':
+            template_form = TemplateForm(request.POST)
+
+            if template_form.is_valid():
+                template = template_form.save(commit=False)
+                template.project = project
+                template.save()
+ 
+        if setting == 'domain':
+            domain_form = AddDomainToProjectForm(request.POST)
+
+            if domain_form.is_valid():
+                domain_id = domain_form.cleaned_data['domain']
+                domain = get_object_or_404(Domain, pk=domain_id)
+                project.domain.add(domain)
+    
+    context['user_form']            = user_form
+    context['template_form']        = template_form
+    context['domain_form']          = domain_form
+    return render(request, 'ranker/project_settings.html', context)
 
 def project_remove_domain(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     domain_id = request.POST['domain']
     domain = get_object_or_404(Domain, pk=domain_id)
     project.domain.remove(domain)
-    return redirect('project_settings', project.id)
-
-def project_add_user(request, project_id):
-    project = get_object_or_404(Project, pk=project_id)
-    email = request.POST['email']
-    user = get_object_or_404(User, email=email)
-    project.user.add(user)
     return redirect('project_settings', project.id)
 
 def project_remove_user(request, project_id):
