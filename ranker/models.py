@@ -2,9 +2,13 @@ from django.db import models
 from django.utils import timezone
 from django.urls import reverse
 from django.db.models import UniqueConstraint, Max 
-from django.core.validators import FileExtensionValidator
+from django.core.validators import FileExtensionValidator, RegexValidator
 from accounts.models import User 
 # Create your models here.
+
+def alphanumeric_validator():
+    return RegexValidator(r'^[a-zA-Z0-9-_ ]+$',
+        'Only numbers, letters, underscores, dashes and spaces are allowed.')
 
 class Domain(models.Model):
     domain = models.CharField(max_length=200, unique=True)
@@ -87,7 +91,7 @@ class ProjectUser(models.Model):
         return reverse('project_settings', args=[str(self.project.id)])
     
 class ProjectDomain(models.Model):
-    project = models.ForeignKey(Project , on_delete=models.CASCADE)
+    project = models.ForeignKey(Project , on_delete=models.CASCADE, validators=[alphanumeric_validator()])
     domain  = models.ForeignKey(Domain  , on_delete=models.CASCADE)
     def __str__(self):
         return f"{self.project}: {self.domain}"
@@ -99,7 +103,7 @@ class Template(models.Model):
         ('global', 'global'),
         ('per_domain', 'per_domain')
     ]
-    template    = models.CharField(max_length=200, unique=True)
+    template    = models.CharField(max_length=200, unique=True, validators=[alphanumeric_validator()])
     scope       = models.CharField(max_length=200, choices=scope_choices, default='per_domain')
     project     = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
     helper_text_before  = models.TextField(null=True, blank=True)
@@ -108,6 +112,7 @@ class Template(models.Model):
         return self.template
     def get_absolute_url(self):
         return reverse('template_detail', args=[str(self.id)])
+    
 
 class TemplateItem(models.Model):
     mode_choices = [

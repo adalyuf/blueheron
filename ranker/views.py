@@ -182,7 +182,11 @@ def template_delete(request, template_id):
     template = get_object_or_404(Template, pk=template_id)
 
     if request.method == 'POST':
-        template.delete()
+        if template.project:
+            project = template.project
+            template.delete()
+            return redirect('project_settings', project.id)
+    template.delete()
     
     return redirect('template_list')
 
