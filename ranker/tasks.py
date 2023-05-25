@@ -11,7 +11,7 @@ def return_last_value(retry_state):
 
 @shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=5, retry_kwargs={'max_retries': 5})
 def call_openai(self, prompt):
-    openai.api_key = os.getenv("OPENAI_API_KEY")
+    openai.api_key = os.getenv("BACKUP_OPENAI_API_KEY")
     message_array = [{"role": "system", "content": "You are a helpful assistant."}] #by using async we forgo ability to have each message be dependent on previous messages and there is no guarantee of time order
     message_array.append({"role": "user", "content": prompt})
     try:
@@ -42,7 +42,10 @@ def save_message_response(response, message_id):
     try:
         message.response = response
         if message.template_item.mode == 'markdown':
-            message.markdown_response = html.format_html(markdown.markdown(message.response, extensions=['tables']))
+            try: 
+                message.markdown_response = html.format_html(markdown.markdown(message.response, extensions=['tables']))
+            except:
+                print("Error saving as markdown. Did you mean to save as JSON?")
         elif message.template_item.mode == 'json':
             try:
                 start_pos   = message.response.find('{')
@@ -59,6 +62,10 @@ def save_message_response(response, message_id):
         message.requested_at = None
         message.save()
         print(f"Couldn't get response from OpenAI API. Resetting requested_at to null.")
+    conversation = message.conversation
+    if (conversation.message_set.filter(answered_at__isnull=False).count() > 0 & conversation.message_set.filter(answered_at=None).count() == 0):
+        conversation.answered_at = timezone.now()
+        conversation.save()
 
 @shared_task(queue="express")
 def save_keyword_response(api_response, keyword_id):

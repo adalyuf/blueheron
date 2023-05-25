@@ -89,6 +89,10 @@
                     "valueFrom": "arn:aws:secretsmanager:us-east-2:527657145127:secret:topranks-prod-secrets-KZYhJK:OPENAI_API_KEY::"
                 },
                 {
+                    "name": "BACKUP_OPENAI_API_KEY",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:527657145127:secret:topranks-prod-secrets-KZYhJK:BACKUP_OPENAI_API_KEY::"
+                },
+                {
                     "name": "AWS_S3_SECRET_ACCESS_KEY",
                     "valueFrom": "arn:aws:secretsmanager:us-east-2:527657145127:secret:topranks-prod-secrets-KZYhJK:AWS_S3_SECRET_ACCESS_KEY::"
                 }
