@@ -118,7 +118,9 @@ def conversation_get_responses(request, conversation_id):
 
     if request.method == 'POST':
         djmessages.info(request, "Requesting responses.")
-        for message in conversation.message_set.all():
+        conversation.requested_at = timezone.now()
+        conversation.save()
+        for message in conversation.message_set.filter(requested_at=None):
             message.requested_at = timezone.now()
             message.save()
             call_openai.apply_async( (message.prompt,), link=save_message_response.s(message.id)) #note the comma in arguments, critical to imply tuple, otherwise thinks array
