@@ -1,9 +1,9 @@
 from django.core.management import call_command
 from django.utils import timezone, html
 from celery import shared_task
-import os, openai, markdown, json
+import os, openai, markdown, json, re
 
-from ranker.models import Message, Keyword
+from ranker.models import Message, Keyword, Domain, Brand
 
 def return_last_value(retry_state):
         """return the result of the last call attempt"""
@@ -91,3 +91,52 @@ def save_keyword_response(api_response, keyword_id):
         print("Couldn't assign response to columns. Resetting requested_at to null.")
         keyword.requested_at = None
         keyword.save()
+
+@shared_task(queue="express")
+def save_business_json(api_response, domain_id):
+    domain = Domain.objects.get(id = domain_id)
+    try:
+        start_pos   = api_response.find('{')
+        end_pos     = api_response.rfind('}')
+        json_string = api_response[start_pos:end_pos+1]
+        json_object = json.loads(json_string)
+
+        domain.business_json = json_object
+
+        domain.business_name    = domain.business_json['business_name']
+        domain.naics_6          = domain.business_json['naics_6']
+
+        for brand in domain.business_json['company_brands']:
+            add_brand = Brand(brand=brand, domain=domain, type='brand')
+            add_brand.save()
+
+        for brand in domain.business_json['company_products']:
+            add_brand = Brand(brand=brand, domain=domain, type='product')
+            add_brand.save()
+
+        for comp_domain in domain.business_json['competitor_domains']:
+            try:
+                comp_domain = comp_domain.replace('www.', '')
+                comp_domain = comp_domain.replace('http://', '')
+                comp_domain = comp_domain.replace('https://', '')
+
+                try:
+                    competitor = Domain.objects.get(domain=comp_domain)
+                except:
+                    if bool(re.fullmatch("([a-zA-Z]+[.][a-zA-Z]+)", comp_domain)):
+                        print(f"Couldn't find matching competitor domain: {comp_domain} attempting to add domain.")
+                        try:
+                            new_domain = Domain(domain=comp_domain)
+                            new_domain.save()
+                            competitor = new_domain
+                        except:
+                            print(f"Couldn't create new domain for {new_domain}")
+                    else:
+                        print(f"Couldn't find matching competitor domain: {comp_domain} - this doesn't look like a valid domain, skipping import.")
+                domain.competitors.add(competitor)
+            except:
+                print(f"Couldn't find matching competitor domain: {comp_domain} for source domain: {domain.domain}")
+        
+        domain.save()
+    except:
+        print("Couldn't save business json.")

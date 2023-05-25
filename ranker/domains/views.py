@@ -18,7 +18,7 @@ from _keenthemes.libs.theme import KTTheme
 
 from ranker.models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword
 from ranker.forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm
-from ranker.tasks import call_openai, save_keyword_response
+from ranker.tasks import call_openai, save_keyword_response, save_business_json
 
 import csv
 import os
@@ -100,3 +100,17 @@ def get_keyword_responses(request):
         call_openai.apply_async( (prompt,), link=save_keyword_response.s(keyword.id)) #note the comma in arguments, critical to imply tuple, otherwise thinks array, passes response as first argument
 
     return redirect('keyword_list')
+
+def get_business_data(request):
+    if os.getenv("ENVIRONMENT") == "production":
+        batch_size = 10000
+    else:
+        batch_size = 100
+
+    domain_list = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=True)[:batch_size]
+    for domain in domain_list:
+        prompt = f"For {domain.domain}, provide their Business Name, 6-digit NAICS code, Brands, Domains of Competitors, Products in a simple JSON object. In your response, use \"business_name\", \"naics_6\", \"company_brands\", \"competitor_domains\", and \"company_products\" as keys in the JSON."
+        call_openai.apply_async( (prompt,), link=save_business_json.s(domain.id))
+    
+    djmessages.success(request, f'Getting business data for {batch_size} domains')
+    return redirect('domain_list')
