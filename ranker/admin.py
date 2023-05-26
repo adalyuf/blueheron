@@ -1,13 +1,31 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Domain, KeywordFile, Template, TemplateItem, Conversation, Message, AIModel, Project, ProjectUser, ProjectDomain, Keyword, KeywordPosition
+from .models import Domain, KeywordFile, Template, TemplateItem, Conversation, Message, AIModel, Project, ProjectUser, ProjectDomain, Keyword, KeywordPosition, Brand, Competition
+
+class BrandInlineAdmin(admin.TabularInline):
+    model = Brand
+    extra = 0
+
+class CompetitionInlineAdmin(admin.TabularInline):
+    model = Competition
+    extra = 0
+    fk_name = 'domain'
 
 @admin.register(Domain)
 class DomainAdmin(admin.ModelAdmin):
     list_display = ( 'domain', 'keywords', 'cost', 'rank', 'adult_content')
-    fields = ['domain', 'rank', 'adult_content', ('keywords', 'traffic', 'cost'), ('ad_keywords', 'ad_traffic', 'ad_cost')]
+    fields = ['domain', 'rank', 'adult_content', ('keywords', 'traffic', 'cost'), ('ad_keywords', 'ad_traffic', 'ad_cost'), 'business_json', 'business_name', 'naics_6']
     search_fields = ['domain']
+    inlines = [BrandInlineAdmin, CompetitionInlineAdmin]
+
+@admin.register(Brand)
+class BrandAdmin(admin.ModelAdmin):
+    list_display = ( 'domain', 'brand', 'type')
+
+@admin.register(Competition)
+class CompetitionAdmin(admin.ModelAdmin):
+    list_display = ('domain', 'competitor')
 
 @admin.register(KeywordFile)
 class KeywordFileAdmin(admin.ModelAdmin):

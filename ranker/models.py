@@ -11,8 +11,8 @@ def alphanumeric_validator():
         'Only numbers, letters, underscores, dashes and spaces are allowed.')
 
 class Domain(models.Model):
-    domain = models.CharField(max_length=200, unique=True)
-    rank = models.IntegerField(null=True, default=999999)
+    domain  = models.CharField(max_length=200, unique=True)
+    rank    = models.IntegerField(null=True, default=999999)
     keywords    = models.BigIntegerField(null=True, blank=True)
     traffic     = models.BigIntegerField(null=True, blank=True)
     cost        = models.DecimalField(max_digits=19, decimal_places=2,null=True, blank=True)
@@ -20,6 +20,14 @@ class Domain(models.Model):
     ad_traffic  = models.BigIntegerField(null=True, blank=True)
     ad_cost     = models.DecimalField(max_digits=19, decimal_places=2,null=True, blank=True)
     adult_content = models.BooleanField(default=False)
+    business_json = models.JSONField(null=True, blank=True)
+    business_name = models.CharField(max_length=200, null=True, blank=True)
+    naics_6       = models.CharField(max_length=20, null=True, blank=True)
+    competitors = models.ManyToManyField(
+        'self',
+        through="Competition",
+        through_fields=("domain", "competitor"),
+    )
     def __str__(self):
         return self.domain
     def get_absolute_url(self):
@@ -28,8 +36,30 @@ class Domain(models.Model):
     class Meta:
         ordering = ['rank']
 
+class Brand(models.Model):
+    type_choices = [
+        ('brand', 'brand'),
+        ('product', 'product'),
+        ('competitor_brand', 'competitor_brand'),
+        ('competitor_product', 'competitor_product'),
+    ]
+    domain = models.ForeignKey(Domain , on_delete=models.CASCADE)
+    brand = models.CharField(max_length=200)
+    type = models.CharField(max_length=200, choices=type_choices, default='brand')
+    def __str__(self):
+        return f"{self.domain}: {self.brand}"
+    def get_absolute_url(self):
+        return reverse('domain_detail', args=[str(self.domain.id)])
+    def kwcount(self):
+        return Keyword.objects.filter(answered_at__isnull=False).filter(ai_answer__icontains=self.brand).count()
+
+class Competition(models.Model):
+    domain = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name='source_domain_set')
+    competitor = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name='competitor_set')
+    def __str__(self):
+        return f"{self.domain}: {self.competitor}"
+
 def keyword_directory_path(instance, filename=None):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     d = Domain.objects.get(pk=instance.domain_id)
     t = timezone.now()
     filename = f"{d.id}-{d.domain}-{t.year}-{t.month}-{t.day}-{t.hour}-{t.minute}-{t.second}.csv"

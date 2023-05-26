@@ -18,7 +18,7 @@ from _keenthemes.libs.theme import KTTheme
 
 from ranker.models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword
 from ranker.forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm
-from ranker.tasks import call_openai, save_keyword_response
+from ranker.tasks import call_openai, save_keyword_response, save_business_json
 
 import csv
 import os
@@ -49,10 +49,13 @@ def domain_search(request):
 @login_required
 def domain_detail(request, domain_id):
     domain = get_object_or_404(Domain, pk=domain_id)
-    keyword_files = domain.keywordfile_set.all()
-    conversations = domain.conversation_set.all()
-    ai_models = AIModel.objects.all()
-    templates = Template.objects.filter(scope__exact='per_domain').filter(project__isnull=True)
+    context = {}
+    context['domain'] = domain
+    context['keyword_files'] = domain.keywordfile_set.all()
+    context['conversations'] = domain.conversation_set.all()
+    context['ai_models'] = AIModel.objects.all()
+    context['templates'] = Template.objects.filter(scope__exact='per_domain').filter(project__isnull=True)
+    context['brands'] = domain.brand_set.all().order_by('type', 'brand')
     notice = ''
     if request.method == 'POST':
         form = KeywordFileForm(request.POST, request.FILES)
@@ -62,7 +65,9 @@ def domain_detail(request, domain_id):
             notice = "File uploaded successfully."
     else:
         form = KeywordFileForm()
-    return render(request, 'ranker/domain_detail.html', {'domain': domain, 'keyword_files': keyword_files, 'form': form, 'notice': notice, 'conversations': conversations, 'templates': templates, 'ai_models': ai_models })
+    context['form'] = form
+    context['notice'] = notice
+    return render(request, 'ranker/domain_detail.html', context)
 
 @login_required
 def keywordfile_make_primary(request, domain_id, keywordfile_id):
@@ -100,3 +105,17 @@ def get_keyword_responses(request):
         call_openai.apply_async( (prompt,), link=save_keyword_response.s(keyword.id)) #note the comma in arguments, critical to imply tuple, otherwise thinks array, passes response as first argument
 
     return redirect('keyword_list')
+
+def get_business_data(request):
+    if os.getenv("ENVIRONMENT") == "production":
+        batch_size = 10000
+    else:
+        batch_size = 100
+
+    domain_list = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=True)[:batch_size]
+    for domain in domain_list:
+        prompt = f"For {domain.domain}, provide their Business Name, 6-digit NAICS code, Brands, Domains of Competitors, Products in a simple JSON object. In your response, use \"business_name\", \"naics_6\", \"company_brands\", \"competitor_domains\", and \"company_products\" as keys in the JSON."
+        call_openai.apply_async( (prompt,), link=save_business_json.s(domain.id))
+    
+    djmessages.success(request, f'Getting business data for {batch_size} domains')
+    return redirect('domain_list')
