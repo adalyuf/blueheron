@@ -50,6 +50,8 @@ class Brand(models.Model):
         return f"{self.domain}: {self.brand}"
     def get_absolute_url(self):
         return reverse('domain_detail', args=[str(self.domain.id)])
+    def kwcount(self):
+        return Keyword.objects.filter(answered_at__isnull=False).filter(ai_answer__icontains=self.brand).count()
 
 class Competition(models.Model):
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name='source_domain_set')

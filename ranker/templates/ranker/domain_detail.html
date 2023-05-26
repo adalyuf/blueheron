@@ -85,4 +85,33 @@
     <p>No files are available.</p>
 {% endif %}
 
+{% if brands %}
+    <div class="table-responsive">
+        <table id="kt_datatable_zero_configuration" class="table table-row-bordered gy-5">
+        <thead>
+            <tr>
+            <th scope="col">Brand</th>
+            <th scope="col"># of conversations</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for brand in brands %}
+            <tr>
+                <td>{{brand.brand}}</td>
+                <td>
+                    <form class="d-flex justify-content-center" role="search" method="get" action="{% url 'keyword_search' %}"">
+                        <input name="user_search" type="hidden" value="{{brand.brand}}">
+                        <button class="btn btn-link-primary" type="submit">{{brand.kwcount}}</button>
+                    </form>
+                </td>
+            </tr>
+    {% endfor %}
+        </tbody>
+        </table>
+    </div>
+    {% include 'ranker/partials/_pagination.html' %}
+{% else %}
+    <p>No brands available.</p>
+{% endif %}
+
 {% endblock content %}
