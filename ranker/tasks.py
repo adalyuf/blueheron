@@ -1,7 +1,7 @@
 from django.core.management import call_command
 from django.utils import timezone, html
 from celery import shared_task
-import os, openai, markdown, json, re
+import os, openai, markdown, json, re, tldextract
 
 from ranker.models import Message, Keyword, Domain, Brand
 
@@ -114,17 +114,15 @@ def save_business_json(api_response, domain_id):
             add_brand = Brand(brand=brand, domain=domain, type='product')
             add_brand.save()
 
-        for comp_domain in domain.business_json['competitor_domains']:
+        for orig_comp_domain in domain.business_json['competitor_domains']:
             try:
-                comp_domain = comp_domain.replace('www.', '')
-                comp_domain = comp_domain.replace('http://', '')
-                comp_domain = comp_domain.replace('https://', '')
+                comp_domain = tldextract.extract(orig_comp_domain).registered_domain
 
                 try:
                     competitor = Domain.objects.get(domain=comp_domain)
                 except:
-                    if bool(re.fullmatch("([a-zA-Z]+[.][a-zA-Z]+)", comp_domain)):
-                        print(f"Couldn't find matching competitor domain: {comp_domain} attempting to add domain.")
+                    if comp_domain:
+                        print(f"Couldn't find match: {orig_comp_domain} attempting to add: {comp_domain}.")
                         try:
                             new_domain = Domain(domain=comp_domain)
                             new_domain.save()
@@ -132,10 +130,10 @@ def save_business_json(api_response, domain_id):
                         except:
                             print(f"Couldn't create new domain for {new_domain}")
                     else:
-                        print(f"Couldn't find matching competitor domain: {comp_domain} - this doesn't look like a valid domain, skipping import.")
+                        print(f"Couldn't find match: {orig_comp_domain} - this doesn't look like a valid domain, skipping import.")
                 domain.competitors.add(competitor)
             except:
-                print(f"Couldn't find matching competitor domain: {comp_domain} for source domain: {domain.domain}")
+                print(f"Couldn't find matching competitor domain: {orig_comp_domain} for source domain: {domain.domain}")
         
         domain.save()
     except:
