@@ -112,12 +112,15 @@ def get_keyword_responses(request):
 
 def get_business_data(request):
     if os.getenv("ENVIRONMENT") == "production":
-        batch_size = 1000
+        batch_size = 10000
     else:
         batch_size = 100
 
-    domain_list = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=True)[:batch_size]
+    domain_list = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=True).filter(business_attempts__exact=0).order_by('rank')[:batch_size]
     for domain in domain_list:
+        domain.business_attempts = domain.business_attempts + 1
+        domain.business_retrieved_at = timezone.now()
+        domain.save()
         prompt = f"For {domain.domain}, provide their Business Name, 6-digit NAICS code, Brands, Domains of Competitors, Products in a simple JSON object. In your response, use \"business_name\", \"naics_6\", \"company_brands\", \"competitor_domains\", and \"company_products\" as keys in the JSON."
         call_openai.apply_async( (prompt,), link=save_business_json.s(domain.id))
     
