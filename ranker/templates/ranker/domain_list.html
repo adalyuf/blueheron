@@ -15,6 +15,21 @@
     <button class="btn btn-outline-success" type="submit">Search</button>
 </form>
 
+<ul>
+    <li>
+        Domain total: {{domain_count}}
+    </li>
+    <li>
+        Domain (not adult): {{domain_not_adult}}
+    </li>
+    <li>
+        Domains (na) missing business data: {{domain_na_missing_busdata}}
+    </li>
+    <li>
+        Domains (na) with business data: {{domain_na_with_busdata}}
+    </li>
+</ul>
+
 {% if domain_list %}
     <div class="table-responsive">
         <table id="kt_datatable_zero_configuration" class="table table-row-bordered gy-5">

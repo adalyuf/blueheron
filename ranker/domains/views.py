@@ -36,6 +36,10 @@ class DomainListView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context = KTLayout.init(context) # A function to init the global layout. It is defined in _keenthemes/__init__.py file
         KTTheme.addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']) # Include vendors and javascript files for dashboard widgets
+        context['domain_count'] = Domain.objects.count()
+        context['domain_not_adult'] = Domain.objects.filter(adult_content__exact=False).count()
+        context['domain_na_missing_busdata'] = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=True).count()
+        context['domain_na_with_busdata'] = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=False).count()
         return context
 
 def domain_search(request):
@@ -108,7 +112,7 @@ def get_keyword_responses(request):
 
 def get_business_data(request):
     if os.getenv("ENVIRONMENT") == "production":
-        batch_size = 10000
+        batch_size = 1000
     else:
         batch_size = 100
 
