@@ -95,6 +95,8 @@ def save_keyword_response(api_response, keyword_id):
 @shared_task(queue="express")
 def save_business_json(api_response, domain_id):
     domain = Domain.objects.get(id = domain_id)
+    domain.business_api_response = api_response
+    domain.save()
     try:
         start_pos   = api_response.find('{')
         end_pos     = api_response.rfind('}')
@@ -138,3 +140,5 @@ def save_business_json(api_response, domain_id):
         domain.save()
     except:
         print("Couldn't save business json.")
+        domain.business_api_response = "ERROR: Couldn't save business json."
+        domain.save()

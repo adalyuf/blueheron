@@ -41,10 +41,9 @@
             <th scope="col">Keywords</th>
             <th scope="col">Traffic</th>
             <th scope="col">Cost</th>
-            <th scope="col">Ad Keywords</th>
-            <th scope="col">Ad Traffic</th>
-            <th scope="col">Ad Cost</th>
-            <th scope="col">Adult Content</th>
+            <th scope="col">Attempts</th>
+            <th scope="col">Retrieved At</th>
+            <th scope="col">Response</th>
             </tr>
         </thead>
         <tbody>
@@ -56,10 +55,10 @@
                 <td>{{domain.keywords}}</td>
                 <td>{{domain.traffic}}</td>
                 <td>{{domain.cost}}</td>
-                <td>{{domain.ad_keywords}}</td>
-                <td>{{domain.ad_traffic}}</td>
-                <td>{{domain.ad_cost}}</td>
-                <td>{{domain.adult_content}}</td>
+                <td>{{domain.business_attempts}}</td>
+                <td>{{domain.business_retrieved_at}}</td>
+                <td>{{domain.business_api_response|truncatechars:100}}</td>
+
             </tr>
     {% endfor %}
         </tbody>

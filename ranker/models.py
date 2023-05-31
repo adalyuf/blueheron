@@ -22,6 +22,9 @@ class Domain(models.Model):
     adult_content = models.BooleanField(default=False)
     business_json = models.JSONField(null=True, blank=True)
     business_name = models.CharField(max_length=200, null=True, blank=True)
+    business_attempts = models.IntegerField(default=0)
+    business_retrieved_at = models.DateTimeField(default=None, null=True)
+    business_api_response = models.TextField(null=True, blank=True)
     naics_6       = models.CharField(max_length=20, null=True, blank=True)
     competitors = models.ManyToManyField(
         'self',
