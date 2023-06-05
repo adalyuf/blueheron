@@ -1,7 +1,7 @@
 from django.core.management import call_command
 from django.utils import timezone, html
 from celery import shared_task
-import os, openai, markdown, json, re, tldextract
+import os, openai, markdown, json, re, tldextract, requests
 
 from ranker.models import Message, Keyword, Domain, Brand
 
@@ -20,7 +20,7 @@ def call_openai(self, prompt):
         #Handle API error here, e.g. retry or log
         print(f"OpenAI API returned an API Error: {e}")
         pass
-    except openai.error.APIConnectionError as e:
+    except openai.error.APIConnectionError as e: 
         #Handle connection error here
         print(f"Failed to connect to OpenAI API: {e}")
         pass
@@ -138,7 +138,40 @@ def save_business_json(api_response, domain_id):
                 print(f"Couldn't find matching competitor domain: {orig_comp_domain} for source domain: {domain.domain}")
         
         domain.save()
-    except:
+    except Exception as e:
         print("Couldn't save business json.")
-        domain.business_api_response = "ERROR: Couldn't save business json."
+        domain.business_api_response = f"ERROR: Couldn't save business json: {repr(e)}."
         domain.save()
+
+@shared_task()
+def validate_domain(domain_id):
+    domain = Domain.objects.get(pk=domain_id)
+    test_domain = tldextract.extract(domain.domain).registered_domain
+    try: 
+        req = requests.get('https://' + test_domain)
+
+        response_domain = tldextract.extract(req.url).registered_domain
+
+        if req.ok & (response_domain == test_domain):
+            domain.validation_code = 'valid'
+        elif req.ok & (response_domain != test_domain):
+            domain.validation_code = 'different_domain_redirect'
+        elif req.status_code == '403' & (response_domain == test_domain):
+            domain.validation_code = 'valid' # When domains forbid access to bots and tell you they're doing that from same domain as we expect, count as valid.
+        elif not(req.ok):
+            domain.validation_code = 'invalid'
+        else:
+            domain.validation_code = 'validation_failed'
+
+        
+        domain.validation_redirect = req.url 
+        domain.validation_response = req.status_code
+    except ConnectionRefusedError:
+        domain.validation_code = 'valid'
+    except:
+        domain.validation_code = 'validation_failed'
+
+    domain.validated_at = timezone.now()
+    domain.save()
+
+    return f"{domain.validation_code}: {domain.domain}"

@@ -17,10 +17,10 @@
 
 <ul>
     <li>
-        Domain total: {{domain_count}}
+        Domain total: {{domain_count}} <a href="{% url 'validate_domains' %}">(validate domains)</a>
     </li>
     <li>
-        Domain (not adult): {{domain_not_adult}}
+        Domains validated: {{domain_validated}}
     </li>
     <li>
         Domains (na) missing business data: {{domain_na_missing_busdata}}
