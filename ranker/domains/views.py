@@ -136,4 +136,5 @@ def validate_domains(request):
     domain_list = Domain.objects.filter(validated_at__isnull=True)[:batch_size]
     for domain in domain_list:
         validate_domain.delay(domain.id)
+    djmessages(f"{batch_size} validations queued.")
     return redirect('domain_list')
