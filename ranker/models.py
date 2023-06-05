@@ -11,6 +11,13 @@ def alphanumeric_validator():
         'Only numbers, letters, underscores, dashes and spaces are allowed.')
 
 class Domain(models.Model):
+    validation_choices = [
+        ('valid', 'valid'),
+        ('invalid', 'invalid'),
+        ('same_domain_redirect', 'same_domain_redirect'),
+        ('different_domain_redirect', 'different_domain_redirect'),
+        ('validation_failed', 'validation_failed'),
+    ]
     domain  = models.CharField(max_length=200, unique=True)
     rank    = models.IntegerField(null=True, default=999999)
     keywords    = models.BigIntegerField(null=True, blank=True)
@@ -26,6 +33,10 @@ class Domain(models.Model):
     business_retrieved_at = models.DateTimeField(default=None, null=True)
     business_api_response = models.TextField(null=True, blank=True)
     naics_6       = models.CharField(max_length=20, null=True, blank=True)
+    validated_at = models.DateTimeField(default=None, null=True)
+    validation_redirect = models.CharField(max_length=200, null=True, blank=True)
+    validation_response = models.IntegerField(null=True, blank=True)
+    validation_code = models.CharField(max_length=200, choices=validation_choices, null=True, blank=True)
     competitors = models.ManyToManyField(
         'self',
         through="Competition",

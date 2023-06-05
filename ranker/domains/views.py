@@ -18,7 +18,7 @@ from _keenthemes.libs.theme import KTTheme
 
 from ranker.models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword
 from ranker.forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm
-from ranker.tasks import call_openai, save_keyword_response, save_business_json
+from ranker.tasks import call_openai, save_keyword_response, save_business_json, validate_domain
 
 import csv
 import os
@@ -37,7 +37,7 @@ class DomainListView(generic.ListView):
         context = KTLayout.init(context) # A function to init the global layout. It is defined in _keenthemes/__init__.py file
         KTTheme.addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']) # Include vendors and javascript files for dashboard widgets
         context['domain_count'] = Domain.objects.count()
-        context['domain_not_adult'] = Domain.objects.filter(adult_content__exact=False).count()
+        context['domain_validated'] = Domain.objects.filter(validated_at__isnull=False).count()
         context['domain_na_missing_busdata'] = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=True).count()
         context['domain_na_with_busdata'] = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=False).count()
         return context
@@ -124,5 +124,16 @@ def get_business_data(request):
         prompt = f"For {domain.domain}, provide their Business Name, 6-digit NAICS code, Brands, Domains of Competitors, Products in a simple JSON object. In your response, use \"business_name\", \"naics_6\", \"company_brands\", \"competitor_domains\", and \"company_products\" as keys in the JSON."
         call_openai.apply_async( (prompt,), link=save_business_json.s(domain.id))
     
-    djmessages.success(request, f'Getting business data for {batch_size} domains')
+    djmessages.success(request, f'Getting business data for {len(domain_list)} domains')
+    return redirect('domain_list')
+
+def validate_domains(request):
+    if os.getenv("ENVIRONMENT") == "production":
+        batch_size = 10000
+    else:
+        batch_size = 1000
+
+    domain_list = Domain.objects.filter(validated_at__isnull=True)[:batch_size]
+    for domain in domain_list:
+        validate_domain.delay(domain.id)
     return redirect('domain_list')
