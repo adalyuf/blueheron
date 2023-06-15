@@ -30,12 +30,12 @@ class DomainListView(generic.ListView):
     model = Domain
     queryset = Domain.objects.filter(adult_content__exact=False).filter(keywordfile__primary=None).order_by('rank')
     
-    paginate_by = 100
+    # paginate_by = 100
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context = KTLayout.init(context) # A function to init the global layout. It is defined in _keenthemes/__init__.py file
-        KTTheme.addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']) # Include vendors and javascript files for dashboard widgets
+        KTTheme.addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock', 'datatables']) # Include vendors and javascript files for dashboard widgets
         context['domain_count'] = Domain.objects.count()
         context['domain_validated'] = Domain.objects.filter(validated_at__isnull=False).count()
         context['domain_na_missing_busdata'] = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=True).count()

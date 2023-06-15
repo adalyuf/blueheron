@@ -6,10 +6,12 @@ from .models import Domain, KeywordFile, Template, TemplateItem, Conversation, M
 class BrandInlineAdmin(admin.TabularInline):
     model = Brand
     extra = 0
+    readonly_fields=['brand', 'type',]
 
 class CompetitionInlineAdmin(admin.TabularInline):
     model = Competition
     extra = 0
+    readonly_fields = ['competitor',]
     fk_name = 'domain'
 
 @admin.register(Domain)

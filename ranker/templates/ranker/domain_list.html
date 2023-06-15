@@ -35,9 +35,9 @@
         <table id="kt_datatable_zero_configuration" class="table table-row-bordered gy-5">
         <thead>
             <tr>
-            <th scope="col">ID</th>
             <th scope="col">Rank</th>
             <th scope="col">Domain</th>
+            <th scope="col">Brands</th>
             <th scope="col">Keywords</th>
             <th scope="col">Traffic</th>
             <th scope="col">Cost</th>
@@ -49,9 +49,9 @@
         <tbody>
     {% for domain in domain_list %}
             <tr>
-                <td>{{domain.id}}</td>
                 <td>{{domain.rank}}</td>
                 <td><a href="{% url 'domain_detail' domain.id %}">{{domain.domain}}</a></td>
+                <td>{{domain.brand_set.count}}</td>
                 <td>{{domain.keywords}}</td>
                 <td>{{domain.traffic}}</td>
                 <td>{{domain.cost}}</td>
@@ -71,3 +71,7 @@
 
 
 {% endblock content %}
+
+{% block pagejs %}
+<script>$("#kt_datatable_zero_configuration").DataTable();</script>
+{% endblock pagejs %}
