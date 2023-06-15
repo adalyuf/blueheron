@@ -31,26 +31,26 @@ def profile_sample_rate(profiling_context):
     else:
         return 1.0
 
-# sentry_sdk.init(
-#     dsn="https://f83ed0dbb3cd4e728a57d29db739e3ee@o4505092597678080.ingest.sentry.io/4505092601675776",
-#     integrations=[
-#         DjangoIntegration(),
-#         CeleryIntegration(),
-#         CloudResourceContextIntegration(),
-#         RedisIntegration(),
-#     ],
-#     environment=os.getenv("ENVIRONMENT"),
-#     # Set traces_sample_rate to 1.0 to capture 100%
-#     # of transactions for performance monitoring.
-#     # We recommend adjusting this value in production.
+sentry_sdk.init(
+    dsn="https://f83ed0dbb3cd4e728a57d29db739e3ee@o4505092597678080.ingest.sentry.io/4505092601675776",
+    integrations=[
+        DjangoIntegration(),
+        CeleryIntegration(),
+        CloudResourceContextIntegration(),
+        RedisIntegration(),
+    ],
+    environment=os.getenv("ENVIRONMENT"),
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
     
-#     traces_sampler=trace_sample_rate,
-#     profiles_sampler=profile_sample_rate,
+    traces_sampler=trace_sample_rate,
+    profiles_sampler=profile_sample_rate,
 
-#     # If you wish to associate users to errors (assuming you are using
-#     # django.contrib.auth) you may enable sending PII data.
-#     send_default_pii=True
-# )
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
