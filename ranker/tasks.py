@@ -11,7 +11,7 @@ def return_last_value(retry_state):
 
 @shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=5, retry_kwargs={'max_retries': 5})
 def call_openai(self, prompt):
-    openai.api_key = os.getenv("BACKUP_OPENAI_API_KEY")
+    openai.api_key = os.getenv("OPENAI_API_KEY")
     message_array = [{"role": "system", "content": "You are a helpful assistant."}] #by using async we forgo ability to have each message be dependent on previous messages and there is no guarantee of time order
     message_array.append({"role": "user", "content": prompt})
     try:
