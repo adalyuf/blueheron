@@ -30,7 +30,7 @@ class DomainListView(generic.ListView):
     model = Domain
     queryset = Domain.objects.filter(adult_content__exact=False).filter(keywordfile__primary=None).order_by('rank')
     
-    # paginate_by = 100
+    paginate_by = 100
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
