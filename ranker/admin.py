@@ -19,6 +19,7 @@ class DomainAdmin(admin.ModelAdmin):
     list_display = ( 'domain', 'keywords', 'cost', 'rank', 'adult_content')
     fields = ['domain', 'rank', 'adult_content', ('keywords', 'traffic', 'cost'), ('ad_keywords', 'ad_traffic', 'ad_cost'), 'business_json', 'business_name', 'naics_6']
     search_fields = ['domain']
+    list_filter = ['business_retrieved_at', 'business_attempts', ('business_json', admin.EmptyFieldListFilter)]
     inlines = [BrandInlineAdmin, CompetitionInlineAdmin]
 
 @admin.register(Brand)
