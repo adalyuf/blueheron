@@ -45,11 +45,11 @@
                 },
                 {
                     "name": "CELERY_BROKER",
-                    "value": "redis://:TopRedisPass99@18.219.253.102:6379/0"
+                    "value": "redis://:TopRedisPass99@3.143.113.56:6379/0"
                 },
                 {
                     "name": "CELERY_BACKEND",
-                    "value": "redis://:TopRedisPass99@18.219.253.102:6379/1"
+                    "value": "redis://:TopRedisPass99@3.143.113.56:6379/1"
                 },
                 {
                     "name": "DJANGO_STATIC_HOST",
