@@ -18,7 +18,7 @@ from _keenthemes.libs.theme import KTTheme
 
 from ranker.models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword
 from ranker.forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm
-from ranker.tasks import call_openai, save_keyword_response, save_business_json, validate_domain
+from ranker.tasks import call_openai, save_keyword_response, save_business_json
 
 import csv
 import os
@@ -37,7 +37,6 @@ class DomainListView(generic.ListView):
         context = KTLayout.init(context) # A function to init the global layout. It is defined in _keenthemes/__init__.py file
         KTTheme.addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock', 'datatables']) # Include vendors and javascript files for dashboard widgets
         context['domain_count'] = Domain.objects.count()
-        context['domain_validated'] = Domain.objects.filter(validated_at__isnull=False).count()
         context['domain_na_missing_busdata'] = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=True).count()
         context['domain_na_with_busdata'] = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=False).count()
         return context
@@ -125,16 +124,4 @@ def get_business_data(request):
         call_openai.apply_async( (prompt,), link=save_business_json.s(domain.id))
     
     djmessages.success(request, f'Getting business data for {len(domain_list)} domains')
-    return redirect('domain_list')
-
-def validate_domains(request):
-    if os.getenv("ENVIRONMENT") == "production":
-        batch_size = 10000
-    else:
-        batch_size = 1000
-
-    domain_list = Domain.objects.filter(validated_at__isnull=True)[:batch_size]
-    for domain in domain_list:
-        validate_domain.delay(domain.id)
-    djmessages(f"{batch_size} validations queued.")
     return redirect('domain_list')

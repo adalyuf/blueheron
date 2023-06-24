@@ -33,10 +33,6 @@ class Domain(models.Model):
     business_retrieved_at = models.DateTimeField(default=None, null=True)
     business_api_response = models.TextField(null=True, blank=True)
     naics_6       = models.CharField(max_length=20, null=True, blank=True)
-    validated_at = models.DateTimeField(default=None, null=True)
-    validation_redirect = models.CharField(max_length=200, null=True, blank=True)
-    validation_response = models.IntegerField(null=True, blank=True)
-    validation_code = models.CharField(max_length=200, choices=validation_choices, null=True, blank=True)
     competitors = models.ManyToManyField(
         'self',
         through="Competition",

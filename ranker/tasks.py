@@ -123,17 +123,10 @@ def save_business_json(api_response, domain_id):
                 try:
                     competitor = Domain.objects.get(domain=comp_domain)
                 except:
-                    if comp_domain:
-                        print(f"Couldn't find match: {orig_comp_domain} attempting to add: {comp_domain}.")
-                        try:
-                            new_domain = Domain(domain=comp_domain)
-                            new_domain.save()
-                            competitor = new_domain
-                        except:
-                            print(f"Couldn't create new domain for {new_domain}")
-                    else:
-                        print(f"Couldn't find match: {orig_comp_domain} - this doesn't look like a valid domain, skipping import.")
+                    print(f"Couldn't find match: {orig_comp_domain} - skipping.")
+
                 domain.competitors.add(competitor)
+
             except:
                 print(f"Couldn't find matching competitor domain: {orig_comp_domain} for source domain: {domain.domain}")
         
@@ -142,36 +135,3 @@ def save_business_json(api_response, domain_id):
         print("Couldn't save business json.")
         domain.business_api_response = f"ERROR: Couldn't save business json: {repr(e)}."
         domain.save()
-
-@shared_task()
-def validate_domain(domain_id):
-    domain = Domain.objects.get(pk=domain_id)
-    test_domain = tldextract.extract(domain.domain).registered_domain
-    try: 
-        req = requests.get('https://' + test_domain)
-
-        response_domain = tldextract.extract(req.url).registered_domain
-
-        if req.ok & (response_domain == test_domain):
-            domain.validation_code = 'valid'
-        elif req.ok & (response_domain != test_domain):
-            domain.validation_code = 'different_domain_redirect'
-        elif req.status_code == '403' & (response_domain == test_domain):
-            domain.validation_code = 'valid' # When domains forbid access to bots and tell you they're doing that from same domain as we expect, count as valid.
-        elif not(req.ok):
-            domain.validation_code = 'invalid'
-        else:
-            domain.validation_code = 'validation_failed'
-
-        
-        domain.validation_redirect = req.url 
-        domain.validation_response = req.status_code
-    except ConnectionRefusedError:
-        domain.validation_code = 'valid'
-    except:
-        domain.validation_code = 'validation_failed'
-
-    domain.validated_at = timezone.now()
-    domain.save()
-
-    return f"{domain.validation_code}: {domain.domain}"

@@ -14,7 +14,6 @@ urlpatterns = [
     path("domains/"                                 , domain_views.DomainListView.as_view()     , name="domain_list"),
     path("domain_search/"                           , domain_views.domain_search                , name="domain_search"),
     path('domains/<int:domain_id>/'                 , domain_views.domain_detail                , name='domain_detail'),
-    path('domains/validate_domains/'                , domain_views.validate_domains             , name='validate_domains'),
 
     path('keywordfile_make_primary/<int:domain_id>/<int:keywordfile_id>/'   , login_required(domain_views.keywordfile_make_primary) , name='keywordfile_make_primary'),
     path('get_keyword_responses/'                                           , login_required(domain_views.get_keyword_responses)    , name='get_keyword_responses'),
