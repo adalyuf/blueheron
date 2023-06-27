@@ -136,7 +136,7 @@ def save_business_json(api_response, domain_id):
         domain.business_api_response = f"ERROR: Couldn't save business json: {repr(e)}."
         domain.save()
 
-@shared_task(queue="celery")
+@shared_task(queue="celery", rate_limit="5/s")
 def index_brand(brand_id):
     brand = Brand.objects.get(id=brand_id)
     keyword_list = Keyword.objects.filter(ai_answer__icontains=brand.brand)
