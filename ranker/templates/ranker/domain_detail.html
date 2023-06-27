@@ -85,7 +85,7 @@
     <p>No files are available.</p>
 {% endif %}
 
-{% if false %} 
+{% if brands %} 
 <!-- Replace with brands when performance is good -->
     <div class="table-responsive">
         <table id="kt_datatable_zero_configuration" class="table table-row-bordered gy-5">
@@ -102,7 +102,7 @@
                 <td>
                     <form class="d-flex justify-content-center" role="search" method="get" action="{% url 'keyword_search' %}"">
                         <input name="user_search" type="hidden" value="{{brand.brand}}">
-                        <button class="btn btn-link-primary" type="submit">{{brand.kwcount}}</button>
+                        <button class="btn btn-link-primary" type="submit">{{brand.keyword.count}}</button>
                     </form>
                 </td>
             </tr>

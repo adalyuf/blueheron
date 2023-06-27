@@ -18,7 +18,7 @@ urlpatterns = [
     path('keywordfile_make_primary/<int:domain_id>/<int:keywordfile_id>/'   , login_required(domain_views.keywordfile_make_primary) , name='keywordfile_make_primary'),
     path('get_keyword_responses/'                                           , login_required(domain_views.get_keyword_responses)    , name='get_keyword_responses'),
     path('get_business_data/'                                               , login_required(domain_views.get_business_data)        , name='get_business_data'),
-
+    path('index_brands/'                                                    , login_required(domain_views.index_brands)             , name='index_brands'),
 
     path('conversations/<int:conversation_id>/'                     , login_required(conv_views.conversation_detail)                 , name='conversation_detail'),
     path('conversations/add/<int:template_id>/<int:domain_id>/<int:ai_model_id>/', login_required(conv_views.conversation_add)       , name='conversation_add'),
