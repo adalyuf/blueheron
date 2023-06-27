@@ -16,9 +16,9 @@ from django.urls import reverse, reverse_lazy
 from _keenthemes.__init__ import KTLayout
 from _keenthemes.libs.theme import KTTheme
 
-from ranker.models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword
+from ranker.models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword, Brand, BrandKeyword
 from ranker.forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm
-from ranker.tasks import call_openai, save_keyword_response, save_business_json
+from ranker.tasks import call_openai, save_keyword_response, save_business_json, index_brand
 
 import csv
 import os
@@ -39,6 +39,10 @@ class DomainListView(generic.ListView):
         context['domain_count'] = Domain.objects.count()
         context['domain_na_missing_busdata'] = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=True).count()
         context['domain_na_with_busdata'] = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=False).count()
+        context['brands_all'] = Brand.objects.all().count()
+        context['brands_indexed'] = Brand.objects.filter(keyword_indexed_at__isnull=False).count()
+        context['brands_not_indexed'] = Brand.objects.filter(keyword_indexed_at__isnull=True).count()
+        context['keyword_index_size'] = BrandKeyword.objects.all().count()
         return context
 
 def domain_search(request):
@@ -124,4 +128,17 @@ def get_business_data(request):
         call_openai.apply_async( (prompt,), link=save_business_json.s(domain.id))
     
     djmessages.success(request, f'Getting business data for {len(domain_list)} domains')
+    return redirect('domain_list')
+
+def index_brands(request):
+    if os.getenv("ENVIRONMENT") == "production":
+        batch_size = 20000
+    else:
+        batch_size = 10000
+
+    brand_list = Brand.objects.filter(keyword_indexed_at__isnull=True)[:batch_size]
+    for brand in brand_list:
+        index_brand.apply_async( (brand.id,) )
+    
+    djmessages.success(request, f'Requesting indexing for {len(brand_list)} brands')
     return redirect('domain_list')

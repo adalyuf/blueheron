@@ -25,6 +25,18 @@
     <li>
         Domains (na) with business data: {{domain_na_with_busdata}}
     </li>
+    <li>
+        Brands: {{brands_all}}
+    </li>
+    <li>
+        Brands indexed: {{brands_indexed}}
+    </li>
+    <li>
+        Brands not indexed: {{brands_not_indexed}} <a href="{% url 'index_brands' %}">(index brands)</a>
+    </li>
+    <li>
+        Keyword index size: {{keyword_index_size}}
+    </li>
 </ul>
 
 {% if domain_list %}

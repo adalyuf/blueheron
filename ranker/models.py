@@ -46,6 +46,44 @@ class Domain(models.Model):
     class Meta:
         ordering = ['rank']
 
+class Keyword(models.Model):
+    keyword                     = models.CharField(max_length=200, unique=True)
+    user_intent                 = models.TextField(null=True)
+    natural_language_question   = models.TextField(null=True)
+    ai_answer                   = models.TextField(null=True)
+    likely_previous_queries     = models.JSONField(null=True)
+    likely_next_queries         = models.JSONField(null=True)
+    requested_at                = models.DateTimeField(null=True)
+    answered_at                 = models.DateTimeField(null=True)
+    json_response               = models.JSONField(null=True)
+    def __str__(self):
+        return self.keyword
+    
+class KeywordPosition(models.Model):
+    domain  = models.ForeignKey(Domain, on_delete=models.SET_NULL, null=True)
+    keyword = models.ForeignKey(Keyword, on_delete=models.SET_NULL, null=True)
+    domain_text         = models.TextField()
+    keyword_text        = models.TextField()
+    position            = models.IntegerField(null=True)
+    previous_position   = models.IntegerField(null=True)
+    search_volume       = models.IntegerField(null=True)
+    keyword_difficulty  = models.IntegerField(null=True)
+    cpc                 = models.DecimalField(max_digits=19, decimal_places=2,null=True)
+    url                 = models.TextField(null=True)
+    traffic             = models.IntegerField(null=True)
+    traffic_percent     = models.DecimalField(max_digits=19, decimal_places=2,null=True)
+    traffic_cost        = models.DecimalField(max_digits=19, decimal_places=2,null=True)
+    competitive_difficulty = models.DecimalField(max_digits=19, decimal_places=2,null=True)
+    results             = models.BigIntegerField(null=True)
+    trends              = models.TextField(null=True)
+    retrieved_at        = models.DateTimeField(null=True)
+    serp                = models.TextField(null=True)
+    intents             = models.TextField(null=True)
+    type                = models.TextField(null=True)
+    def __str__(self):
+        return f"{self.keyword} - {self.domain} - {self.position}"
+    
+   
 class Brand(models.Model):
     type_choices = [
         ('brand', 'brand'),
@@ -56,12 +94,22 @@ class Brand(models.Model):
     domain = models.ForeignKey(Domain , on_delete=models.CASCADE)
     brand = models.CharField(max_length=200)
     type = models.CharField(max_length=200, choices=type_choices, default='brand')
+    keyword = models.ManyToManyField(
+        Keyword,
+        through='BrandKeyword',
+        through_fields=('brand', 'keyword'),
+    )
+    keyword_indexed_at = models.DateTimeField(null=True, blank=True)
     def __str__(self):
         return f"{self.domain}: {self.brand}"
     def get_absolute_url(self):
         return reverse('domain_detail', args=[str(self.domain.id)])
-    def kwcount(self):
-        return Keyword.objects.filter(answered_at__isnull=False).filter(ai_answer__icontains=(' '+self.brand+' ')).count()
+
+class BrandKeyword(models.Model):
+    brand = models.ForeignKey(Brand , on_delete=models.CASCADE)
+    keyword  = models.ForeignKey(Keyword  , on_delete=models.CASCADE)
+    def __str__(self):
+        return f"{self.brand}: {self.keyword}"
 
 class Competition(models.Model):
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name='source_domain_set')
@@ -211,40 +259,3 @@ class Message(models.Model):
     
     class Meta:
         ordering = ['order']
-
-class Keyword(models.Model):
-    keyword                     = models.CharField(max_length=200, unique=True)
-    user_intent                 = models.TextField(null=True)
-    natural_language_question   = models.TextField(null=True)
-    ai_answer                   = models.TextField(null=True)
-    likely_previous_queries     = models.JSONField(null=True)
-    likely_next_queries         = models.JSONField(null=True)
-    requested_at                = models.DateTimeField(null=True)
-    answered_at                 = models.DateTimeField(null=True)
-    json_response               = models.JSONField(null=True)
-    def __str__(self):
-        return self.keyword
-    
-class KeywordPosition(models.Model):
-    domain  = models.ForeignKey(Domain, on_delete=models.SET_NULL, null=True)
-    keyword = models.ForeignKey(Keyword, on_delete=models.SET_NULL, null=True)
-    domain_text         = models.TextField()
-    keyword_text        = models.TextField()
-    position            = models.IntegerField(null=True)
-    previous_position   = models.IntegerField(null=True)
-    search_volume       = models.IntegerField(null=True)
-    keyword_difficulty  = models.IntegerField(null=True)
-    cpc                 = models.DecimalField(max_digits=19, decimal_places=2,null=True)
-    url                 = models.TextField(null=True)
-    traffic             = models.IntegerField(null=True)
-    traffic_percent     = models.DecimalField(max_digits=19, decimal_places=2,null=True)
-    traffic_cost        = models.DecimalField(max_digits=19, decimal_places=2,null=True)
-    competitive_difficulty = models.DecimalField(max_digits=19, decimal_places=2,null=True)
-    results             = models.BigIntegerField(null=True)
-    trends              = models.TextField(null=True)
-    retrieved_at        = models.DateTimeField(null=True)
-    serp                = models.TextField(null=True)
-    intents             = models.TextField(null=True)
-    type                = models.TextField(null=True)
-    def __str__(self):
-        return f"{self.keyword} - {self.domain} - {self.position}"

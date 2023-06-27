@@ -135,3 +135,12 @@ def save_business_json(api_response, domain_id):
         print("Couldn't save business json.")
         domain.business_api_response = f"ERROR: Couldn't save business json: {repr(e)}."
         domain.save()
+
+@shared_task(queue="celery")
+def index_brand(brand_id):
+    brand = Brand.objects.get(id=brand_id)
+    keyword_list = Keyword.objects.filter(ai_answer__icontains=brand.brand)
+    for keyword in keyword_list:
+        brand.keyword.add(keyword)
+    brand.keyword_indexed_at = timezone.now()
+    brand.save()
