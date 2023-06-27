@@ -132,9 +132,9 @@ def get_business_data(request):
 
 def index_brands(request):
     if os.getenv("ENVIRONMENT") == "production":
-        batch_size = 20000
+        batch_size = 5000
     else:
-        batch_size = 10000
+        batch_size = 5000
 
     brand_list = Brand.objects.filter(keyword_indexed_at__isnull=True)[:batch_size]
     for brand in brand_list:
