@@ -138,5 +138,5 @@ def index_brands(request):
 
     index_brand.apply_async( (batch_size,) )
     
-    djmessages.success(request, f'Requesting indexing for {len(batch_size)} brands')
+    djmessages.success(request, f'Requesting indexing for {batch_size} brands')
     return redirect('domain_list')
