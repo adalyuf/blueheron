@@ -136,9 +136,7 @@ def index_brands(request):
     else:
         batch_size = 5000
 
-    brand_list = Brand.objects.filter(keyword_indexed_at__isnull=True)[:batch_size]
-    for brand in brand_list:
-        index_brand.apply_async( (brand.id,) )
+    index_brand.apply_async( (batch_size,) )
     
-    djmessages.success(request, f'Requesting indexing for {len(brand_list)} brands')
+    djmessages.success(request, f'Requesting indexing for {len(batch_size)} brands')
     return redirect('domain_list')

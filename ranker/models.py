@@ -99,6 +99,7 @@ class Brand(models.Model):
         through='BrandKeyword',
         through_fields=('brand', 'keyword'),
     )
+    indexing_requested_at = models.DateTimeField(null=True, blank=True)
     keyword_indexed_at = models.DateTimeField(null=True, blank=True)
     def __str__(self):
         return f"{self.domain}: {self.brand}"
