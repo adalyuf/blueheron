@@ -92,7 +92,7 @@ class Brand(models.Model):
         ('competitor_product', 'competitor_product'),
     ]
     domain = models.ForeignKey(Domain , on_delete=models.CASCADE)
-    brand = models.CharField(max_length=200)
+    brand = models.CharField(max_length=200, db_index=True)
     type = models.CharField(max_length=200, choices=type_choices, default='brand')
     keyword = models.ManyToManyField(
         Keyword,
