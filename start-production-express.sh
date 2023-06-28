@@ -6,6 +6,7 @@ python manage.py migrate
 python manage.py collectstatic --noinput
 
 #Celery detached background processes
+celery --app=topranks worker --loglevel=info --detach --queues steamroller --concurrency=4
 celery --app=topranks worker --loglevel=info --detach --queues express
 
 #Gunicorn web server
