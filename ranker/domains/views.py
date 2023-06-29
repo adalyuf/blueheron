@@ -62,7 +62,7 @@ def domain_detail(request, domain_id):
     context['conversations'] = domain.conversation_set.all()
     context['ai_models'] = AIModel.objects.all()
     context['templates'] = Template.objects.filter(scope__exact='per_domain').filter(project__isnull=True)
-    context['brands'] = domain.brand_set.all().order_by('type', 'brand')
+    context['brands'] = domain.branddomain_set.all().order_by('type','brand')
     notice = ''
     if request.method == 'POST':
         form = KeywordFileForm(request.POST, request.FILES)
