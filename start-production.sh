@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #Python setup
-# python manage.py makemigrations
-# python manage.py migrate
-# python manage.py collectstatic --noinput
+python manage.py makemigrations
+python manage.py migrate
+python manage.py collectstatic --noinput
 
 #Celery detached background processes
 celery --app=topranks worker --loglevel=info --detach --queues celery,express --concurrency=30
