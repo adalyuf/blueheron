@@ -1,10 +1,10 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Domain, KeywordFile, Template, TemplateItem, Conversation, Message, AIModel, Project, ProjectUser, ProjectDomain, Keyword, KeywordPosition, Brand, Competition
+from .models import Domain, KeywordFile, Template, TemplateItem, Conversation, Message, AIModel, Project, ProjectUser, ProjectDomain, Keyword, KeywordPosition, Brand, BrandDomain, Competition
 
 class BrandInlineAdmin(admin.TabularInline):
-    model = Brand
+    model = BrandDomain
     extra = 0
     readonly_fields=['brand', 'type',]
 
@@ -24,7 +24,7 @@ class DomainAdmin(admin.ModelAdmin):
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
-    list_display = ( 'domain', 'brand', 'type')
+    list_display = ( 'brand',)
 
 @admin.register(Competition)
 class CompetitionAdmin(admin.ModelAdmin):

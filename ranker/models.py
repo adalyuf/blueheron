@@ -82,9 +82,42 @@ class KeywordPosition(models.Model):
     type                = models.TextField(null=True)
     def __str__(self):
         return f"{self.keyword} - {self.domain} - {self.position}"
-    
-   
+
 class Brand(models.Model):
+    brand = models.CharField(max_length=200, db_index=True)
+    domain = models.ManyToManyField(
+        Domain,
+        through='BrandDomain',
+        through_fields=('brand', 'domain'),
+    )
+    keyword = models.ManyToManyField(
+        Keyword,
+        through='BrandKeyword',
+        through_fields=('brand', 'keyword'),
+    )
+    indexing_requested_at = models.DateTimeField(null=True, blank=True)
+    keyword_indexed_at = models.DateTimeField(null=True, blank=True)
+    def __str__(self):
+        return f"{self.brand}"
+
+class BrandDomain(models.Model):
+    type_choices = [
+        ('brand', 'brand'),
+        ('product', 'product'),
+        ('competitor_brand', 'competitor_brand'),
+        ('competitor_product', 'competitor_product'),
+    ]
+    brand = models.ForeignKey(Brand , on_delete=models.CASCADE)
+    domain = models.ForeignKey(Domain , on_delete=models.CASCADE)
+    type = models.CharField(max_length=200, choices=type_choices, default='brand')
+
+class BrandKeyword(models.Model):
+    brand = models.ForeignKey(Brand , on_delete=models.CASCADE)
+    keyword  = models.ForeignKey(Keyword  , on_delete=models.CASCADE)
+    def __str__(self):
+        return f"{self.brand}: {self.keyword}"
+
+class OldBrand(models.Model):
     type_choices = [
         ('brand', 'brand'),
         ('product', 'product'),
@@ -96,7 +129,7 @@ class Brand(models.Model):
     type = models.CharField(max_length=200, choices=type_choices, default='brand')
     keyword = models.ManyToManyField(
         Keyword,
-        through='BrandKeyword',
+        through='OldBrandKeyword',
         through_fields=('brand', 'keyword'),
     )
     indexing_requested_at = models.DateTimeField(null=True, blank=True)
@@ -106,8 +139,8 @@ class Brand(models.Model):
     def get_absolute_url(self):
         return reverse('domain_detail', args=[str(self.domain.id)])
 
-class BrandKeyword(models.Model):
-    brand = models.ForeignKey(Brand , on_delete=models.CASCADE)
+class OldBrandKeyword(models.Model):
+    brand = models.ForeignKey(OldBrand , on_delete=models.CASCADE)
     keyword  = models.ForeignKey(Keyword  , on_delete=models.CASCADE)
     def __str__(self):
         return f"{self.brand}: {self.keyword}"

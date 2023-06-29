@@ -39,8 +39,8 @@ class DomainListView(generic.ListView):
         context['domain_count'] = Domain.objects.count()
         context['domain_na_missing_busdata'] = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=True).count()
         context['domain_na_with_busdata'] = Domain.objects.filter(adult_content__exact=False).filter(business_json__isnull=False).count()
-        context['brands_all'] = Brand.objects.all().count()
-        context['brands_indexed'] = Brand.objects.filter(keyword_indexed_at__isnull=False).count()
+        context['brands_all']       = Brand.objects.all().count()
+        context['brands_indexed']   = Brand.objects.filter(keyword_indexed_at__isnull=False).count()
         context['brands_not_indexed'] = Brand.objects.filter(keyword_indexed_at__isnull=True).count()
         context['keyword_index_size'] = BrandKeyword.objects.all().count()
         return context
