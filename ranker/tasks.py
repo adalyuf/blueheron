@@ -3,7 +3,7 @@ from django.utils import timezone, html
 from celery import shared_task
 import os, openai, markdown, json, re, tldextract, requests
 
-from ranker.models import Message, Keyword, Domain, Brand
+from ranker.models import Message, Keyword, Domain, Brand, BrandKeyword
 
 def return_last_value(retry_state):
         """return the result of the last call attempt"""
