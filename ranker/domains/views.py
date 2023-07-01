@@ -132,7 +132,7 @@ def get_business_data(request):
 
 def index_brands(request):
     if os.getenv("ENVIRONMENT") == "production":
-        batch_size = 5000
+        batch_size = 50000
     else:
         batch_size = 5000
 
