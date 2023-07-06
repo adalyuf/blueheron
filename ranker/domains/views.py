@@ -13,6 +13,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib import messages as djmessages
 from django.views import generic, View
 from django.urls import reverse, reverse_lazy
+from django.db.models import Avg, Count
 from _keenthemes.__init__ import KTLayout
 from _keenthemes.libs.theme import KTTheme
 
@@ -62,7 +63,8 @@ def domain_detail(request, domain_id):
     context['conversations'] = domain.conversation_set.all()
     context['ai_models'] = AIModel.objects.all()
     context['templates'] = Template.objects.filter(scope__exact='per_domain').filter(project__isnull=True)
-    context['brands'] = domain.branddomain_set.all().order_by('type','brand')
+    context['brands'] = domain.branddomain_set.all().order_by('type','brand').annotate(num_keywords=Count("brand__keyword"))
+
     notice = ''
     if request.method == 'POST':
         form = KeywordFileForm(request.POST, request.FILES)

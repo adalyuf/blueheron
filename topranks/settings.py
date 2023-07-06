@@ -66,7 +66,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 USE_NGROK = os.environ.get('USE_NGROK', '') != 'False'
 
-ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '3.132.134.103', '3.134.21.36', '3.134.236.55', '.topranks.ai' ]
+ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '3.132.134.103', '3.134.21.36', '3.134.236.55', '.topranks.ai', '3.18.81.39' ]
 INTERNAL_IPS = ['localhost', "127.0.0.1"]
 CSRF_TRUSTED_ORIGINS = ['https://topranks.ai']
 

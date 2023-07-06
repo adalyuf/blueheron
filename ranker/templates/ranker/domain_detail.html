@@ -102,7 +102,7 @@
                 <td>
                     <form class="d-flex justify-content-center" role="search" method="get" action="{% url 'keyword_search' %}"">
                         <input name="user_search" type="hidden" value="{{brand.brand}}">
-                        <button class="btn btn-link-primary" type="submit">{{brand.keyword.count}}</button>
+                        <button class="btn btn-link-primary" type="submit">{{brand.num_keywords}}</button>
                     </form>
                 </td>
             </tr>

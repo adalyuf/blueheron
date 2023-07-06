@@ -110,7 +110,9 @@ class BrandDomain(models.Model):
     brand = models.ForeignKey(Brand , on_delete=models.CASCADE)
     domain = models.ForeignKey(Domain , on_delete=models.CASCADE)
     type = models.CharField(max_length=200, choices=type_choices, default='brand')
-
+    def __str__(self):
+        return f"{self.brand}: {self.domain}"
+    
 class BrandKeyword(models.Model):
     brand = models.ForeignKey(Brand , on_delete=models.CASCADE)
     keyword  = models.ForeignKey(Keyword  , on_delete=models.CASCADE)
