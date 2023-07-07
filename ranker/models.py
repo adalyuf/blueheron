@@ -38,6 +38,8 @@ class Domain(models.Model):
         through="Competition",
         through_fields=("domain", "competitor"),
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.domain
     def get_absolute_url(self):
@@ -56,6 +58,8 @@ class Keyword(models.Model):
     requested_at                = models.DateTimeField(null=True)
     answered_at                 = models.DateTimeField(null=True)
     json_response               = models.JSONField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.keyword
     
@@ -80,11 +84,13 @@ class KeywordPosition(models.Model):
     serp                = models.TextField(null=True)
     intents             = models.TextField(null=True)
     type                = models.TextField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"{self.keyword} - {self.domain} - {self.position}"
 
 class Brand(models.Model):
-    brand = models.CharField(max_length=200, db_index=True)
+    brand = models.CharField(max_length=200, db_index=True, unique=True)
     domain = models.ManyToManyField(
         Domain,
         through='BrandDomain',
@@ -97,6 +103,8 @@ class Brand(models.Model):
     )
     indexing_requested_at = models.DateTimeField(null=True, blank=True)
     keyword_indexed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"{self.brand}"
 
@@ -110,18 +118,24 @@ class BrandDomain(models.Model):
     brand = models.ForeignKey(Brand , on_delete=models.CASCADE)
     domain = models.ForeignKey(Domain , on_delete=models.CASCADE)
     type = models.CharField(max_length=200, choices=type_choices, default='brand')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"{self.brand}: {self.domain}"
     
 class BrandKeyword(models.Model):
     brand = models.ForeignKey(Brand , on_delete=models.CASCADE)
     keyword  = models.ForeignKey(Keyword  , on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"{self.brand}: {self.keyword}"
 
 class Competition(models.Model):
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name='source_domain_set')
     competitor = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name='competitor_set')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"{self.domain}: {self.competitor}"
 
@@ -137,6 +151,8 @@ class KeywordFile(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     primary     = models.BooleanField(default=False)
     processed_at = models.DateTimeField(default=None, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.filepath.name
     def get_absolute_url(self):
@@ -156,6 +172,8 @@ class Token(models.Model):
 class AIModel(models.Model):
     ai_model = models.CharField(max_length=200)
     api_identifier = models.CharField(max_length=200, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.ai_model 
 
@@ -172,6 +190,8 @@ class Project(models.Model):
         through='ProjectDomain',
         through_fields=('project', 'domain'),
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.project
     def get_absolute_url(self):
@@ -181,6 +201,8 @@ class Project(models.Model):
 class ProjectUser(models.Model):
     project = models.ForeignKey(Project , on_delete=models.CASCADE)
     user    = models.ForeignKey(User    , on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"{self.project}: {self.user}"
     def get_absolute_url(self):
@@ -189,6 +211,8 @@ class ProjectUser(models.Model):
 class ProjectDomain(models.Model):
     project = models.ForeignKey(Project , on_delete=models.CASCADE, validators=[alphanumeric_validator()])
     domain  = models.ForeignKey(Domain  , on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"{self.project}: {self.domain}"
     def get_absolute_url(self):
@@ -204,6 +228,8 @@ class Template(models.Model):
     project     = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
     helper_text_before  = models.TextField(null=True, blank=True)
     helper_text_after   = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.template
     def get_absolute_url(self):
@@ -223,6 +249,8 @@ class TemplateItem(models.Model):
     visible     = models.BooleanField(default=True)
     template    = models.ForeignKey(Template, on_delete=models.CASCADE)
     mode        = models.CharField(max_length=200, choices=mode_choices, default='markdown')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.prompt1
     def get_absolute_url(self):
@@ -238,6 +266,8 @@ class Conversation(models.Model):
     ai_model    = models.ForeignKey(AIModel, on_delete=models.CASCADE)
     requested_at= models.DateTimeField(null=True)
     answered_at = models.DateTimeField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     class Meta:
         constraints = [ 
             UniqueConstraint(name='unique_template_domain', fields=['template', 'domain', 'project', 'ai_model'], include=['answered_at']),
@@ -260,6 +290,8 @@ class Message(models.Model):
     requested_at    = models.DateTimeField(null=True)
     answered_at     = models.DateTimeField(null=True)
     template_item   = models.ForeignKey(TemplateItem, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.prompt
     def get_absolute_url(self):
