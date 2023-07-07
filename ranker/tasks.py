@@ -109,12 +109,28 @@ def save_business_json(api_response, domain_id):
         domain.naics_6          = domain.business_json['naics_6']
 
         for brand in domain.business_json['company_brands']:
-            add_brand = Brand(brand=brand, domain=domain, type='brand')
-            add_brand.save()
+            # lowercase, try to pull the brand, if fail, add brand
+            # Add domain to brand once established
+            brand = brand.lower()
+            try:
+                our_brand = Brand.objects.get(brand=brand)
+            except:
+                our_brand = Brand(brand=brand)
+                print(f"Couldn't find {brand}, adding to database.")
+                our_brand.save()
+            our_brand.domain.add(domain, through_defaults={'type': 'brand'})
+            
 
         for brand in domain.business_json['company_products']:
-            add_brand = Brand(brand=brand, domain=domain, type='product')
-            add_brand.save()
+            #TODO: If this becomes more complicated, try and DRY this up with above.
+            brand = brand.lower()
+            try:
+                our_brand = Brand.objects.get(brand=brand)
+            except:
+                our_brand = Brand(brand=brand)
+                print(f"Couldn't find {brand}, adding to database.")
+                our_brand.save()
+            our_brand.domain.add(domain, through_defaults={'type': 'product'})
 
         for orig_comp_domain in domain.business_json['competitor_domains']:
             try:

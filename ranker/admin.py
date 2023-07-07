@@ -25,6 +25,8 @@ class DomainAdmin(admin.ModelAdmin):
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
     list_display = ( 'brand',)
+    search_fields = ['brand']
+    list_filter = ['keyword_indexed_at']
 
 @admin.register(Competition)
 class CompetitionAdmin(admin.ModelAdmin):
