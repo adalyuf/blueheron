@@ -38,7 +38,7 @@ class TemplateListView(generic.ListView):
 
 class KeywordListView(generic.ListView):
     model = Keyword
-    queryset = Keyword.objects.filter(answered_at__isnull=False) 
+    queryset = Keyword.objects.filter(answered_at__isnull=False).order_by('-answered_at')[:500]
     paginate_by = 100
 
     def get_context_data(self, **kwargs):
