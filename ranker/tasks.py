@@ -87,10 +87,12 @@ def save_keyword_response(api_response, keyword_id):
         keyword.answered_at = timezone.now()
         keyword.save()
         print(f"{keyword} took {(keyword.answered_at-keyword.requested_at).total_seconds()} seconds.")
+        return "Keyword saved"
     except:
         print("Couldn't assign response to columns. Resetting requested_at to null.")
         keyword.requested_at = None
         keyword.save()
+        return "Keyword not saved"
 
 @shared_task(queue="express")
 def save_business_json(api_response, domain_id):
