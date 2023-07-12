@@ -1,13 +1,13 @@
 from django.core.management import call_command
 from django.utils import timezone, html
+from django.conf import settings
 from celery import shared_task
 import os, openai, markdown, json, re, tldextract, requests
 
 from ranker.models import Message, Keyword, Domain, Brand, BrandKeyword
+from celery.utils.log import get_task_logger
 
-import logging
-
-logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__)
 
 def return_last_value(retry_state):
         """return the result of the last call attempt"""
