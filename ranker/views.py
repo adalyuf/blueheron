@@ -25,6 +25,10 @@ import openai
 import markdown
 import json
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class TemplateListView(generic.ListView):
     model = Template
     queryset = Template.objects.filter(project__isnull=True)
