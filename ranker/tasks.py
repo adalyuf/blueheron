@@ -19,19 +19,20 @@ def call_openai(self, prompt):
     except openai.error.APIError as e:
         #Handle API error here, e.g. retry or log
         print(f"OpenAI API returned an API Error: {e}")
-        pass
+        raise e 
     except openai.error.APIConnectionError as e: 
         #Handle connection error here
         print(f"Failed to connect to OpenAI API: {e}")
-        pass
+        raise e 
     except openai.error.RateLimitError as e:
         #Handle rate limit error (we recommend using exponential backoff)
         print(f"OpenAI API request exceeded rate limit: {e}")
-        pass
+        raise e 
     try:
         return response['choices'][0]['message']['content']
     except:
         print(f"Couldn't get a response. We retried several times. Sorry. Better luck next time.")
+        raise "Multiple retries attempted, all failed."
 
 
 
