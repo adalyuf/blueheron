@@ -13,7 +13,7 @@ def return_last_value(retry_state):
         """return the result of the last call attempt"""
         return retry_state.outcome.result()
 
-@shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={'max_retries': 8})
+@shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={'max_retries': 8}, rate_limit='1500/m')
 def call_openai(self, prompt):
     openai.api_key = os.getenv("OPENAI_API_KEY")
     message_array = [{"role": "system", "content": "You are a helpful assistant."}] #by using async we forgo ability to have each message be dependent on previous messages and there is no guarantee of time order
