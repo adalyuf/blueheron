@@ -311,7 +311,7 @@ logging.config.dictConfig({
             'handlers': ['console'],
         },
         # Our application code
-        'app': {
+        'topranks': {
             'level': LOGLEVEL,
             'handlers': ['console'],
             # Avoid double logging because of root logger
@@ -321,8 +321,6 @@ logging.config.dictConfig({
         'django.server': DEFAULT_LOGGING['loggers']['django.server'],
     },
 })
-
-
 
 
 

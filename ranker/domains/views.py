@@ -26,6 +26,9 @@ import os
 import openai
 import markdown
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 class DomainListView(generic.ListView):
     model = Domain
@@ -100,7 +103,8 @@ def get_keyword_responses(request):
         kw_batch_size = 100
     
     keyword_list = Keyword.objects.filter(requested_at=None)[:kw_batch_size]
-
+    logger.info(f"Requesting responses for {kw_batch_size} keywords.")
+    
     item_list = []
     for keyword in keyword_list:
         keyword.requested_at = timezone.now()
