@@ -18,6 +18,8 @@ from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.cloud_resource_context import CloudResourceContextIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
+import logging.config
+from django.utils.log import DEFAULT_LOGGING
 
 def trace_sample_rate(sampling_context):
     if os.getenv("ENVIRONMENT") == "production":
@@ -279,7 +281,46 @@ CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", False)
 SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", False)
 # SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", False)
 
+# Disable Django's logging setup
+LOGGING_CONFIG = None
 
+LOGLEVEL = os.environ.get('LOGLEVEL', 'info').upper()
+
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            # exact format is not important, this is the minimum information
+            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+        },
+        'django.server': DEFAULT_LOGGING['formatters']['django.server'],
+    },
+    'handlers': {
+        # console logs to stderr
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'default',
+        },
+        'django.server': DEFAULT_LOGGING['handlers']['django.server'],
+    },
+    'loggers': {
+        # default for all undefined Python modules
+        '': {
+            'level': 'WARNING',
+            'handlers': ['console'],
+        },
+        # Our application code
+        'app': {
+            'level': LOGLEVEL,
+            'handlers': ['console'],
+            # Avoid double logging because of root logger
+            'propagate': False,
+        },
+        # Default runserver request logging
+        'django.server': DEFAULT_LOGGING['loggers']['django.server'],
+    },
+})
 
 
 

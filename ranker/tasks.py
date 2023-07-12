@@ -5,11 +5,15 @@ import os, openai, markdown, json, re, tldextract, requests
 
 from ranker.models import Message, Keyword, Domain, Brand, BrandKeyword
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 def return_last_value(retry_state):
         """return the result of the last call attempt"""
         return retry_state.outcome.result()
 
-@shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=5, retry_kwargs={'max_retries': 5})
+@shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={'max_retries': 8})
 def call_openai(self, prompt):
     openai.api_key = os.getenv("OPENAI_API_KEY")
     message_array = [{"role": "system", "content": "You are a helpful assistant."}] #by using async we forgo ability to have each message be dependent on previous messages and there is no guarantee of time order
@@ -19,19 +23,23 @@ def call_openai(self, prompt):
     except openai.error.APIError as e:
         #Handle API error here, e.g. retry or log
         print(f"OpenAI API returned an API Error: {e}")
+        logger.warning("OpenAI API returned an API Error: %s", e)
         raise e 
     except openai.error.APIConnectionError as e: 
         #Handle connection error here
         print(f"Failed to connect to OpenAI API: {e}")
+        logger.warning("Failed to connect to OpenAI API: %s", e)
         raise e 
     except openai.error.RateLimitError as e:
         #Handle rate limit error (we recommend using exponential backoff)
         print(f"OpenAI API request exceeded rate limit: {e}")
+        logger.warning("OpenAI API request exceeded rate limit: %s", e)
         raise e 
     try:
         return response['choices'][0]['message']['content']
     except:
         print(f"Couldn't get a response. We retried several times. Sorry. Better luck next time.")
+        logger.warning("Multiple attempts failed, response: %s", response)
         raise "Multiple retries attempted, all failed."
 
 
