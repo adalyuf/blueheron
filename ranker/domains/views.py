@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 class DomainListView(generic.ListView):
     model = Domain
-    queryset = Domain.objects.filter(adult_content__exact=False).filter(keywordfile__primary=None).order_by('rank')
+    queryset = Domain.objects.filter(adult_content__exact=False).filter(keywordfile__primary=None).order_by('rank').annotate(num_brands=Count("brand"))
     
     paginate_by = 100
 
@@ -104,7 +104,7 @@ def get_keyword_responses(request):
     
     keyword_list = Keyword.objects.filter(requested_at=None)[:kw_batch_size]
     logger.info(f"Requesting responses for {kw_batch_size} keywords.")
-    
+
     item_list = []
     for keyword in keyword_list:
         keyword.requested_at = timezone.now()
