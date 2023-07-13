@@ -13,9 +13,10 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib import messages as djmessages
 from django.views import generic, View
 from django.urls import reverse, reverse_lazy
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Q
 from _keenthemes.__init__ import KTLayout
 from _keenthemes.libs.theme import KTTheme
+from django.contrib.postgres.search import SearchVector
 
 from ranker.models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword, Brand, BrandKeyword
 from ranker.forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm
@@ -52,7 +53,11 @@ class DomainListView(generic.ListView):
 def domain_search(request):
     user_search = request.GET['user_search']
     if user_search:
-        queryset = Domain.objects.filter(adult_content__exact=False).filter(domain__icontains=user_search).order_by('rank')
+        # queryset = Domain.objects.filter(adult_content__exact=False).filter(
+        #     Q(domain__icontains=user_search) |
+        #     Q(business_name__icontains=user_search) 
+        #     ).order_by('rank')
+        queryset = Domain.objects.filter(adult_content__exact=False).annotate(search=SearchVector("domain", "business_name")).filter(search=user_search)
     else:
         queryset = Domain.objects.filter(adult_content__exact=False).order_by('rank')
     return render(request, 'ranker/domain_list.html', {'domain_list': queryset})
