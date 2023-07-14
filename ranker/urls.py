@@ -16,7 +16,7 @@ urlpatterns = [
     path('domains/<int:domain_id>/'                 , domain_views.domain_detail                , name='domain_detail'),
 
     path('keywordfile_make_primary/<int:domain_id>/<int:keywordfile_id>/'   , login_required(domain_views.keywordfile_make_primary) , name='keywordfile_make_primary'),
-    path('get_keyword_responses/'                                           , login_required(domain_views.get_keyword_responses)    , name='get_keyword_responses'),
+    path('get_keyword_responses/<int:batch_multiplier>/'                    , login_required(domain_views.get_keyword_responses)    , name='get_keyword_responses'),
     path('get_business_data/'                                               , login_required(domain_views.get_business_data)        , name='get_business_data'),
     path('index_brands/'                                                    , login_required(domain_views.index_brands)             , name='index_brands'),
 
