@@ -63,6 +63,7 @@
         <thead>
             <tr>
             <th scope="col">Brand</th>
+            <th scope="col">Type</th>
             <th scope="col"># of conversations</th>
             </tr>
         </thead>
@@ -70,6 +71,7 @@
     {% for brand in brands %}
             <tr>
                 <td>{{brand.brand}}</td>
+                <td>{{brand.type}}</td>
                 <td>
                     <form class="d-flex justify-content-center" role="search" method="get" action="{% url 'keyword_search' %}"">
                         <input name="user_search" type="hidden" value="{{brand.brand}}">
@@ -84,6 +86,15 @@
     {% include 'ranker/partials/_pagination.html' %}
 {% else %}
     <p>No brands available.</p>
+{% endif %}
+
+{% if competitors %}
+<h3>Competitors</h3>
+    {% for competitor in competitors %}
+    <ul>
+        <a href="{% url 'domain_detail' competitor.id %}">{{competitor.domain}}</a>
+    </ul>
+    {% endfor %}
 {% endif %}
 
 {% if conversations %}

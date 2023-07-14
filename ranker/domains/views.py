@@ -71,6 +71,7 @@ def domain_detail(request, domain_id):
     context['ai_models'] = AIModel.objects.all()
     context['templates'] = Template.objects.filter(scope__exact='per_domain').filter(project__isnull=True)
     context['brands'] = domain.branddomain_set.all().order_by('type','brand').annotate(num_keywords=Count("brand__keyword"))
+    context['competitors'] = domain.competitors.all()
 
     notice = ''
     if request.method == 'POST':
@@ -100,12 +101,13 @@ def keywordfile_make_primary(request, domain_id, keywordfile_id):
     return redirect('domain_detail', domain_id=domain_id)
 
 @login_required
-def get_keyword_responses(request):
+def get_keyword_responses(request, batch_multiplier=1):
     if os.getenv("ENVIRONMENT") == "production":
         kw_batch_size = 10000
     else:
         kw_batch_size = 100
-    
+    kw_batch_size = kw_batch_size * batch_multiplier
+
     keyword_list = Keyword.objects.filter(requested_at=None)[:kw_batch_size]
     logger.info(f"Requesting responses for {kw_batch_size} keywords.")
 
