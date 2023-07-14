@@ -16,6 +16,7 @@ from django.urls import reverse, reverse_lazy
 from _keenthemes.__init__ import KTLayout
 from _keenthemes.libs.theme import KTTheme
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.db.models import F
 
 from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword
 from .forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm, AddDomainToProjectForm, CreateConversationsForm
@@ -63,7 +64,8 @@ class KeywordListView(generic.ListView):
 def keyword_search(request):
     user_search = request.GET['user_search']
     if user_search:
-        queryset = Keyword.objects.filter(search_vector=user_search)
+        search_query = SearchQuery(user_search, search_type="websearch")
+        queryset = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")
     else:
         queryset = Keyword.objects.filter(answered_at__isnull=False) 
     return render(request, 'ranker/keyword_list.html', {'keyword_list': queryset})
