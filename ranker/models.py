@@ -3,6 +3,9 @@ from django.utils import timezone
 from django.urls import reverse
 from django.db.models import UniqueConstraint, Max 
 from django.core.validators import FileExtensionValidator, RegexValidator
+from django.contrib.postgres.search import SearchVectorField
+from django.contrib.postgres.indexes import GinIndex # add the Postgres recommended GIN index 
+
 from accounts.models import User 
 # Create your models here.
 
@@ -60,8 +63,14 @@ class Keyword(models.Model):
     json_response               = models.JSONField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    search_vector = SearchVectorField(null=True)
     def __str__(self):
         return self.keyword
+    
+    class Meta:
+        indexes = [
+            GinIndex(fields=["search_vector"]),
+        ]
     
 class KeywordPosition(models.Model):
     domain  = models.ForeignKey(Domain, on_delete=models.SET_NULL, null=True)
