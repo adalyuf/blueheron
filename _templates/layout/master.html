@@ -55,7 +55,9 @@
     <!--end::Head-->
 
     <!--begin::Body-->
-    <body {% printHtmlClasses 'body' %} {% printHtmlAttributes 'body' %}>
+    <!-- <body {% printHtmlClasses 'body' %} {% printHtmlAttributes 'body' %}> -->
+    <!-- The below hardcodes the theme, I got tired of seeing a broken layout, switch to above if we ever fix that -->
+    <body class="app-default" data-kt-app-layout="dark-sidebar" data-kt-app-header-fixed="true" data-kt-app-sidebar-enabled="true" data-kt-app-sidebar-fixed="true" data-kt-app-sidebar-hoverable="true" data-kt-app-sidebar-push-header="true" data-kt-app-sidebar-push-toolbar="true" data-kt-app-sidebar-push-footer="true" data-kt-app-toolbar-enabled="true" id="kt_app_body" data-kt-name="metronic">
 
         {% include 'partials/theme-mode/_init.html' %}
 
