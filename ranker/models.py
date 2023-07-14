@@ -50,6 +50,7 @@ class Domain(models.Model):
     
     class Meta:
         ordering = ['rank']
+        permissions = (("manage_domains", "Can run all domain functions"),)
 
 class Keyword(models.Model):
     keyword                     = models.CharField(max_length=200, unique=True)
@@ -71,6 +72,7 @@ class Keyword(models.Model):
         indexes = [
             GinIndex(fields=["search_vector"]),
         ]
+        permissions = (("manage_keywords", "Can run all keyword functions"),)
     
 class KeywordPosition(models.Model):
     domain  = models.ForeignKey(Domain, on_delete=models.SET_NULL, null=True)

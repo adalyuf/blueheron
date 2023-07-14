@@ -11,10 +11,8 @@
 
 {% block content %}
 
-<h1>Domain Detail - {{domain.domain}}</h1>
-<p>More info on this domain</p>
-
-{{ domain }}
+{% if perms.ranker.manage_domains %}
+<h3>Admin Area</h3>
 
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
@@ -26,37 +24,9 @@
 <p>{{ notice }}</p>
 {% endif %}
 
-<h3>File for non-brand keywords</h3>
-<a href="https://www.semrush.com/analytics/organic/positions/?sortField=&sortDirection=desc&filter=%7B%22search%22%3A%22%22%2C%22volume%22%3A%22%22%2C%22positions%22%3A%22%22%2C%22positionsType%22%3A%22all%22%2C%22intent%22%3A%22%22%2C%22intentPositions%22%3A%22%22%2C%22clickPotential%22%3A%22%22%2C%22clickPotentialPercent%22%3A%22%22%2C%22kd%22%3A%22%22%2C%22advanced%22%3A%7B%220%22%3A%7B%22inc%22%3Atrue%2C%22fld%22%3A%22kt%22%2C%22val%22%3A0%7D%7D%7D&db=us&q={{ domain.domain }}&searchType=domain" target="_blank">get keyword file</a>
-
-{% if conversations %}
-<h2>Conversations</h2>
-    <ul>
-    {% for conversation in conversations %}
-        <li><a href="{% url 'conversation_detail' conversation.id %}">{{conversation.template.template}}</a>
-            {% if conversation.answered_at %}
-            (answered at: {{conversation.answered_at}})
-            {% else %}
-            (not yet answered)
-            {% endif %}
-        </li>
-    {% endfor %}
-    </ul>
-{% endif %}
-
-{% if templates %}
-<h2>Templates</h2>
-    <ul>
-    {% for template in templates %}
-        <li>{{template.template}}: Create conversation with ( 
-            {% for ai_model in ai_models %}
-            <a href="{% url 'conversation_add' template.id domain.id ai_model.id %}">{{ai_model}}</a>
-            {% endfor %}
-        )
-        </li>
-    {% endfor %}
-    </ul>
-{% endif %}
+<br>
+<p>File for non-brand keywords: <a href="https://www.semrush.com/analytics/organic/positions/?sortField=&sortDirection=desc&filter=%7B%22search%22%3A%22%22%2C%22volume%22%3A%22%22%2C%22positions%22%3A%22%22%2C%22positionsType%22%3A%22all%22%2C%22intent%22%3A%22%22%2C%22intentPositions%22%3A%22%22%2C%22clickPotential%22%3A%22%22%2C%22clickPotentialPercent%22%3A%22%22%2C%22kd%22%3A%22%22%2C%22advanced%22%3A%7B%220%22%3A%7B%22inc%22%3Atrue%2C%22fld%22%3A%22kt%22%2C%22val%22%3A0%7D%7D%7D&db=us&q={{ domain.domain }}&searchType=domain" target="_blank">get keyword file</a>
+</p>
 
 {% if keyword_files %}
     <div class="table-responsive">
@@ -85,8 +55,9 @@
     <p>No files are available.</p>
 {% endif %}
 
+{% endif %}
+
 {% if brands %} 
-<!-- Replace with brands when performance is good -->
     <div class="table-responsive">
         <table id="kt_datatable_zero_configuration" class="table table-row-bordered gy-5">
         <thead>
@@ -113,6 +84,35 @@
     {% include 'ranker/partials/_pagination.html' %}
 {% else %}
     <p>No brands available.</p>
+{% endif %}
+
+{% if conversations %}
+<h2>Conversations</h2>
+    <ul>
+    {% for conversation in conversations %}
+        <li><a href="{% url 'conversation_detail' conversation.id %}">{{conversation.template.template}}</a>
+            {% if conversation.answered_at %}
+            (answered at: {{conversation.answered_at}})
+            {% else %}
+            (not yet answered)
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{% if templates %}
+<h2>Templates</h2>
+    <ul>
+    {% for template in templates %}
+        <li>{{template.template}}: Create conversation with ( 
+            {% for ai_model in ai_models %}
+            <a href="{% url 'conversation_add' template.id domain.id ai_model.id %}">{{ai_model}}</a>
+            {% endfor %}
+        )
+        </li>
+    {% endfor %}
+    </ul>
 {% endif %}
 
 {% endblock content %}

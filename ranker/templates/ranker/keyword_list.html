@@ -12,13 +12,16 @@
 {% block content %}
 <h1>Keywords</h1>
 
-<h2>Keyword Statistics</h2>
+
+{% if perms.ranker.manage_keywords %}
+<h3>Admin Area</h3>
 <ul>
     <li>Total Keywords: {{kwtotal}}</li>
     <li>Available to be queued: {{kwavailable}}  <a href="{% url 'get_keyword_responses' %}">(queue {{kw_batch_size}})</a></li> 
     <li>Queued: {{kwpending}} <a href="{% url 'reset_keyword_queue' %}">(reset queue)</a></li>
     <li>Completed: {{kwcompleted}} </li>
 </ul>
+{% endif %}
 
 <form class="d-flex justify-content-center" role="search" method="get" action="{% url 'keyword_search' %}"">
     <input name="user_search" class="form-control me-2" style="max-width: 600px;" type="search" placeholder="Search responses" aria-label="Search">
