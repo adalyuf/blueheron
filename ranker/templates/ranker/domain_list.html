@@ -15,6 +15,8 @@
     <button class="btn btn-outline-success" type="submit">Search</button>
 </form>
 
+{% if perms.ranker.manage_domains %}
+<h3>Admin Area</h3>
 <ul>
     <li>
         Domain total: {{domain_count}}
@@ -38,6 +40,7 @@
         Keyword index size: {{keyword_index_size}}
     </li>
 </ul>
+{% endif %}
 
 {% if domain_list %}
     <div class="table-responsive">
