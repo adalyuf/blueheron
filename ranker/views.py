@@ -63,12 +63,7 @@ class KeywordListView(generic.ListView):
 def keyword_search(request):
     user_search = request.GET['user_search']
     if user_search:
-        # queryset = Keyword.objects.filter(answered_at__isnull=False).filter(ai_answer__icontains=user_search)
-        search_vector = SearchVector("ai_answer", "keyword", "natural_language_question","likely_next_queries", "likely_previous_queries")
-        search_query = SearchQuery(user_search)
-        queryset =  Keyword.objects.annotate(
-                search=search_vector, rank=SearchRank(search_vector, search_query)
-            ).filter(search=search_query).order_by("-rank")
+        queryset = Keyword.objects.filter(search_vector=user_search)
     else:
         queryset = Keyword.objects.filter(answered_at__isnull=False) 
     return render(request, 'ranker/keyword_list.html', {'keyword_list': queryset})
