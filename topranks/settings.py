@@ -21,17 +21,28 @@ from sentry_sdk.integrations.redis import RedisIntegration
 import logging.config
 from django.utils.log import DEFAULT_LOGGING
 
-def trace_sample_rate(sampling_context):
+def traces_sampler(sampling_context):
+    transaction_context = sampling_context.get("transaction_context")
+    if transaction_context is None:
+        return 0
+    op = transaction_context.get("op")
+
     if os.getenv("ENVIRONMENT") == "production":
-        return 0.1
+        if   op == "http.server":
+            path = sampling_context.get("wsgi_environ", {}).get("PATH_INFO")
+
+            if path.startswith("/health"): # Don't sample healthcheck
+                return 0
+            
+        elif op == "celery.task":
+            return 0.0001 #Sample 1/10,000 celery tasks
+        else:
+            return 0.1 #Sample 10% of everything by default
     else:
         return 1.0
 
-def profile_sample_rate(profiling_context):
-    if os.getenv("ENVIRONMENT") == "production":
-        return 0.01
-    else:
-        return 1.0
+def profiles_sampler(sampling_context):
+    return 0.1*traces_sampler(sampling_context)
 
 sentry_sdk.init(
     dsn="https://f83ed0dbb3cd4e728a57d29db739e3ee@o4505092597678080.ingest.sentry.io/4505092601675776",
@@ -46,8 +57,8 @@ sentry_sdk.init(
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production.
     
-    traces_sampler=trace_sample_rate,
-    profiles_sampler=profile_sample_rate,
+    traces_sampler=traces_sampler,
+    profiles_sampler=profiles_sampler,
 
     # If you wish to associate users to errors (assuming you are using
     # django.contrib.auth) you may enable sending PII data.
