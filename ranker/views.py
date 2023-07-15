@@ -51,10 +51,8 @@ class KeywordListView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context = KTLayout.init(context) # A function to init the global layout. It is defined in _keenthemes/__init__.py file
         KTTheme.addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']) # Include vendors and javascript files for dashboard widgets    
-        context['kwtotal'] = Keyword.objects.count()
-        context['kwavailable'] = Keyword.objects.filter(requested_at__isnull=True).count()
-        context['kwpending'] = Keyword.objects.filter(requested_at__isnull=False).filter(answered_at__isnull=True).count()
-        context['kwcompleted'] = Keyword.objects.filter(answered_at__isnull=False).count()
+        context['kwavailable']  = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=True).count()
+        context['kwpending']    = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=False).count()
         if os.getenv("ENVIRONMENT") == "production":
             context['kw_batch_size'] = 10000
         else:
