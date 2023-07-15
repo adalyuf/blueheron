@@ -16,7 +16,6 @@
 {% if perms.ranker.manage_keywords %}
 <h3>Admin Area</h3>
 <ul>
-    <li>Total Keywords: {{kwtotal}}</li>
     <li>Available to be queued: {{kwavailable}}  
         <a href="{% url 'get_keyword_responses' 1 %}">(queue {% widthratio 1 1 kw_batch_size %})</a>
         <a href="{% url 'get_keyword_responses' 2 %}">(queue {% widthratio 2 1 kw_batch_size %})</a>
@@ -24,7 +23,6 @@
         <a href="{% url 'get_keyword_responses' 10 %}">(queue {% widthratio 10 1 kw_batch_size %})</a>
     </li> 
     <li>Queued: {{kwpending}} <a href="{% url 'reset_keyword_queue' %}">(reset queue)</a></li>
-    <li>Completed: {{kwcompleted}} </li>
 </ul>
 {% endif %}
 
