@@ -47,7 +47,6 @@ class DomainListView(generic.ListView):
         context['brands_all']       = Brand.objects.all().count()
         context['brands_indexed']   = Brand.objects.filter(keyword_indexed_at__isnull=False).count()
         context['brands_not_indexed'] = Brand.objects.filter(keyword_indexed_at__isnull=True).count()
-        context['keyword_index_size'] = BrandKeyword.objects.all().count()
         return context
 
 def domain_search(request):

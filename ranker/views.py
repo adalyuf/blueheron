@@ -69,12 +69,12 @@ def keyword_search(request):
     return render(request, 'ranker/keyword_list.html', {'keyword_list': queryset})
 
 def reset_keyword_queue(request):
-    pending_keywords = Keyword.objects.filter(requested_at__isnull=False).filter(answered_at__isnull=True)
+    pending_keywords = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=False)
     item_list= []
     for keyword in pending_keywords:
         keyword.requested_at = None
         item_list.append(keyword)
-    Keyword.objects.bulk_update(item_list, ["requested_at"], batch_size=5000)
+    Keyword.objects.bulk_update(item_list, ["requested_at"], batch_size=10000)
     return redirect('keyword_list')
 
 class KeywordDetailView(generic.DetailView):
