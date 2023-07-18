@@ -63,10 +63,10 @@ def keyword_search(request):
     user_search = request.GET['user_search']
     if user_search:
         search_query = SearchQuery(user_search, search_type="websearch")
-        queryset = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")
+        queryset = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:100]
     else:
         queryset = Keyword.objects.filter(answered_at__isnull=False) 
-    return render(request, 'ranker/keyword_list.html', {'keyword_list': queryset})
+    return render(request, 'ranker/keyword_list.html', {'keyword_list': queryset, 'kw_batch_size': 10000})
 
 def reset_keyword_queue(request):
     pending_keywords = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=False)

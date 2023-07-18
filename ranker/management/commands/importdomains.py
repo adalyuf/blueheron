@@ -16,9 +16,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         #handle is a special method that the django manage command will run, with the args and options provided
 
-        # if Domain.objects.count() > 0:
-        #     self.stderr.write(f"There are already {Domain.objects.count()} domains in the database. Skipping import.")
-        #     return
+        if Domain.objects.count() > 0:
+            self.stderr.write(f"There are already {Domain.objects.count()} domains in the database. Skipping import.")
+            return
 
         myfile = options["file_path"][0]
         start_time = timezone.now()
