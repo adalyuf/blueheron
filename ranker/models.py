@@ -71,7 +71,7 @@ class Keyword(models.Model):
     class Meta:
         indexes = [
             GinIndex(fields=["search_vector"]),
-            models.Index(fields=['answered_at'])
+            models.Index(name="idx_answered_requested_at", fields=['answered_at'], include=['requested_at'])
         ]
         permissions = (("manage_keywords", "Can run all keyword functions"),)
     
