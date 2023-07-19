@@ -61,6 +61,14 @@ Signup
       {% endfor %}
     </div>
   {% endfor %}
+  {% if form.non_field_errors %}
+    <ul class="list-group">
+    {% for error in form.non_field_errors %}
+      <li class="list-group-item list-group-item-danger">{{ error|escape }}</li>
+    {% endfor %}
+    </ul>
+    <br>
+  {% endif %}
   <!--begin::Submit button-->
   <div class="d-grid mb-10">
     <button type="submit" id="kt_sign_up_submit" class="btn btn-primary">
