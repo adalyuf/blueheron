@@ -74,8 +74,8 @@ def keyword_search(request):
 
 def reset_keyword_queue(request):
     pending_keywords = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=False)
-    r = redis.Redis(host=os.getenv("REDIS_HOST"), port=6379, db=0, password=os.getenv("REDIS_PASS"))
-    r.flushdb()
+    broker.flushdb()
+    backend.flushdb()
     item_list= []
     for keyword in pending_keywords:
         keyword.requested_at = None
