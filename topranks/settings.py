@@ -306,6 +306,7 @@ CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://localhost:6379/0")
 CELERY_TIME_ZONE = "America/New_York"
 CELERY_MAX_CACHED_RESULTS = 50000
+CELERY_RESULT_EXPIRES = 7200 #2 hours
 
 # HTTPS Settings for production
 CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", False)
