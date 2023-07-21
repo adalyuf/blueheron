@@ -44,6 +44,14 @@
                     "value": "False"
                 },
                 {
+                    "name": "REDIS_HOST",
+                    "value": "172.30.0.60"
+                },
+                {
+                    "name": "REDIS_PASS",
+                    "value": "TopRedisPass99"
+                },
+                {
                     "name": "CELERY_BROKER",
                     "value": "redis://:TopRedisPass99@172.30.0.60:6379/0"
                 },
