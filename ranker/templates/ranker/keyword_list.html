@@ -23,6 +23,8 @@
         <a href="{% url 'get_keyword_responses' 10 %}">(queue {% widthratio 10 1 kw_batch_size %})</a>
     </li> 
     <li>Queued: {{kwpending}} <a href="{% url 'reset_keyword_queue' %}">(reset queue)</a></li>
+    <li>Broker size: {{broker_size}}</li>
+    <li>Backend size: {{backend_size}}</li>
 </ul>
 {% endif %}
 

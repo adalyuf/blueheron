@@ -26,10 +26,13 @@ import os
 import openai
 import markdown
 import json
+import redis 
 
 import logging
 
 logger = logging.getLogger(__name__)
+broker = redis.Redis(host=os.getenv("REDIS_HOST"), port=6379, db=0, password=os.getenv("REDIS_PASS"))
+backend  = redis.Redis(host=os.getenv("REDIS_HOST"), port=6379, db=1, password=os.getenv("REDIS_PASS"))
 
 class TemplateListView(generic.ListView):
     model = Template
@@ -52,6 +55,8 @@ class KeywordListView(generic.ListView):
         context = KTLayout.init(context) # A function to init the global layout. It is defined in _keenthemes/__init__.py file
         context['kwavailable']  = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=True).count()
         context['kwpending']    = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=False).count()
+        context['broker_size'] = broker.dbsize()
+        context['backend_size'] = backend.dbsize()
         if os.getenv("ENVIRONMENT") == "production":
             context['kw_batch_size'] = 10000
         else:
@@ -69,6 +74,8 @@ def keyword_search(request):
 
 def reset_keyword_queue(request):
     pending_keywords = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=False)
+    r = redis.Redis(host=os.getenv("REDIS_HOST"), port=6379, db=0, password=os.getenv("REDIS_PASS"))
+    r.flushdb()
     item_list= []
     for keyword in pending_keywords:
         keyword.requested_at = None
