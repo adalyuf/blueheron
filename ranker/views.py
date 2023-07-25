@@ -55,7 +55,7 @@ class KeywordListView(generic.ListView):
         context = KTLayout.init(context) # A function to init the global layout. It is defined in _keenthemes/__init__.py file
         context['kwavailable']  = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=True).count()
         context['kwpending']    = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=False).count()
-        context['broker_size'] = broker.dbsize()
+        context['broker_size'] = broker.llen('celery')
         context['backend_size'] = backend.dbsize()
         if os.getenv("ENVIRONMENT") == "production":
             context['kw_batch_size'] = 10000
