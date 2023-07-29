@@ -103,10 +103,17 @@ def keywordfile_make_primary(request, domain_id, keywordfile_id):
 def get_keyword_responses(request, batch_multiplier=1):
     if os.getenv("ENVIRONMENT") == "production":
         kw_batch_size = 10000
+        max_queue = 300000
     else:
         kw_batch_size = 100
-    kw_batch_size = kw_batch_size * batch_multiplier
+        max_queue = 300
 
+    kw_batch_size = kw_batch_size * batch_multiplier
+    queued = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=False).count()
+
+    if queued + kw_batch_size >= max_queue:
+        kw_batch_size = max(max_queue-queued, 0)
+    
     keyword_list = Keyword.objects.filter(requested_at=None)[:kw_batch_size]
     logger.info(f"Requesting responses for {kw_batch_size} keywords.")
 
