@@ -103,7 +103,7 @@ def keywordfile_make_primary(request, domain_id, keywordfile_id):
 def get_keyword_responses(request, batch_multiplier=1):
     if os.getenv("ENVIRONMENT") == "production":
         kw_batch_size = 10000
-        max_queue = 300000
+        max_queue = 250000
     else:
         kw_batch_size = 100
         max_queue = 300
@@ -128,7 +128,8 @@ def get_keyword_responses(request, batch_multiplier=1):
         prompt = "If a user searches for @currentKeyword, what is their user intent, how would you rephrase this as a natural language question, please provide a thorough and detailed answer to the natural language question, what was their likely previous query, and what could be their next query? Provide your response as a simple JSON object, with keys \"user_intent\", \"natural_language_question\", \"ai_answer\", \"likely_previous_queries\", and \"likely_next_queries\". If this is likely to be their first or last query in their journey, answer \"none\" in the field"
         prompt = prompt.replace("@currentKeyword", keyword.keyword)
         call_openai.apply_async( (prompt,), link=save_keyword_response.s(keyword.id)) #note the comma in arguments, critical to imply tuple, otherwise thinks array, passes response as first argument
-
+    
+    djmessages.success(request, f'Adding {len(item_list)} keywords to the queue')
     return redirect('keyword_list')
 
 def get_business_data(request):
