@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-import os, json
+import os
+import json
 from django.contrib.messages import constants as messages
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -21,6 +22,7 @@ from sentry_sdk.integrations.redis import RedisIntegration
 import logging.config
 from django.utils.log import DEFAULT_LOGGING
 
+
 def traces_sampler(sampling_context):
     transaction_context = sampling_context.get("transaction_context")
     if transaction_context is None:
@@ -28,21 +30,23 @@ def traces_sampler(sampling_context):
     op = transaction_context.get("op")
 
     if os.getenv("ENVIRONMENT") == "production":
-        if   op == "http.server":
+        if op == "http.server":
             path = sampling_context.get("wsgi_environ", {}).get("PATH_INFO")
 
-            if path.startswith("/health"): # Don't sample healthcheck
+            if path.startswith("/health"):  # Don't sample healthcheck
                 return 0
-            
+
         elif op == "celery.task":
-            return 0.0001 #Sample 1/10,000 celery tasks
+            return 0.0001  # Sample 1/10,000 celery tasks
         else:
-            return 0.2 #Sample 10% of everything by default
+            return 0.2  # Sample 10% of everything by default
     else:
         return 1.0
 
+
 def profiles_sampler(sampling_context):
     return 0.1*traces_sampler(sampling_context)
+
 
 sentry_sdk.init(
     dsn="https://f83ed0dbb3cd4e728a57d29db739e3ee@o4505092597678080.ingest.sentry.io/4505092601675776",
@@ -56,7 +60,7 @@ sentry_sdk.init(
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production.
-    
+
     traces_sampler=traces_sampler,
     profiles_sampler=profiles_sampler,
 
@@ -79,7 +83,8 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 USE_NGROK = os.environ.get('USE_NGROK', '') != 'False'
 
-ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '3.132.134.103', '3.134.21.36', '3.134.236.55', '.topranks.ai', '3.18.81.39' ]
+ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '3.132.134.103',
+                 '3.134.21.36', '3.134.236.55', '.topranks.ai', '3.18.81.39']
 INTERNAL_IPS = ['localhost', "127.0.0.1"]
 CSRF_TRUSTED_ORIGINS = ['https://topranks.ai']
 
@@ -102,8 +107,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     "django.contrib.postgres",
     'allauth',
-    'allauth.account', 
-    'allauth.socialaccount', 
+    'allauth.account',
+    'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     "ranker",
     "accounts",
@@ -169,12 +174,12 @@ TEMPLATES = [
 ]
 
 MESSAGE_TAGS = {
-        messages.DEBUG: 'bg-secondary',
-        messages.INFO: 'bg-info',
-        messages.SUCCESS: 'bg-success',
-        messages.WARNING: 'bg-warning',
-        messages.ERROR: 'bg-danger',
- }
+    messages.DEBUG: 'bg-secondary',
+    messages.INFO: 'bg-info',
+    messages.SUCCESS: 'bg-success',
+    messages.WARNING: 'bg-warning',
+    messages.ERROR: 'bg-danger',
+}
 
 WSGI_APPLICATION = "topranks.wsgi.application"
 
@@ -192,7 +197,7 @@ DATABASES = {
         'PORT':     os.getenv("POSTGRES_PORT", '5432'),
     }
 }
-CONN_MAX_AGE = 60 #seconds to keep database connection alive
+CONN_MAX_AGE = 60  # seconds to keep database connection alive
 
 # DATABASES = {
 #     'default': {
@@ -229,11 +234,11 @@ AUTHENTICATION_BACKENDS = (
     # `allauth` specific authentication methods, such as login by e-mail
     "allauth.account.auth_backends.AuthenticationBackend",
 )
-#django-allauth config options
+# django-allauth config options
 SITE_ID = 1
 
 ACCOUNT_FORMS = {
-'signup': 'accounts.forms.CustomSignupForm',
+    'signup': 'accounts.forms.CustomSignupForm',
 }
 
 ACCOUNT_EMAIL_REQUIRED = True
@@ -273,12 +278,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 # STATIC_URL = "/static_collected/" #This is how the URL is configured in templates
-STATIC_ROOT = BASE_DIR / 'static_collected' #This is the directory where assets are collected
+# This is the directory where assets are collected
+STATIC_ROOT = BASE_DIR / 'static_collected'
 STATICFILES_DIRS = [
     BASE_DIR / "topranks/static",
     BASE_DIR / "static_build",
 ]
-STATIC_HOST = os.environ.get("DJANGO_STATIC_HOST", "") #Enabled for AWS CloudFront
+# Enabled for AWS CloudFront
+STATIC_HOST = os.environ.get("DJANGO_STATIC_HOST", "")
 STATIC_URL = STATIC_HOST + "/static_collected/"
 
 STORAGES = {
@@ -291,9 +298,9 @@ STORAGES = {
 }
 # Use S3 for media file uploads
 AWS_S3_ADDRESSING_STYLE = "virtual"
-AWS_STORAGE_BUCKET_NAME= "topranks-media-public"
+AWS_STORAGE_BUCKET_NAME = "topranks-media-public"
 AWS_DEFAULT_ACL = "public-read"
-AWS_S3_REGION_NAME = 'us-east-2' 
+AWS_S3_REGION_NAME = 'us-east-2'
 AWS_S3_SIGNATURE_VERSION = 's3v4'
 
 # Default primary key field type
@@ -305,11 +312,12 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Celery settings
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://localhost:6379/0")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get(
+    "CELERY_BACKEND", "redis://localhost:6379/0")
 CELERY_TIME_ZONE = "America/New_York"
 CELERY_MAX_CACHED_RESULTS = 50000
-CELERY_RESULT_EXPIRES = 7200 #2 hours
-CELERYD_MAX_TASKS_PER_CHILD = 6000
+CELERY_RESULT_EXPIRES = 7200  # 2 hours
+CELERYD_MAX_TASKS_PER_CHILD = 200
 
 # HTTPS Settings for production
 CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", False)
@@ -356,9 +364,6 @@ logging.config.dictConfig({
         'django.server': DEFAULT_LOGGING['loggers']['django.server'],
     },
 })
-
-
-
 
 
 ######################
