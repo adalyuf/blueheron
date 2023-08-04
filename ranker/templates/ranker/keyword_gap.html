@@ -1,0 +1,39 @@
+{% extends 'layout/default.html' %}
+
+{% load i18n %}
+
+{% block title %}{% translate "Keyword Gap Analysis" %}{% endblock %}
+{% block bctitle %}{% translate "Keyword Gap Analysis" %}{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{% url 'keyword_list' %}" class="text-muted text-hover-primary">Keywords</a></li>
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+<form action="{% url 'keyword_gap'  %}" method="post">
+    {% csrf_token %}
+    <div class="overflow-hidden flex-grow-1 col-md-6">
+        <label for="SelectBrand1">Brand 1</label>
+        <select name="brand" id="SelectBrand1" class="form-select" data-control="select2" data-placeholder="Select an option">
+        {% if global_brand_list %}
+            {% for brand in global_brand_list %}
+                <option value="{{brand.id}}">{{brand.brand}}</option>
+            {% endfor %}
+        {% endif %}
+        </select>
+    </div>
+    <div class="overflow-hidden flex-grow-1 col-md-6">
+        <label for="SelectBrand2">Brand 2</label>
+        <select name="brand" id="SelectBrand2" class="form-select" data-control="select2" data-placeholder="Select an option">
+        {% if global_brand_list %}
+            {% for brand in global_brand_list %}
+                <option value="{{brand.id}}">{{brand.brand}}</option>
+            {% endfor %}
+        {% endif %}
+        </select>
+    </div>
+    <input class="btn btn-secondary" type="submit" value="Compare">
+</form>
+
+{% endblock content %}
