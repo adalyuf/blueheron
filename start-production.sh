@@ -6,10 +6,10 @@ python manage.py migrate
 python manage.py collectstatic --noinput
 
 #Celery detached background processes
-celery --app=topranks worker --loglevel=info --detach --queues celery,express --concurrency=30
+celery --app=topranks worker --loglevel=info --detach --queues celery,express --concurrency=30 --max-tasks-per-child=10
 
 #Gunicorn web server
-gunicorn topranks.wsgi -b 0.0.0.0:80 --worker-tmp-dir /dev/shm --workers=2 --threads=4 --worker-class=gthread --max-tasks-per-child=10
+gunicorn topranks.wsgi -b 0.0.0.0:80 --worker-tmp-dir /dev/shm --workers=2 --threads=4 --worker-class=gthread
 
 #To monitor celery in production, run flower locally with below command.
 #celery --app=topranks --broker=redis://:TopRedisPass99@18.219.28.43:6379 flower --port=5555
