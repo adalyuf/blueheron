@@ -16,7 +16,7 @@
             "essential": true,
             "entryPoint": [
                 "sh",
-                "start-production-express.sh"
+                "./start-production-express.sh"
             ],
             "environment": [
                 {
@@ -117,7 +117,7 @@
             "healthCheck": {
                 "command": [
                     "CMD-SHELL",
-                    "curl -f http://localhost/health || exit"
+                    "(curl -f http://localhost/health && celery status) || exit 1"
                 ],
                 "interval": 30,
                 "timeout": 5,
