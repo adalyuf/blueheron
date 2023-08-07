@@ -41,3 +41,4 @@ dump.rdb
 _keenthemes/tools/node_modules
 _keenthemes/tools/yarn.lock
 _keenthemes/tools/package-lock.json
+celerybeat-schedule

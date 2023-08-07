@@ -9,9 +9,6 @@ from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
 
-def return_last_value(retry_state):
-        """return the result of the last call attempt"""
-        return retry_state.outcome.result()
 
 @shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={'max_retries': 8}, rate_limit='1500/m')
 def call_openai(self, prompt):
@@ -43,8 +40,6 @@ def call_openai(self, prompt):
         raise "Multiple retries attempted, all failed."
 
 
-
-# @shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=5, retry_kwargs={'max_retries': 5})
 @shared_task(queue="express")
 def save_message_response(response, message_id):
     message = Message.objects.get(id = message_id)
@@ -163,6 +158,7 @@ def save_business_json(api_response, domain_id):
         domain.business_api_response = f"ERROR: Couldn't save business json: {repr(e)}."
         domain.save()
 
+
 @shared_task(queue="steamroller")
 def index_brand(batch_size):
     print(f'Batch size: {batch_size}')
@@ -184,3 +180,28 @@ def index_brand(batch_size):
         brand.save()
         end_time = timezone.now()
         print(f"({i}/{len(brand_list)} - {int((end_time-start_time).total_seconds())} sec - {timezone.now()}) Brand ID {brand.pk} ({brand.brand}): {len(keyword_list)} keywords updated")
+
+
+@shared_task(queue="steamroller")
+def refill_keyword_queue():
+    if os.getenv("ENVIRONMENT") == "production":
+        kw_batch_size = 10000
+        max_queue = 250000
+    else:
+        kw_batch_size = 100
+        max_queue = 300
+
+    kw_batch_size = kw_batch_size
+    queued = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=False).count()
+
+    if queued + kw_batch_size >= max_queue:
+        kw_batch_size = max(max_queue-queued, 0)
+    
+    keyword_list = Keyword.objects.filter(requested_at=None)[:kw_batch_size]
+    logger.info(f"Requesting responses for {kw_batch_size} keywords.")
+
+    item_list = []
+    for keyword in keyword_list:
+        keyword.requested_at = timezone.now()
+        item_list.append(keyword)
+    Keyword.objects.bulk_update(item_list, ["requested_at"], batch_size=5000)
