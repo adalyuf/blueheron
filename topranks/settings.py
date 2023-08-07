@@ -20,6 +20,7 @@ from sentry_sdk.integrations.cloud_resource_context import CloudResourceContextI
 from sentry_sdk.integrations.redis import RedisIntegration
 import logging.config
 from django.utils.log import DEFAULT_LOGGING
+from celery.schedules import crontab 
 
 def traces_sampler(sampling_context):
     transaction_context = sampling_context.get("transaction_context")
@@ -310,6 +311,14 @@ CELERY_TIME_ZONE = "America/New_York"
 CELERY_RESULT_CACHE_MAX = 50000
 CELERY_RESULT_EXPIRES = 7200 #2 hours
 CELERY_WORKER_MAX_TASKS_PER_CHILD = 200
+
+CELERY_BEAT_SCHEDULE = {
+    "refill_keyword_queue": {
+        "task": "ranker.tasks.refill_keyword_queue",
+        "schedule": crontab(minute="*/10"),
+    },
+}
+
 
 # HTTPS Settings for production
 CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", False)

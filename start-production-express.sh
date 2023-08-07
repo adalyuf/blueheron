@@ -8,6 +8,9 @@ python manage.py collectstatic --noinput
 #Celery detached background processes
 celery --app=topranks worker --loglevel=info --detach --queues steamroller,express --concurrency=4
 
+#Scheduler for celery beat, scheduled celery tasks
+celery --app=topranks beat --loglevel=info --detach
+
 #Gunicorn web server
 gunicorn topranks.wsgi -b 0.0.0.0:80 --worker-tmp-dir /dev/shm --workers=2 --threads=4 --worker-class=gthread
 
