@@ -89,6 +89,14 @@ class KeywordDetailView(generic.DetailView):
 def keyword_gap(request):
     context = {}
     context['global_brand_list']   = Brand.objects.all()
+    
+    if request.method == 'POST':
+        brand1 = get_object_or_404(Brand, id = request.POST['brand1'])
+        brand2 = get_object_or_404(Brand, id = request.POST['brand2'])
+        context['brand1'] = brand1 
+        context['brand2'] = brand2
+        search_query = SearchQuery(f"{brand1.brand} OR {brand2.brand}", search_type="websearch")
+        context['keyword_list'] = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:100]
     return render(request, 'ranker/keyword_gap.html', context)
 
 
