@@ -18,7 +18,7 @@ from _keenthemes.libs.theme import KTTheme
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.db.models import F
 
-from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword
+from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword, Brand
 from .forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm, AddDomainToProjectForm, CreateConversationsForm
 
 import csv
@@ -85,6 +85,20 @@ def reset_keyword_queue(request):
 
 class KeywordDetailView(generic.DetailView):
     model = Keyword
+
+def keyword_gap(request):
+    context = {}
+    context['global_brand_list']   = Brand.objects.all()
+    
+    if request.method == 'POST':
+        brand1 = get_object_or_404(Brand, id = request.POST['brand1'])
+        brand2 = get_object_or_404(Brand, id = request.POST['brand2'])
+        context['brand1'] = brand1 
+        context['brand2'] = brand2
+        search_query = SearchQuery(f"{brand1.brand} OR {brand2.brand}", search_type="websearch")
+        context['keyword_list'] = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:100]
+    return render(request, 'ranker/keyword_gap.html', context)
+
 
 
 def template_create(request, project_id=None):
