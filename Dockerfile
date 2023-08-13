@@ -11,6 +11,7 @@ WORKDIR $DockerHOME
 RUN sh ./install-nvm-aws.sh
 
 RUN pip install -r requirements.txt
+RUN echo "Starting new container"
 
 EXPOSE 80
 ENTRYPOINT ./start-production.sh
