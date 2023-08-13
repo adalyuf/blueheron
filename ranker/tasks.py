@@ -186,7 +186,7 @@ def index_brand(batch_size):
 def refill_keyword_queue():
     if os.getenv("ENVIRONMENT") == "production":
         kw_batch_size = 10000
-        max_queue = 270000
+        max_queue = 100000
     else:
         kw_batch_size = 100
         max_queue = 300
