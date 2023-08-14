@@ -113,7 +113,7 @@
             "healthCheck": {
                 "command": [
                     "CMD-SHELL",
-                    "(curl -f http://localhost/health && celery status) || exit 1"
+                    "(curl -f http://localhost/health && celery status -d standard@us-east-2.compute.internal) || exit 1"
                 ],
                 "interval": 30,
                 "timeout": 5,
