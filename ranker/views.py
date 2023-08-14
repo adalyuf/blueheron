@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -86,9 +86,16 @@ def reset_keyword_queue(request):
 class KeywordDetailView(generic.DetailView):
     model = Keyword
 
+
+def autocomplete_brands(request):
+    if 'term' in request.GET:
+        term = request.GET.get('term')
+        brands = Brand.objects.all().filter(brand__icontains=term)
+        return JsonResponse(list(brands.values()), safe=False)
+    return render(request, 'index.html')
+
 def keyword_gap(request):
     context = {}
-    context['global_brand_list']   = Brand.objects.all()
     
     if request.method == 'POST':
         brand1 = get_object_or_404(Brand, id = request.POST['brand1'])
