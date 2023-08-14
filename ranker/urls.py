@@ -53,6 +53,8 @@ urlpatterns = [
     path("keywords/keyword_search/" , login_required(views.keyword_search)                  , name="keyword_search"),
     path("keywords/reset_keyword_queue/" , login_required(views.reset_keyword_queue)        , name="reset_keyword_queue"),
     path("keywords/gap/"                 , login_required(views.keyword_gap)                , name='keyword_gap'),
+    path("keywords/gap/autocomplete-brands/", login_required(views.autocomplete_brands)     , name='autocomplete_brands'),
+
 
 
 ]
