@@ -6,7 +6,7 @@ python manage.py migrate
 python manage.py collectstatic --noinput
 
 #Celery detached background processes
-celery --app=topranks worker --loglevel=info --detach --queues steamroller,express --concurrency=4
+celery --app=topranks worker --loglevel=info --detach --queues steamroller,express --concurrency=4 --hostname=express@%d
 
 #Scheduler for celery beat, scheduled celery tasks
 celery --app=topranks beat --loglevel=info --detach
