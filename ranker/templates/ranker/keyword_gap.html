@@ -35,6 +35,7 @@
         <thead>
             <tr>
             <th scope="col">Keyword</th>
+            <th scope="col">Traffic</th>
             <th scope="col">Natural Language Question</th>
             <th scope="col">AI Answer</th>
             </tr>
@@ -43,6 +44,7 @@
     {% for keyword in keyword_list %}
             <tr>
                 <td>{{keyword.keyword}}</td>
+                <td>{{keyword.traffic}}</td>
                 <td><a href="{% url 'keyword_detail' keyword.id %}">{{keyword.natural_language_question}}</a></td>
                 <td>{{keyword.ai_answer}}</td>
             </tr>

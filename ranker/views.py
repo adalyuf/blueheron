@@ -16,7 +16,7 @@ from django.urls import reverse, reverse_lazy
 from _keenthemes.__init__ import KTLayout
 from _keenthemes.libs.theme import KTTheme
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
-from django.db.models import F
+from django.db.models import F, Max
 
 from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword, Brand
 from .forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm, AddDomainToProjectForm, CreateConversationsForm
@@ -103,7 +103,7 @@ def keyword_gap(request):
         context['brand1'] = brand1 
         context['brand2'] = brand2
         search_query = SearchQuery(f"{brand1.brand} OR {brand2.brand}", search_type="websearch")
-        context['keyword_list'] = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:100]
+        context['keyword_list'] = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).annotate(traffic=(Max('keywordposition__search_volume'))).filter(search_vector=search_query).order_by("-traffic")[:100]
     return render(request, 'ranker/keyword_gap.html', context)
 
 
