@@ -103,7 +103,7 @@ def keyword_gap(request):
         context['brand1'] = brand1 
         context['brand2'] = brand2
         search_query = SearchQuery(f"{brand1.brand} OR {brand2.brand}", search_type="websearch")
-        context['keyword_list'] = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).annotate(traffic=(Max('keywordposition__search_volume'))).filter(search_vector=search_query).order_by("-traffic")[:100]
+        context['keyword_list'] = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).annotate(traffic=(Max('keywordposition__search_volume'))).filter(search_vector=search_query).exclude(ai_answer__isnull=True).order_by("-traffic")[:100]
     return render(request, 'ranker/keyword_gap.html', context)
 
 
