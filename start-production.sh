@@ -6,7 +6,7 @@ python manage.py migrate
 python manage.py collectstatic --noinput
 
 #Celery detached background processes
-celery --app=topranks worker --loglevel=info --detach --queues celery,express --concurrency=30
+celery --app=topranks worker --loglevel=info --detach --queues celery,express --concurrency=30 -n standard@%d
 
 #Gunicorn web server
 gunicorn topranks.wsgi -b 0.0.0.0:80 --worker-tmp-dir /dev/shm --workers=2 --threads=4 --worker-class=gthread
