@@ -51,7 +51,7 @@ class Command(BaseCommand):
                 keywords_total.save()
                 #Add new keywords to keywords available to be queued stat
                 keywords_available = Statistic.objects.get(key="keywords_available")
-                keywords_available += len(item_list)
+                keywords_available.value += len(item_list)
                 keywords_available.save()
                 self.stdout.write(f"Bulk insert completed: {len(item_list)} {type(item_list[0]).__name__} records")
 
