@@ -76,8 +76,18 @@ def keyword_search(request):
 
 def reset_keyword_queue(request):
     pending_keywords = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=False)
+    # Add pending keywords back to keywords available to be queued stat
+    keywords_available = Statistic.objects.get(key="keywords_available")
+    keywords_available.value = keywords_available.value + pending_keywords.count()
+    keywords_available.save()
+    # Reset pending keywords stat to 0
+    keywords_pending_stat = Statistic.objects.get(key="keywords_pending")
+    keywords_pending_stat.value = 0
+    keywords_pending_stat.save() 
+    # Flush Redis cache and results
     broker.flushdb()
     backend.flushdb()
+    # Unset each individual keywords requested at value
     item_list= []
     for keyword in pending_keywords:
         keyword.requested_at = None
