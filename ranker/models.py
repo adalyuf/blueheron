@@ -52,6 +52,10 @@ class Domain(models.Model):
         ordering = ['rank']
         permissions = (("manage_domains", "Can run all domain functions"),)
 
+class Statistic(models.Model):
+    key     = models.CharField(max_length=200, unique=True)
+    value   = models.BigIntegerField(null=True, blank=True)
+
 class Keyword(models.Model):
     keyword                     = models.CharField(max_length=200, unique=True)
     user_intent                 = models.TextField(null=True)
