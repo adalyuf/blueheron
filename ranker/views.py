@@ -18,7 +18,7 @@ from _keenthemes.libs.theme import KTTheme
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.db.models import F, Max
 
-from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword, Brand
+from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword, Brand, Statistic
 from .forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm, AddDomainToProjectForm, CreateConversationsForm
 
 import csv
@@ -53,8 +53,10 @@ class KeywordListView(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context = KTLayout.init(context) # A function to init the global layout. It is defined in _keenthemes/__init__.py file
-        context['kwavailable']  = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=True).count()
-        context['kwpending']    = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=False).count()
+        context['keywords_total']       = Statistic.objects.get(key="keywords_total").value
+        context['keywords_available']   = Statistic.objects.get(key="keywords_available").value
+        context['keywords_pending']     = Statistic.objects.get(key="keywords_pending").value
+        context['keywords_answered']    = Statistic.objects.get(key="keywords_answered").value
         context['broker_size'] = broker.llen('celery')
         context['backend_size'] = backend.dbsize()
         if os.getenv("ENVIRONMENT") == "production":
