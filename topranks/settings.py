@@ -31,6 +31,8 @@ def traces_sampler(sampling_context):
     if os.getenv("ENVIRONMENT") == "production":
         if   op == "http.server":
             path = sampling_context.get("wsgi_environ", {}).get("PATH_INFO")
+            if path is None:
+                return 0
 
             if path.startswith("/health"): # Don't sample healthcheck
                 return 0
@@ -306,7 +308,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Celery settings
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://localhost:6379/0")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://localhost:6379/1")
 CELERY_TIME_ZONE = "America/New_York"
 CELERY_RESULT_CACHE_MAX = 50000
 CELERY_RESULT_EXPIRES = 7200 #2 hours

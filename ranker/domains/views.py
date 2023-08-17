@@ -18,7 +18,7 @@ from _keenthemes.__init__ import KTLayout
 from _keenthemes.libs.theme import KTTheme
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 
-from ranker.models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword, Brand, BrandKeyword
+from ranker.models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword, Brand, BrandKeyword, Statistic
 from ranker.forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm
 from ranker.tasks import call_openai, save_keyword_response, save_business_json, index_brand
 
@@ -116,6 +116,15 @@ def get_keyword_responses(request, batch_multiplier=1):
     
     keyword_list = Keyword.objects.filter(requested_at=None)[:kw_batch_size]
     logger.info(f"Requesting responses for {kw_batch_size} keywords.")
+
+    # Remove batch size from keywords available to be queued stat
+    keywords_available = Statistic.objects.get(key="keywords_available")
+    keywords_available.value = keywords_available.value - kw_batch_size
+    keywords_available.save()
+    # Add batch size to keywords pending stat
+    keywords_pending = Statistic.objects.get(key="keywords_pending")
+    keywords_pending.value = keywords_pending.value + kw_batch_size
+    keywords_pending.save()
 
     item_list = []
     for keyword in keyword_list:
