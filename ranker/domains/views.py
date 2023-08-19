@@ -69,8 +69,14 @@ def domain_detail(request, domain_id):
     context['conversations'] = domain.conversation_set.all()
     context['ai_models'] = AIModel.objects.all()
     context['templates'] = Template.objects.filter(scope__exact='per_domain').filter(project__isnull=True)
-    context['brands'] = domain.branddomain_set.all().order_by('type','brand').annotate(num_keywords=Count("brand__keyword"))
-    context['competitors'] = domain.competitors.all()
+    context['brands'] = domain.branddomain_set.all().filter(type__exact='brand').annotate(num_keywords=Count("brand__keyword"))
+    competitors = domain.competitors.all()
+    context['competitors'] = competitors
+    competitor_brands = []
+    for comp in competitors:
+        comp_brands = comp.branddomain_set.all().filter(type__exact='brand').annotate(num_keywords=Count("brand__keyword"))
+        competitor_brands.append(comp_brands)
+    context['competitor_brands'] = competitor_brands
 
     notice = ''
     if request.method == 'POST':

@@ -11,7 +11,7 @@
 
 {% block content %}
 
-<form action="{% url 'keyword_gap'  %}" method="post">
+<form action="{% url 'keyword_gap' %}" method="post">
     {% csrf_token %}
     <div class="overflow-hidden flex-grow-1 col-md-6">
         <label for="SelectBrand1">Brand 1</label>
@@ -25,8 +25,8 @@
 </form>
 
 {% if brand1 %}
-{{brand1}}
-{{brand2}}
+{{brand1}} {{brand1.id}}
+{{brand2}} {{brand2.id}}
 {% endif %}
 
 {% if keyword_list %}
