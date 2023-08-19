@@ -106,12 +106,18 @@ def autocomplete_brands(request):
         return JsonResponse(list(brands.values()), safe=False)
     return render(request, 'index.html')
 
-def keyword_gap(request):
+def keyword_gap(request, brand1_id=None, brand2_id=None):
     context = {}
     
     if request.method == 'POST':
-        brand1 = get_object_or_404(Brand, id = request.POST['brand1'])
-        brand2 = get_object_or_404(Brand, id = request.POST['brand2'])
+        if brand1_id:
+            brand1 = get_object_or_404(Brand, id = brand1_id)
+        else:
+            brand1 = get_object_or_404(Brand, id = request.POST['brand1'])
+        if brand2_id:
+            brand2 = get_object_or_404(Brand, id = brand2_id)
+        else:
+            brand2 = get_object_or_404(Brand, id = request.POST['brand2'])
         context['brand1'] = brand1 
         context['brand2'] = brand2
         search_query = SearchQuery(f"{brand1.brand} OR {brand2.brand}", search_type="websearch")
