@@ -119,7 +119,7 @@
             <td>
                 <form class="row row-cols" method="post" action="{% url 'keyword_gap' brand.brand.id comp_brand.brand.id %}">
                     {% csrf_token %}
-                    <button class="btn btn-link form-control form-control-flush" type="submit">{{brand.num_keywords}} vs {{comp_brand.num_keywords}}</button>
+                    <button class="btn btn-link form-control form-control-flush" type="submit">{{brand.brand.num_search_keywords}} vs {{comp_brand.brand.num_search_keywords}}</button>
                 </form>
             </td>
             {% endfor %}

@@ -5,6 +5,7 @@ from django.db.models import UniqueConstraint, Max
 from django.core.validators import FileExtensionValidator, RegexValidator
 from django.contrib.postgres.search import SearchVectorField
 from django.contrib.postgres.indexes import GinIndex # add the Postgres recommended GIN index 
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 
 from accounts.models import User 
 # Create your models here.
@@ -123,6 +124,9 @@ class Brand(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"{self.brand}"
+    def num_search_keywords(self):
+        search_query = SearchQuery(self.brand, search_type="websearch")
+        return Keyword.objects.filter(search_vector=search_query).count()
 
 class BrandDomain(models.Model):
     type_choices = [
