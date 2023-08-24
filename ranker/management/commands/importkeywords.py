@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone, html
 
-from ranker.models import Domain, TokenType, Token, Template, TemplateItem, Conversation, Message, KeywordFile, Keyword, KeywordPosition, Statistic
+from ranker.models import Domain, TokenType, Token, Template, TemplateItem, Conversation, Message, KeywordFile, Keyword, KeywordPosition, Statistic, add_value
 from ranker.tasks import call_openai, save_keyword_response
 
 import os, openai, markdown, json, csv
@@ -45,14 +45,10 @@ class Command(BaseCommand):
                     )
                     item_list.append(item)
                 Keyword.objects.bulk_create(item_list, ignore_conflicts=True)
-                # Add new keywords to keyword total statistic
-                keywords_total = Statistic.objects.get(key="keywords_total")
-                keywords_total.value += len(item_list)
-                keywords_total.save()
-                #Add new keywords to keywords available to be queued stat
-                keywords_available = Statistic.objects.get(key="keywords_available")
-                keywords_available.value += len(item_list)
-                keywords_available.save()
+                # Add new keywords to total keywords and available keywords statistics
+                add_value('keywords_total'    , len(item_list))
+                add_value('keywords_available', len(item_list))
+
                 self.stdout.write(f"Bulk insert completed: {len(item_list)} {type(item_list[0]).__name__} records")
 
             #Save original data in case useful later
