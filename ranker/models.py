@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.urls import reverse
 from django.db.models import UniqueConstraint, Max 
@@ -56,6 +56,13 @@ class Domain(models.Model):
 class Statistic(models.Model):
     key     = models.CharField(max_length=200, unique=True)
     value   = models.BigIntegerField(null=True, blank=True)
+
+def add_value(key, amount):
+    #Select for update locks the rows of the stats table until the transaction has completed.
+    with transaction.atomic():
+        stat = Statistic.objects.select_for_update().get(key=key)
+        stat.value = stat.value + amount
+        stat.save()
 
 class Keyword(models.Model):
     keyword                     = models.CharField(max_length=200, unique=True)

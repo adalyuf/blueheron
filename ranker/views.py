@@ -17,8 +17,9 @@ from _keenthemes.__init__ import KTLayout
 from _keenthemes.libs.theme import KTTheme
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.db.models import F, Max
+from django.db import transaction
 
-from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword, Brand, Statistic
+from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword, Brand, Statistic, add_value
 from .forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm, AddDomainToProjectForm, CreateConversationsForm
 
 import csv
@@ -77,13 +78,13 @@ def keyword_search(request):
 def reset_keyword_queue(request):
     pending_keywords = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=False)
     # Add pending keywords back to keywords available to be queued stat
-    keywords_available = Statistic.objects.get(key="keywords_available")
-    keywords_available.value = keywords_available.value + pending_keywords.count()
-    keywords_available.save()
-    # Reset pending keywords stat to 0
-    keywords_pending_stat = Statistic.objects.get(key="keywords_pending")
-    keywords_pending_stat.value = 0
-    keywords_pending_stat.save() 
+    add_value('keywords_available', pending_keywords.count())
+
+    # Reset pending keywords stat to 0 (can't use add_value helper because we're setting to 0 instead of adding)
+    with transaction.atomic():
+        stat = Statistic.objects.select_for_update().get(key='keywords_pending')
+        stat.value = 0
+        stat.save()
     # Flush Redis cache and results
     broker.flushdb()
     backend.flushdb()

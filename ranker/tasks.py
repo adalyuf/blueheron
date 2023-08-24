@@ -4,7 +4,7 @@ from django.conf import settings
 from celery import shared_task
 import os, openai, markdown, json, re, tldextract, requests
 
-from ranker.models import Message, Keyword, Domain, Brand, BrandKeyword, Statistic
+from ranker.models import Message, Keyword, Domain, Brand, BrandKeyword, Statistic, add_value
 from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
@@ -91,14 +91,10 @@ def save_keyword_response(api_response, keyword_id):
         keyword.answered_at = timezone.now()
         keyword.save()
         print(f"{keyword} took {(keyword.answered_at-keyword.requested_at).total_seconds()} seconds.")
-        # Remove one from the pending keywords stat
-        keywords_pending = Statistic.objects.get(key="keywords_pending")
-        keywords_pending.value = keywords_pending.value - 1
-        keywords_pending.save()
-        # Add one to the answered keywords stat
-        keywords_answered = Statistic.objects.get(key="keywords_answered")
-        keywords_answered.value = keywords_answered.value + 1
-        keywords_answered.save()
+        # Remove one from the pending keywords stat and add one to the answered keywords stat
+        add_value('keywords_pending' , -1)
+        add_value('keywords_answered',  1)
+
         return "Keyword saved"
     except:
         print("Couldn't assign response to columns. Resetting requested_at to null.")
@@ -207,14 +203,9 @@ def refill_keyword_queue():
     
     keyword_list = Keyword.objects.filter(requested_at=None)[:kw_batch_size]
     logger.info(f"Requesting responses for {kw_batch_size} keywords.")
-    # Remove batch size from keywords available to be queued stat
-    keywords_available = Statistic.objects.get(key="keywords_available")
-    keywords_available.value = keywords_available.value - kw_batch_size
-    keywords_available.save()
-    # Add batch size to keywords pending stat
-    keywords_pending = Statistic.objects.get(key="keywords_pending")
-    keywords_pending.value = keywords_pending.value + kw_batch_size
-    keywords_pending.save()
+    # Remove batch size from keywords available to be queued stat and add to pending keywords stat
+    add_value('keywords_available'  ,   -kw_batch_size)
+    add_value('keywords_pending'    ,    kw_batch_size)
 
     item_list = []
     for keyword in keyword_list:
