@@ -1,5 +1,6 @@
 from django.db import models, transaction
 from django.utils import timezone
+from django.utils.text import slugify
 from django.urls import reverse
 from django.db.models import UniqueConstraint, Max 
 from django.core.validators import FileExtensionValidator, RegexValidator
@@ -47,7 +48,8 @@ class Domain(models.Model):
     def __str__(self):
         return self.domain
     def get_absolute_url(self):
-        return reverse('domain_detail', args=[str(self.id)])
+        slug = slugify(f"{self.domain.replace('.com','')}")
+        return reverse('domain_detail', kwargs={"domain_id": self.id, "slug": slug})
     
     class Meta:
         ordering = ['rank']
@@ -79,6 +81,11 @@ class Keyword(models.Model):
     search_vector = SearchVectorField(null=True)
     def __str__(self):
         return self.keyword
+    def get_absolute_url(self):
+        slug = slugify(f"{self.keyword}")
+        if not slug:
+            slug = 'missing-slug'
+        return reverse('keyword_detail', kwargs={"pk": self.id, "slug": slug})
     
     class Meta:
         indexes = [

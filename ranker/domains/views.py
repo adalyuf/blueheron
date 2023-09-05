@@ -61,8 +61,10 @@ def domain_search(request):
     return render(request, 'ranker/domain_list.html', {'domain_list': queryset})
 
 @login_required
-def domain_detail(request, domain_id):
+def domain_detail(request, domain_id, slug=None):
     domain = get_object_or_404(Domain, pk=domain_id)
+    if request.path != domain.get_absolute_url():
+        return redirect(domain, permanent=True)
     context = {}
     context['domain'] = domain
     context['keyword_files'] = domain.keywordfile_set.all()
