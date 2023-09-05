@@ -99,6 +99,15 @@ def reset_keyword_queue(request):
 class KeywordDetailView(generic.DetailView):
     model = Keyword
 
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        if self.request.path != self.object.get_absolute_url():
+            return redirect(self.object, permanent=True)
+
+        return super().get(self, request, args, kwargs)
+
+
 
 def autocomplete_brands(request):
     if 'term' in request.GET:

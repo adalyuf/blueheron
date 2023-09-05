@@ -14,6 +14,8 @@ urlpatterns = [
     path("domains/"                                 , domain_views.DomainListView.as_view()     , name="domain_list"),
     path("domain_search/"                           , domain_views.domain_search                , name="domain_search"),
     path('domains/<int:domain_id>/'                 , domain_views.domain_detail                , name='domain_detail'),
+    path('domains/<int:domain_id>/<slug:slug>/'     , domain_views.domain_detail                , name='domain_detail'),
+
 
     path('keywordfile_make_primary/<int:domain_id>/<int:keywordfile_id>/'   , login_required(domain_views.keywordfile_make_primary) , name='keywordfile_make_primary'),
     path('get_keyword_responses/<int:batch_multiplier>/'                    , login_required(domain_views.get_keyword_responses)    , name='get_keyword_responses'),
@@ -48,14 +50,14 @@ urlpatterns = [
     path('projects/<int:pk>/update/'                    , login_required(project_views.ProjectUpdate.as_view())         , name='project_update'),
     path('projects/<int:pk>/delete/'                    , login_required(project_views.ProjectDelete.as_view())         , name='project_delete'),
 
-    path("keywords/"                , login_required(views.KeywordListView.as_view())       , name='keyword_list'),
-    path("keywords/<int:pk>/"       , login_required(views.KeywordDetailView.as_view())     , name='keyword_detail'),
-    path("keywords/keyword_search/" , login_required(views.keyword_search)                  , name="keyword_search"),
-    path("keywords/reset_keyword_queue/" , login_required(views.reset_keyword_queue)        , name="reset_keyword_queue"),
-    path("keywords/gap/"                 , login_required(views.keyword_gap)                , name='keyword_gap'),
-    path("keywords/gap/<int:brand1_id>/<int:brand2_id>/", login_required(views.keyword_gap) , name='keyword_gap'),
-    path("keywords/gap/autocomplete-brands/", login_required(views.autocomplete_brands)     , name='autocomplete_brands'),
-
+    path("keywords/"                        , login_required(views.KeywordListView.as_view())       , name='keyword_list'),
+    path("keywords/<int:pk>/"               , views.KeywordDetailView.as_view()                     , name='keyword_detail'),
+    path("keywords/<int:pk>/<slug:slug>/"   , views.KeywordDetailView.as_view()                     , name='keyword_detail'),
+    path("keywords/keyword_search/"         , login_required(views.keyword_search)                  , name="keyword_search"),
+    path("keywords/reset_keyword_queue/"    , login_required(views.reset_keyword_queue)             , name="reset_keyword_queue"),
+    path("keywords/gap/"                    , login_required(views.keyword_gap)                     , name='keyword_gap'),
+    path("keywords/gap/<int:brand1_id>/<int:brand2_id>/", login_required(views.keyword_gap)         , name='keyword_gap'),
+    path("keywords/gap/autocomplete-brands/", login_required(views.autocomplete_brands)             , name='autocomplete_brands'),
 
 
 ]
