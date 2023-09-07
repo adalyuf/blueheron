@@ -333,3 +333,8 @@ class Message(models.Model):
     
     class Meta:
         ordering = ['order']
+
+class Sitemap(models.Model):
+    url = models.CharField(max_length=250)
+    lastmod = models.DateTimeField(auto_now=True)
+    category = models.CharField(max_length=50, null=True, blank=True)

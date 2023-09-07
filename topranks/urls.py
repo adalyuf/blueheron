@@ -16,35 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.contrib.sitemaps import views 
-
-from .sitemaps import KeywordsSitemap
-
-def trigger_error(request):
-    division_by_zero = 1 / 0
-
-sitemaps = {
-    "keywords": KeywordsSitemap,
-}
 
 urlpatterns = [
-    path('sentry-debug/', trigger_error),
     path('__debug__/', include('debug_toolbar.urls')),
     path("", include("ranker.urls")),    
     path('account/', include('allauth.urls')),
     path("admin/", admin.site.urls),
-    path(
-        "sitemap.xml",
-        views.index,
-        {"sitemaps": sitemaps},
-        name="django.contrib.sitemaps.views.index",
-    ),
-    path(
-        "sitemap-<section>.xml",
-        views.sitemap,
-        {"sitemaps": sitemaps},
-        name="django.contrib.sitemaps.views.sitemap",
-    ),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
     path("", domain_views.DomainListView.as_view(), name="home"),
+    path("sitemap.xml", views.sitemap, name="sitemap_index"),
 
     path('dashboard/', views.DashboardsView.as_view(template_name = 'pages/dashboards/index.html'), name='dashboard'),
 
