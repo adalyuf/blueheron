@@ -221,23 +221,28 @@ def refill_keyword_queue():
  
 @shared_task(queue="steamroller")
 def build_sitemaps():
-    batch_size = 10000
-    keywords = Keyword.objects.filter(answered_at__isnull=False)
-    num_pages = int(keywords.count()/batch_size) + 1 
-    Sitemap.objects.filter(category='keywords').delete()
-    for page in range(num_pages):
+    # Generic implementation to build sitemaps for a model
+    def sitemaps_for_model(category, objects, batch_size=10000):
+        num_pages = int(objects.count()/batch_size) + 1 
+        Sitemap.objects.filter(category=category).delete()
+        
+        for page in range(num_pages):
 
-        with default_storage.open(f'sitemap-keywords-{page}.xml', 'w') as the_file:
-            the_file.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            the_file.write("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\">\n")
-            
-            for domain in keywords[batch_size*page:batch_size*(page+1)]:
-                the_file.write("<url>\n")
-                the_file.write(f"\t<loc>https://topranks.ai{domain.get_absolute_url()}</loc>\n")
-                the_file.write(f"\t<lastmod>{domain.created_at.strftime('%Y-%m-%d')}</lastmod>\n")
-                the_file.write("</url>\n")
-            the_file.write("</urlset>")
-    
-        url = "https://topranks-media-public.s3.us-east-2.amazonaws.com/" + the_file.obj.key
-        sitemap = Sitemap.objects.create(url=url, category='keywords')
-        print(f"Sitemap ({sitemap.category}): {sitemap.url}")
+            with default_storage.open(f'sitemaps/{category}/sitemap-{category}-{1000+page}.xml', 'w') as the_file:
+                the_file.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+                the_file.write("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\">\n")
+                
+                for obj in objects[batch_size*page:batch_size*(page+1)]:
+                    the_file.write("<url>\n")
+                    the_file.write(f"\t<loc>https://topranks.ai{obj.get_absolute_url()}</loc>\n")
+                    the_file.write(f"\t<lastmod>{obj.created_at.strftime('%Y-%m-%d')}</lastmod>\n")
+                    the_file.write("</url>\n")
+                the_file.write("</urlset>")
+        
+            url = "https://topranks-media-public.s3.us-east-2.amazonaws.com/" + the_file.obj.key
+            sitemap = Sitemap.objects.create(url=url, category=category)
+            print(f"Sitemap ({sitemap.category}): {sitemap.url}")
+
+    #Each model desired, pass in category and context
+    keywords = Keyword.objects.filter(answered_at__isnull=False)
+    sitemaps_for_model('keywords', keywords)
