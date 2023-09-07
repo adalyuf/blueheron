@@ -40,6 +40,9 @@ def sitemap(request):
     context['sitemap_index'] = Sitemap.objects.all()
     return render(request, 'ranker/sitemap.xml', context, content_type='application/xml' )
 
+def sitemap_redirect(request, folder, category, page_num):
+    return redirect(f"https://topranks-media-public.s3.us-east-2.amazonaws.com/media/sitemaps/{folder}/sitemap-{category}-{page_num}.xml")
+
 class TemplateListView(generic.ListView):
     model = Template
     queryset = Template.objects.filter(project__isnull=True)

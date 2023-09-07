@@ -239,8 +239,8 @@ def build_sitemaps():
                     the_file.write("</url>\n")
                 the_file.write("</urlset>")
         
-            url = "https://topranks-media-public.s3.us-east-2.amazonaws.com/" + the_file.obj.key
-            sitemap = Sitemap.objects.create(url=url, category=category)
+            redirect = "https://topranks.ai/" + the_file.obj.key
+            sitemap = Sitemap.objects.create(url=redirect, category=category)
             print(f"Sitemap ({sitemap.category}): {sitemap.url}")
 
     #Each model desired, pass in category and context
