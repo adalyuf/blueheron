@@ -4,8 +4,9 @@ from django.conf import settings
 from celery import shared_task
 import os, openai, markdown, json, re, tldextract, requests
 
-from ranker.models import Message, Keyword, Domain, Brand, BrandKeyword, Statistic, add_value
+from ranker.models import Message, Keyword, Domain, Brand, BrandKeyword, Statistic, add_value, Sitemap
 from celery.utils.log import get_task_logger
+from django.core.files.storage import default_storage
 
 logger = get_task_logger(__name__)
 
@@ -218,3 +219,25 @@ def refill_keyword_queue():
         prompt = prompt.replace("@currentKeyword", keyword.keyword)
         call_openai.apply_async( (prompt,), link=save_keyword_response.s(keyword.id)) #note the comma in arguments, critical to imply tuple, otherwise thinks array, passes response as first argument
  
+@shared_task(queue="steamroller")
+def build_sitemaps():
+    batch_size = 10000
+    keywords = Keyword.objects.filter(answered_at__isnull=False)
+    num_pages = int(keywords.count()/batch_size) + 1 
+    Sitemap.objects.filter(category='keywords').delete()
+    for page in range(num_pages):
+
+        with default_storage.open(f'sitemap-keywords-{page}.xml', 'w') as the_file:
+            the_file.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+            the_file.write("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\">\n")
+            
+            for domain in keywords[batch_size*page:batch_size*(page+1)]:
+                the_file.write("<url>\n")
+                the_file.write(f"\t<loc>https://topranks.ai{domain.get_absolute_url()}</loc>\n")
+                the_file.write(f"\t<lastmod>{domain.created_at.strftime('%Y-%m-%d')}</lastmod>\n")
+                the_file.write("</url>\n")
+            the_file.write("</urlset>")
+    
+        url = "https://topranks-media-public.s3.us-east-2.amazonaws.com/" + the_file.obj.key
+        sitemap = Sitemap.objects.create(url=url, category='keywords')
+        print(f"Sitemap ({sitemap.category}): {sitemap.url}")

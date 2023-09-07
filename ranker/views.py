@@ -19,7 +19,7 @@ from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.db.models import F, Max
 from django.db import transaction
 
-from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword, Brand, Statistic, add_value
+from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword, Brand, Statistic, add_value, Sitemap
 from .forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm, AddDomainToProjectForm, CreateConversationsForm
 
 import csv
@@ -34,6 +34,11 @@ import logging
 logger = logging.getLogger(__name__)
 broker = redis.Redis(host=os.getenv("REDIS_HOST"), port=6379, db=0, password=os.getenv("REDIS_PASS"))
 backend  = redis.Redis(host=os.getenv("REDIS_HOST"), port=6379, db=1, password=os.getenv("REDIS_PASS"))
+
+def sitemap(request):
+    context = {}
+    context['sitemap_index'] = Sitemap.objects.all()
+    return render(request, 'ranker/sitemap.xml', context, content_type='application/xml' )
 
 class TemplateListView(generic.ListView):
     model = Template

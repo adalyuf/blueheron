@@ -103,8 +103,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'django.contrib.sites',
-    "django.contrib.sitemaps",
     "django.contrib.postgres",
+    "storages",
     'allauth',
     'allauth.account', 
     'allauth.socialaccount', 
@@ -285,20 +285,33 @@ STATICFILES_DIRS = [
 STATIC_HOST = os.environ.get("DJANGO_STATIC_HOST", "") #Enabled for AWS CloudFront
 STATIC_URL = STATIC_HOST + "/static_collected/"
 
+# Media Files
+MEDIA_S3_ACCESS_KEY_ID = os.environ.get('AWS_S3_ACCESS_KEY_ID', "")
+MEDIA_S3_SECRET_ACCESS_KEY = os.environ.get('AWS_S3_SECRET_ACCESS_KEY', "")
+MEDIA_S3_BUCKET_NAME = "topranks-media-public"
+MEDIA_ROOT = 'media'
+MEDIA_HOST = os.environ.get("DJANGO_STATIC_HOST", "")
+MEDIA_URL = MEDIA_HOST + '/media/'
+
 STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
     "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage"
+        # "BACKEND": "storages.backends.s3boto3.S3Boto3Storage"
+        "BACKEND": "topranks.storage_backends.PublicMediaStorage"
     },
 }
 # Use S3 for media file uploads
-AWS_S3_ADDRESSING_STYLE = "virtual"
-AWS_STORAGE_BUCKET_NAME= "topranks-media-public"
-AWS_DEFAULT_ACL = "public-read"
-AWS_S3_REGION_NAME = 'us-east-2' 
-AWS_S3_SIGNATURE_VERSION = 's3v4'
+# I think all of these are obsoleted by use of the PublicMediaStorage class
+# I also think we added the addressing style and signature version to get filepaths to work in admin, which is now broken even with these uncommented.
+# Ticket here: https://trello.com/c/dlJhFDX0/185-bug-filepath-displays-incorrect-s3-bucket-in-django-admin-for-kw-files
+# Commenting out, 9/6/2023
+# AWS_S3_ADDRESSING_STYLE = "virtual"
+# AWS_STORAGE_BUCKET_NAME= "topranks-media-public"
+# AWS_DEFAULT_ACL = "public-read"
+# AWS_S3_REGION_NAME = 'us-east-2' 
+# AWS_S3_SIGNATURE_VERSION = 's3v4'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -320,6 +333,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "ranker.tasks.refill_keyword_queue",
         "schedule": crontab(minute="*/10"),
     },
+    "build_sitemaps": {
+        "task": "ranker.tasks.build_sitemaps",
+        "schedule": crontab(hour="*/4"),
+    }
 }
 
 
