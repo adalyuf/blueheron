@@ -37,8 +37,13 @@ backend  = redis.Redis(host=os.getenv("REDIS_HOST"), port=6379, db=1, password=o
 
 def sitemap(request):
     context = {}
-    context['sitemap_index'] = Sitemap.objects.all()
-    return render(request, 'ranker/sitemap.xml', context, content_type='application/xml' )
+    context['sitemap_index'] = Sitemap.objects.all().exclude(category__exact='static')
+    return render(request, 'ranker/sitemap_index.xml', context, content_type='application/xml' )
+
+def sitemap_static(request):
+    context = {}
+    context['sitemap_static'] = Sitemap.objects.filter(category__exact='static')
+    return render(request, 'ranker/sitemap_static.xml', context, content_type='application/xml' )
 
 def sitemap_redirect(request, folder, category, page_num):
     return redirect(f"https://topranks-media-public.s3.us-east-2.amazonaws.com/media/sitemaps/{folder}/sitemap-{category}-{page_num}.xml")
