@@ -335,7 +335,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     "build_sitemaps": {
         "task": "ranker.tasks.build_sitemaps",
-        "schedule": crontab(hour="*/4"),
+        "schedule": crontab(minute=10,hour="*/4"),
     }
 }
 
