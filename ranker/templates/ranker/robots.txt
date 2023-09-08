@@ -1,0 +1,14 @@
+#Whitelisted user agents 
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: SemrushBot
+
+Disallow:
+
+#Block all other bots 
+User-agent: *
+
+Disallow: /
+
+#sitemap
+Sitemap: https://topranks.ai/sitemap.xml

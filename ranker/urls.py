@@ -1,9 +1,12 @@
 from django.urls import path
+from django.contrib.auth.decorators import login_required
+from django.views.generic.base import TemplateView
+
 from ranker import views
 from ranker.domains import views as domain_views
 from ranker.conversations import views as conv_views
 from ranker.projects import views as project_views
-from django.contrib.auth.decorators import login_required
+
 
 
 urlpatterns = [
@@ -11,6 +14,8 @@ urlpatterns = [
     path("sitemap.xml", views.sitemap, name="sitemap_index"),
     path("sitemap-static.xml", views.sitemap_static, name="sitemap_static"),
     path("media/sitemaps/<str:folder>/sitemap-<str:category>-<int:page_num>.xml", views.sitemap_redirect, name="sitemap_redirect"),
+    path("robots.txt",TemplateView.as_view(template_name="ranker/robots.txt", content_type="text/plain")),  #add the robots.txt file
+
 
     path('dashboard/', views.DashboardsView.as_view(template_name = 'pages/dashboards/index.html'), name='dashboard'),
 
