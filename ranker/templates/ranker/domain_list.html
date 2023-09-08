@@ -59,7 +59,7 @@
     {% for domain in domain_list %}
             <tr>
                 <td>{{domain.rank}}</td>
-                <td><a href="{% url 'domain_detail' domain.id %}">{{domain.domain}}</a></td>
+                <td><a href="{{domain.get_absolute_url}}">{{domain.domain}}</a></td>
                 <td>{{domain.brand_set.count}}</td>
                 <td>{{domain.keywords}}</td>
                 <td>{{domain.traffic}}</td>
