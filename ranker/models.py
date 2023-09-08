@@ -48,7 +48,10 @@ class Domain(models.Model):
     def __str__(self):
         return self.domain
     def get_absolute_url(self):
-        slug = slugify(f"{self.domain.replace('.com','')}")
+        dn = self.domain 
+        dn = dn.replace('.com', '')
+        dn = dn.replace('.org', '')
+        slug = slugify(dn)
         return reverse('domain_detail', kwargs={"domain_id": self.id, "slug": slug})
     
     class Meta:

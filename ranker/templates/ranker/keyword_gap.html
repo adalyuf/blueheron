@@ -49,7 +49,7 @@
                 <td>{{keyword.traffic}}</td>
                 <td>{% if brand1.brand in keyword.ai_answer %} {{brand1}} {% endif %}</td>
                 <td>{% if brand2.brand in keyword.ai_answer %} {{brand2}} {% endif %}</td>
-                <td><a href="{% url 'keyword_detail' keyword.id %}">{{keyword.natural_language_question}}</a></td>
+                <td><a href="{{ keyword.get_absolute_url }}">{{keyword.natural_language_question}}</a></td>
                 <td>{{keyword.ai_answer}}</td>
             </tr>
     {% endfor %}
