@@ -235,7 +235,7 @@ def build_sitemaps():
                 for obj in objects[batch_size*page:batch_size*(page+1)]:
                     the_file.write("<url>\n")
                     the_file.write(f"\t<loc>https://topranks.ai{obj.get_absolute_url()}</loc>\n")
-                    the_file.write(f"\t<lastmod>{obj.created_at.strftime('%Y-%m-%d')}</lastmod>\n")
+                    the_file.write(f"\t<lastmod>{obj.updated_at.strftime('%Y-%m-%d')}</lastmod>\n")
                     the_file.write("</url>\n")
                 the_file.write("</urlset>")
         
