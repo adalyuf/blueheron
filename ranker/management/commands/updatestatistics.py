@@ -20,11 +20,11 @@ class Command(BaseCommand):
         print("Starting to update statistics. This historically takes around 3 minutes for each of the larger statistics.")
 
         #Update total keywords
-        keywords_total = Keyword.objects.all().count()
-        keywords_total_stat = Statistic.objects.get(key="keywords_total")
-        keywords_total_stat.value = keywords_total
-        keywords_total_stat.save()
-        print(f"Total keywords updated. ({keywords_total_stat.value})")
+        # keywords_total = Keyword.objects.all().count()
+        # keywords_total_stat = Statistic.objects.get(key="keywords_total")
+        # keywords_total_stat.value = keywords_total
+        # keywords_total_stat.save()
+        # print(f"Total keywords updated. ({keywords_total_stat.value})")
 
         #Update available keywords
         keywords_available = Keyword.objects.filter(answered_at__isnull=True).filter(requested_at__isnull=True).count()
@@ -41,11 +41,11 @@ class Command(BaseCommand):
         print(f"Pending keywords updated. ({keywords_pending_stat.value})")
 
         #Update answered keywords
-        keywords_answered = Keyword.objects.filter(answered_at__isnull=False).count()
-        keywords_answered_stat = Statistic.objects.get(key="keywords_answered")
-        keywords_answered_stat.value = keywords_answered
-        keywords_answered_stat.save()
-        print(f"Keywords answered updated. ({keywords_answered_stat.value})")
+        # keywords_answered = Keyword.objects.filter(answered_at__isnull=False).count()
+        # keywords_answered_stat = Statistic.objects.get(key="keywords_answered")
+        # keywords_answered_stat.value = keywords_answered
+        # keywords_answered_stat.save()
+        # print(f"Keywords answered updated. ({keywords_answered_stat.value})")
 
 
 
