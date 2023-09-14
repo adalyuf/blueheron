@@ -329,10 +329,10 @@ CELERY_RESULT_EXPIRES = 7200 #2 hours
 CELERY_WORKER_MAX_TASKS_PER_CHILD = 200
 
 CELERY_BEAT_SCHEDULE = {
-    "refill_keyword_queue": {
-        "task": "ranker.tasks.refill_keyword_queue",
-        "schedule": crontab(minute="*/10"),
-    },
+    # "refill_keyword_queue": {
+    #     "task": "ranker.tasks.refill_keyword_queue",
+    #     "schedule": crontab(minute="*/10"),
+    # },
     "build_sitemaps": {
         "task": "ranker.tasks.build_sitemaps",
         "schedule": crontab(minute=8,hour=5), #Should build at 5:08am UTC or 1:08am EST
