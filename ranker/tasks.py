@@ -1,12 +1,15 @@
 from django.core.management import call_command
 from django.utils import timezone, html
 from django.conf import settings
-from celery import shared_task
+from django.core.files.storage import default_storage
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+
 import os, openai, markdown, json, re, tldextract, requests
+from celery import shared_task
+from celery.utils.log import get_task_logger
 
 from ranker.models import Message, Keyword, Domain, Brand, BrandKeyword, Statistic, add_value, Sitemap
-from celery.utils.log import get_task_logger
-from django.core.files.storage import default_storage
+
 
 logger = get_task_logger(__name__)
 
@@ -167,18 +170,21 @@ def save_business_json(api_response, domain_id):
 @shared_task(queue="steamroller")
 def index_brand(batch_size):
     print(f'Batch size: {batch_size}')
-    brand_list = Brand.objects.filter(indexing_requested_at__isnull=True).filter(keyword_indexed_at__isnull=True)[:batch_size]
+    brand_list = Brand.objects.all().order_by('keyword_indexed_at')[:batch_size]
     print(f"Found {len(brand_list)} brands")
 
     for brand in brand_list:
         brand.indexing_requested_at = timezone.now()
-    Brand.objects.bulk_update(brand_list, ['indexing_requested_at'])
+        brand.keyword_indexed_at = None
+    Brand.objects.bulk_update(brand_list, ['indexing_requested_at', 'keyword_indexed_at'])
 
     i = 0
     for brand in brand_list:
         i += 1
         start_time = timezone.now()
-        keyword_list = Keyword.objects.filter(ai_answer__icontains=brand.brand)
+        # keyword_list = Keyword.objects.filter(ai_answer__icontains=brand.brand)
+        search_query = SearchQuery(brand.brand, search_type="websearch")
+        keyword_list = Keyword.objects.filter(search_vector=search_query)
         if keyword_list:
             brand.keyword.add(*keyword_list)
         brand.keyword_indexed_at = timezone.now()
