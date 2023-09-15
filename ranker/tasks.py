@@ -168,7 +168,7 @@ def save_business_json(api_response, domain_id):
 
 
 @shared_task(queue="steamroller")
-def index_brand(batch_size):
+def index_brands(batch_size):
     print(f'Batch size: {batch_size}')
     brand_list = Brand.objects.all().order_by('keyword_indexed_at')[:batch_size]
     print(f"Found {len(brand_list)} brands")

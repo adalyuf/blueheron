@@ -20,7 +20,7 @@ from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 
 from ranker.models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword, Brand, BrandKeyword, Statistic, add_value
 from ranker.forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm
-from ranker.tasks import call_openai, save_keyword_response, save_business_json, index_brand
+from ranker.tasks import call_openai, save_keyword_response, save_business_json, index_brands
 
 import csv
 import os
@@ -163,11 +163,11 @@ def get_business_data(request):
 
 def index_brands(request):
     if os.getenv("ENVIRONMENT") == "production":
-        batch_size = 50000
+        batch_size = 1000
     else:
-        batch_size = 5000
+        batch_size = 50
 
-    index_brand.apply_async( (batch_size,) )
+    index_brands.apply_async( (batch_size,) )
     
     djmessages.success(request, f'Requesting indexing for {batch_size} brands')
     return redirect('domain_list')
