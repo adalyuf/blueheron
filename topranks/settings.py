@@ -340,7 +340,7 @@ CELERY_BEAT_SCHEDULE = {
     "index_brands": {
         "task": "ranker.tasks.index_brands",
         "schedule": crontab(minute=5),
-        "args": [500,]
+        "args": (1000,)
     }
 }
 
