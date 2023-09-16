@@ -170,7 +170,10 @@ def save_business_json(api_response, domain_id):
 @shared_task(queue="steamroller")
 def index_brands(batch_size):
     print(f'Batch size: {batch_size}')
-    brand_list = Brand.objects.all().order_by('keyword_indexed_at')[:batch_size]
+    if Brand.objects.filter(keyword_indexed_at__exact=None).count() > 0:
+        brand_list = Brand.objects.filter(keyword_indexed_at__exact=None)[:batch_size]
+    else:
+        brand_list = Brand.objects.all().order_by('keyword_indexed_at')[:batch_size]
     print(f"Found {len(brand_list)} brands")
 
     for brand in brand_list:
