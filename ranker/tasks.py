@@ -188,20 +188,23 @@ def index_brands(batch_size):
         # keyword_list = Keyword.objects.filter(ai_answer__icontains=brand.brand)
         search_query = SearchQuery(brand.brand, search_type="websearch")
         keyword_count = Keyword.objects.filter(search_vector=search_query).count()
+        
         if  keyword_count > 50000:
             print(f"Too many matches ({keyword_count}). Likely a generic brand. Deleting: {brand.brand}")
             brand.delete()
+            continue
         else:
             keyword_list = Keyword.objects.filter(search_vector=search_query)
+
         if keyword_list:
             brand.keyword.add(*keyword_list)
+            brand.keyword_indexed_at = timezone.now()
+            brand.save()
+            end_time = timezone.now()
+            print(f"({i}/{len(brand_list)} - {int((end_time-start_time).total_seconds())} sec - {timezone.now()}) Brand ID {brand.pk} ({brand.brand}): {len(keyword_list)} keywords updated")
         else:
-            keyword_list = []
+            print(f"No keywords found for: {brand.brand} ")
 
-        brand.keyword_indexed_at = timezone.now()
-        brand.save()
-        end_time = timezone.now()
-        print(f"({i}/{len(brand_list)} - {int((end_time-start_time).total_seconds())} sec - {timezone.now()}) Brand ID {brand.pk} ({brand.brand}): {len(keyword_list)} keywords updated")
 
 
 
