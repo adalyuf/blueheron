@@ -195,10 +195,14 @@ def index_brands(batch_size):
             keyword_list = Keyword.objects.filter(search_vector=search_query)
         if keyword_list:
             brand.keyword.add(*keyword_list)
+        else:
+            keyword_list = []
+
         brand.keyword_indexed_at = timezone.now()
         brand.save()
         end_time = timezone.now()
         print(f"({i}/{len(brand_list)} - {int((end_time-start_time).total_seconds())} sec - {timezone.now()}) Brand ID {brand.pk} ({brand.brand}): {len(keyword_list)} keywords updated")
+
 
 
 @shared_task(queue="steamroller")
