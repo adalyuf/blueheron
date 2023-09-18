@@ -115,11 +115,33 @@ class KeywordDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         related_keywords = []
-        for query in self.get_object().likely_next_queries:
-            search_query = SearchQuery(query, search_type="websearch")
-            related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:3]
-            for kw in related_kws:
-                related_keywords.append(kw)
+        keyword = self.get_object()
+
+        if keyword.likely_previous_queries:
+            if type(keyword.likely_previous_queries) is list:    
+                for query in keyword.likely_previous_queries:
+                    search_query = SearchQuery(query, search_type="websearch")
+                    related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:2]
+                    for kw in related_kws:
+                        related_keywords.append(kw)
+            if type(keyword.likely_previous_queries) is str and keyword.likely_previous_queries != 'none':
+                    search_query = SearchQuery(query, search_type="websearch")
+                    related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:2]
+                    related_keywords.append(kw)
+
+        if keyword.likely_next_queries:
+            if type(keyword.likely_next_queries) is list:    
+                for query in keyword.likely_next_queries:
+                    search_query = SearchQuery(query, search_type="websearch")
+                    related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:2]
+                    for kw in related_kws:
+                        related_keywords.append(kw)
+            if type(keyword.likely_next_queries) is str and keyword.likely_next_queries != 'none':
+                    search_query = SearchQuery(query, search_type="websearch")
+                    related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:2]
+                    related_keywords.append(kw)
+
+
         context['related_keywords'] = related_keywords
         return context
 
