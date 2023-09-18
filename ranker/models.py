@@ -175,6 +175,9 @@ class Competition(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"{self.domain}: {self.competitor}"
+    
+    class Meta:
+        unique_together = ['domain', 'competitor']
 
 def keyword_directory_path(instance, filename=None):
     d = Domain.objects.get(pk=instance.domain_id)
