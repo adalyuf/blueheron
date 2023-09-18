@@ -112,6 +112,17 @@ def reset_keyword_queue(request):
 class KeywordDetailView(generic.DetailView):
     model = Keyword
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        related_keywords = []
+        for query in self.get_object().likely_next_queries:
+            search_query = SearchQuery(query, search_type="websearch")
+            related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:3]
+            for kw in related_kws:
+                related_keywords.append(kw)
+        context['related_keywords'] = related_keywords
+        return context
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
