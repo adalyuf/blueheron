@@ -125,7 +125,7 @@ class KeywordDetailView(generic.DetailView):
                     for kw in related_kws:
                         related_keywords.append(kw)
             if type(keyword.likely_previous_queries) is str and keyword.likely_previous_queries != 'none':
-                    search_query = SearchQuery(query, search_type="websearch")
+                    search_query = SearchQuery(keyword.likely_previous_queries, search_type="websearch")
                     related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:2]
                     related_keywords.append(kw)
 
@@ -137,7 +137,7 @@ class KeywordDetailView(generic.DetailView):
                     for kw in related_kws:
                         related_keywords.append(kw)
             if type(keyword.likely_next_queries) is str and keyword.likely_next_queries != 'none':
-                    search_query = SearchQuery(query, search_type="websearch")
+                    search_query = SearchQuery(keyword.likely_next_queries, search_type="websearch")
                     related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:2]
                     related_keywords.append(kw)
 
