@@ -8,8 +8,8 @@ export NVM_DIR="/usr/local/share/nvm"
 
 #Build node modules
 cd _keenthemes/tools/
-nvm install 18
-nvm use 18
+nvm install 16
+nvm use 16
 npm install
 npm run build
 cd ../..
