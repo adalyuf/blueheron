@@ -15,7 +15,7 @@
         "@ckeditor/ckeditor5-build-inline": "^35.2.1",
         "@eonasdan/tempus-dominus": "^6.2.10",
         "@fortawesome/fontawesome-free": "^6.1.1",
-        "@popperjs/core": "2.11.6",
+        "@popperjs/core": "^2.11.5",
         "@shopify/draggable": "^1.0.0-beta.12",
         "@yaireo/tagify": "^4.9.2",
         "acorn": "^8.0.4",
