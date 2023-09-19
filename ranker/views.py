@@ -117,6 +117,7 @@ class KeywordDetailView(generic.DetailView):
         related_keywords = []
         keyword = self.get_object()
 
+        #TODO: Consider adding the single string into a list to process with list logic, rather than duplicating code.
         if keyword.likely_previous_queries:
             if type(keyword.likely_previous_queries) is list:    
                 for query in keyword.likely_previous_queries:
@@ -127,7 +128,7 @@ class KeywordDetailView(generic.DetailView):
             if type(keyword.likely_previous_queries) is str and keyword.likely_previous_queries != 'none':
                     search_query = SearchQuery(keyword.likely_previous_queries, search_type="websearch")
                     related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:2]
-                    related_keywords.append(kw)
+                    related_keywords.append(related_kws)
 
         if keyword.likely_next_queries:
             if type(keyword.likely_next_queries) is list:    
@@ -139,7 +140,7 @@ class KeywordDetailView(generic.DetailView):
             if type(keyword.likely_next_queries) is str and keyword.likely_next_queries != 'none':
                     search_query = SearchQuery(keyword.likely_next_queries, search_type="websearch")
                     related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:2]
-                    related_keywords.append(kw)
+                    related_keywords.append(related_kws)
 
 
         context['related_keywords'] = related_keywords
