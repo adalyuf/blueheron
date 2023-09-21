@@ -133,6 +133,8 @@ class KeywordDetailView(generic.DetailView):
             search_query = SearchQuery(query, search_type="websearch")
             related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).exclude(id=keyword.id).order_by("-rank")[:3]
             for kw in related_kws:
+                if kw in related_keywords:
+                    continue #Used to have distinct list, alternatively try using set(related_keywords)
                 related_keywords.append(kw)               
 
         context['related_keywords'] = related_keywords
