@@ -114,36 +114,26 @@ class KeywordDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        related_keywords = []
         keyword = self.get_object()
+        related_keywords = []
+        queries = []
 
-        #TODO: Consider adding the single string into a list to process with list logic, rather than duplicating code.
-        if keyword.likely_previous_queries:
-            if type(keyword.likely_previous_queries) is list:    
-                for query in keyword.likely_previous_queries:
-                    search_query = SearchQuery(query, search_type="websearch")
-                    related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:2]
-                    for kw in related_kws:
-                        related_keywords.append(kw)
-            if type(keyword.likely_previous_queries) is str and keyword.likely_previous_queries != 'none':
-                    search_query = SearchQuery(keyword.likely_previous_queries, search_type="websearch")
-                    related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:2]
-                    if related_kws:
-                        related_keywords.append(related_kws)
+        if type(keyword.likely_previous_queries) is str and keyword.likely_previous_queries != 'none':
+            queries.append(keyword.likely_previous_queries)
+        if type(keyword.likely_previous_queries) is list:
+            for q in keyword.likely_previous_queries:
+                queries.append(q)
+        if type(keyword.likely_next_queries) is str and keyword.likely_next_queries != 'none':
+            queries.append(keyword.likely_next_queries)
+        if type(keyword.likely_next_queries) is list:
+            for q in keyword.likely_next_queries:
+                queries.append(q)
 
-        if keyword.likely_next_queries:
-            if type(keyword.likely_next_queries) is list:    
-                for query in keyword.likely_next_queries:
-                    search_query = SearchQuery(query, search_type="websearch")
-                    related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:2]
-                    for kw in related_kws:
-                        related_keywords.append(kw)
-            if type(keyword.likely_next_queries) is str and keyword.likely_next_queries != 'none':
-                    search_query = SearchQuery(keyword.likely_next_queries, search_type="websearch")
-                    related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).order_by("-rank")[:2]
-                    if related_kws:
-                        related_keywords.append(related_kws)
-
+        for query in queries:
+            search_query = SearchQuery(query, search_type="websearch")
+            related_kws = Keyword.objects.annotate(rank=SearchRank(F("search_vector"), search_query)).filter(search_vector=search_query).exclude(id=keyword.id).order_by("-rank")[:3]
+            for kw in related_kws:
+                related_keywords.append(kw)               
 
         context['related_keywords'] = related_keywords
         return context
