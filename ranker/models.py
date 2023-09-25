@@ -82,6 +82,9 @@ class Keyword(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     search_vector = SearchVectorField(null=True)
+    primary_category    = models.TextField(null=True, max_length=50)
+    category_scores     = models.JSONField(null=True)
+
     def __str__(self):
         return self.keyword
     def get_absolute_url(self):
