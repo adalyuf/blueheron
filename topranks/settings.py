@@ -335,7 +335,7 @@ CELERY_BEAT_SCHEDULE = {
     # },
     "build_sitemaps": {
         "task": "ranker.tasks.build_sitemaps",
-        "schedule": crontab(minute=8,hour=5), #Should build at 5:08am UTC or 1:08am EST
+        "schedule": crontab(minute=8,hour=5, day_of_week=6), #Should build at 5:08am UTC or 1:08am EST, on Saturday
     },
     "index_brands": {
         "task": "ranker.tasks.index_brands",
