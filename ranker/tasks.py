@@ -268,6 +268,7 @@ def build_sitemaps():
 
 @shared_task(queue="steamroller")
 def keyword_volumes():
+    print("Starting task: Keyword Volumes")
     key_list = Keyword.objects.filter(search_volume=None).all().values_list('id', flat=True)
     batch_size = 10000
     for i in range(int(len(key_list)/batch_size)+1):
