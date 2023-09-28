@@ -29,8 +29,8 @@ name: Deploy to Amazon ECS
 on:
   push:
     branches: [ "main" ]
-  schedule:
-    - cron: '21 5 * * *' #Deploy each day at 5:21 UTC, 1:21am EST, minute hour day month day-of-week
+  # schedule:
+  #   - cron: '21 5 * * *' #Deploy each day at 5:21 UTC, 1:21am EST, minute hour day month day-of-week
 
 env:
   AWS_REGION: us-east-2                               # set this to your preferred AWS region, e.g. us-west-1
