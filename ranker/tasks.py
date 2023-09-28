@@ -9,7 +9,7 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 
 from ranker.models import Message, Keyword, Domain, Brand, BrandKeyword, Statistic, add_value, Sitemap
-
+from django.db.models import Count, Avg 
 
 logger = get_task_logger(__name__)
 
@@ -265,3 +265,21 @@ def build_sitemaps():
     #Each model desired, pass in category and context
     keywords = Keyword.objects.filter(answered_at__isnull=False)
     sitemaps_for_model('keywords', keywords)
+
+@shared_task(queue="steamroller")
+def keyword_volumes():
+    key_list = Keyword.objects.filter(search_volume=None).all().values_list('id', flat=True)
+    batch_size = 10000
+    for i in range(int(len(key_list)/batch_size)+1):
+        loop_list = key_list[i*batch_size:(i+1)*batch_size]
+        keys = Keyword.objects.filter(pk__in=loop_list).annotate(sv=Avg('keywordposition__search_volume'))
+        for key in keys:
+            key.search_volume = key.sv 
+        Keyword.objects.bulk_update(keys, ['search_volume'])
+        print(f"Updated {len(keys)} keywords with search volume from {min(loop_list)} to {max(loop_list)}")
+
+        keys = Keyword.objects.filter(pk__in=loop_list).annotate(brands=Count('brandkeyword'))
+        for key in keys:
+            key.num_brands = key.brands 
+        Keyword.objects.bulk_update(keys, ['num_brands'])
+        print(f"Updated {len(keys)} keywords with number of brands from {min(loop_list)} to {max(loop_list)}")
