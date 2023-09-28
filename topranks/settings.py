@@ -344,7 +344,7 @@ CELERY_BEAT_SCHEDULE = {
     # },
     "keyword_volumes": {
         "task": "ranker.tasks.keyword_volumes",
-        "schedule": crontab(minute=40, hour=15, day_of_month=28, month_of_year=9)
+        "schedule": crontab(minute=40, hour=15, day_of_month=28, month_of_year=9),
     },
 }
 
