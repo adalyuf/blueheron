@@ -270,17 +270,18 @@ def build_sitemaps():
 def keyword_volumes():
     print("Starting task: Keyword Volumes")
     key_list = Keyword.objects.filter(search_volume=None).all().values_list('id', flat=True)
+    key_list = list(set(key_list))
     batch_size = 10000
-    for i in range(int(len(key_list)/batch_size)+1):
+    num_runs = int(len(key_list)/batch_size)+1
+    for i in range(num_runs):
         loop_list = key_list[i*batch_size:(i+1)*batch_size]
         keys = Keyword.objects.filter(pk__in=loop_list).annotate(sv=Avg('keywordposition__search_volume'))
         for key in keys:
             key.search_volume = key.sv 
         Keyword.objects.bulk_update(keys, ['search_volume'])
-        print(f"Updated {len(keys)} keywords with search volume from {min(loop_list)} to {max(loop_list)}")
 
         keys = Keyword.objects.filter(pk__in=loop_list).annotate(brands=Count('brandkeyword'))
         for key in keys:
             key.num_brands = key.brands 
         Keyword.objects.bulk_update(keys, ['num_brands'])
-        print(f"Updated {len(keys)} keywords with number of brands from {min(loop_list)} to {max(loop_list)}")
+        print(f"[{i}/{num_runs}] Updated {len(keys)} keywords with search volume and number of brands from {min(loop_list)} to {max(loop_list)}")
