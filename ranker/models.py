@@ -78,13 +78,13 @@ class Keyword(models.Model):
     likely_next_queries         = models.JSONField(null=True)
     requested_at                = models.DateTimeField(null=True)
     answered_at                 = models.DateTimeField(null=True)
-    json_response               = models.JSONField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     search_vector = SearchVectorField(null=True)
-    primary_category            = models.TextField(null=True, max_length=50)
     search_volume               = models.IntegerField(null=True)
     num_brands                  = models.IntegerField(null=True)
+    priority                    = models.IntegerField(null=True)
+    
 
 
     def __str__(self):

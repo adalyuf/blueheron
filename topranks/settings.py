@@ -328,6 +328,8 @@ CELERY_RESULT_CACHE_MAX = 50000
 CELERY_RESULT_EXPIRES = 7200 #2 hours
 CELERY_WORKER_MAX_TASKS_PER_CHILD = 200
 
+#THESE USE EST NOT UTC!!! See CELERY_TIME_ZONE above.
+# 0 is Sunday, 6 is Saturday
 CELERY_BEAT_SCHEDULE = {
     # "refill_keyword_queue": {
     #     "task": "ranker.tasks.refill_keyword_queue",
@@ -335,16 +337,12 @@ CELERY_BEAT_SCHEDULE = {
     # },
     "build_sitemaps": {
         "task": "ranker.tasks.build_sitemaps",
-        "schedule": crontab(minute=8,hour=5, day_of_week=6), #Should build at 5:08am UTC or 1:08am EST, on Saturday
+        "schedule": crontab(minute=8,hour=1, day_of_week=6), #Should build at 5:08am UTC or 1:08am EST, on Saturday
     },
-    # "index_brands": {
-    #     "task": "ranker.tasks.index_brands",
-    #     "schedule": crontab(minute="*/5"),
-    #     "args": (100,),
-    # },
-    "keyword_volumes": {
-        "task": "ranker.tasks.keyword_volumes",
-        "schedule": crontab(minute=50, hour=14, day_of_month=28, month_of_year=9),
+    "index_brands": {
+        "task": "ranker.tasks.index_brands",
+        "schedule": crontab(minute="*/5"),
+        "args": (100,),
     },
 }
 
