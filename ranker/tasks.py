@@ -84,13 +84,11 @@ def save_keyword_response(api_response, keyword_id):
         json_string = api_response[start_pos:end_pos+1]
         json_object = json.loads(json_string)
 
-        keyword.json_response = json_object
-
-        keyword.user_intent                 = keyword.json_response['user_intent']
-        keyword.natural_language_question   = keyword.json_response['natural_language_question']
-        keyword.ai_answer                   = keyword.json_response['ai_answer']
-        keyword.likely_previous_queries     = keyword.json_response['likely_previous_queries']
-        keyword.likely_next_queries         = keyword.json_response['likely_next_queries']
+        keyword.user_intent                 = json_object['user_intent']
+        keyword.natural_language_question   = json_object['natural_language_question']
+        keyword.ai_answer                   = json_object['ai_answer']
+        keyword.likely_previous_queries     = json_object['likely_previous_queries']
+        keyword.likely_next_queries         = json_object['likely_next_queries']
 
         keyword.answered_at = timezone.now()
         keyword.save()
