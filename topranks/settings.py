@@ -40,9 +40,9 @@ def traces_sampler(sampling_context):
         elif op == "celery.task":
             return 0.0001 #Sample 1/10,000 celery tasks
         else:
-            return 0.2 #Sample 10% of everything by default
+            return 0.02 #Sample 2% of everything by default
     else:
-        return 1.0
+        return 0.2
 
 def profiles_sampler(sampling_context):
     return 0.1*traces_sampler(sampling_context)
