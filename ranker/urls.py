@@ -67,6 +67,7 @@ urlpatterns = [
     path("keywords/gap/"                    , login_required(views.keyword_gap)                     , name='keyword_gap'),
     path("keywords/gap/<int:brand1_id>/<int:brand2_id>/", login_required(views.keyword_gap)         , name='keyword_gap'),
     path("keywords/gap/autocomplete-brands/", login_required(views.autocomplete_brands)             , name='autocomplete_brands'),
+    path("keywords/answer/<int:ai_model_id>/<int:keyword_id>/", login_required(views.keyword_answer), name='keyword_answer'),
 
 
 ]
