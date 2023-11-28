@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Domain, KeywordFile, Template, TemplateItem, Conversation, Message, AIModel, Project, ProjectUser, ProjectDomain, Keyword, KeywordPosition, Brand, BrandDomain, Competition, Sitemap
+from .models import Domain, KeywordFile, Template, TemplateItem, Conversation, Message, AIModel, Project, ProjectUser, ProjectDomain, Keyword, KeywordPosition, Brand, BrandDomain, Competition, Sitemap, Answer
 
 class BrandInlineAdmin(admin.TabularInline):
     model = BrandDomain
@@ -92,3 +92,8 @@ class KeywordPositionAdmin(admin.ModelAdmin):
 @admin.register(Sitemap)
 class SitemapAdmin(admin.ModelAdmin):
     list_display = ('url', 'lastmod', 'category')
+
+@admin.register(Answer)
+class AnswerAdmin(admin.ModelAdmin):
+    list_display = ('ai_model', 'keyword_id')
+    fields = ('answer', 'ai_model')

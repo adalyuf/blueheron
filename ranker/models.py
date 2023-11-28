@@ -15,6 +15,14 @@ def alphanumeric_validator():
     return RegexValidator(r'^[a-zA-Z0-9-_ ]+$',
         'Only numbers, letters, underscores, dashes and spaces are allowed.')
 
+class AIModel(models.Model):
+    ai_model = models.CharField(max_length=200)
+    api_identifier = models.CharField(max_length=200, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return self.ai_model 
+
 class Domain(models.Model):
     validation_choices = [
         ('valid', 'valid'),
@@ -85,8 +93,6 @@ class Keyword(models.Model):
     num_brands                  = models.IntegerField(null=True)
     priority                    = models.IntegerField(null=True)
     
-
-
     def __str__(self):
         return self.keyword
     def get_absolute_url(self):
@@ -101,7 +107,29 @@ class Keyword(models.Model):
             models.Index(name="idx_answered_requested_at", fields=['answered_at'], include=['requested_at'])
         ]
         permissions = (("manage_keywords", "Can run all keyword functions"),)
+
+class Answer(models.Model):
+    answer                      = models.TextField(null=True)
+    keyword                     = models.ForeignKey(Keyword, on_delete=models.CASCADE)
+    ai_model                    = models.ForeignKey(AIModel, on_delete=models.CASCADE)
+    requested_at                = models.DateTimeField(null=True)
+    answered_at                 = models.DateTimeField(null=True)
+    created_at                  = models.DateTimeField(auto_now_add=True)
+    updated_at                  = models.DateTimeField(auto_now=True)
+    search_vector               = SearchVectorField(null=True)
     
+    def __str__(self):
+        return self.keyword.natural_language_question
+    
+    class Meta:
+        indexes = [
+            GinIndex(fields=["search_vector"]),
+            models.Index(name="idx_answer_answered_at", fields=['answered_at'], include=['requested_at'])
+        ]
+        constraints = [
+            UniqueConstraint(fields=['keyword', 'ai_model'], name='unique_answer_ai_model_keyword'),
+        ]
+
 class KeywordPosition(models.Model):
     domain  = models.ForeignKey(Domain, on_delete=models.SET_NULL, null=True)
     keyword = models.ForeignKey(Keyword, on_delete=models.SET_NULL, null=True)
@@ -213,14 +241,6 @@ class Token(models.Model):
     type = models.ForeignKey(TokenType, on_delete=models.CASCADE)
     def __str__(self):
         return self.value
-
-class AIModel(models.Model):
-    ai_model = models.CharField(max_length=200)
-    api_identifier = models.CharField(max_length=200, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    def __str__(self):
-        return self.ai_model 
 
 class Project(models.Model):
     project = models.CharField(max_length=200)

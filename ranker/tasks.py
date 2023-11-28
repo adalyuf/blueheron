@@ -8,7 +8,7 @@ import os, openai, markdown, json, re, tldextract, requests
 from celery import shared_task
 from celery.utils.log import get_task_logger
 
-from ranker.models import Message, Keyword, Domain, Brand, BrandKeyword, Statistic, add_value, Sitemap
+from ranker.models import Message, Keyword, Domain, Brand, BrandKeyword, Statistic, add_value, Sitemap, AIModel, Answer
 from django.db.models import Count, Avg 
 
 logger = get_task_logger(__name__)
@@ -74,6 +74,17 @@ def save_message_response(response, message_id):
     if (conversation.message_set.filter(answered_at__isnull=False).count() > 0 & conversation.message_set.filter(answered_at=None).count() == 0):
         conversation.answered_at = timezone.now()
         conversation.save()
+
+@shared_task(queue="express")
+def save_keyword_answer(api_response, ai_model_id, keyword_id):
+    ai_model = AIModel.objects.get(id = ai_model_id)
+    keyword = Keyword.objects.get(id = keyword_id)
+    answer = Answer.objects.update_or_create(
+        answer = api_response,
+        keyword = keyword,
+        ai_model = ai_model
+    )
+    answer.save()
 
 @shared_task(queue="express")
 def save_keyword_response(api_response, keyword_id):

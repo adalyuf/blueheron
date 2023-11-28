@@ -21,6 +21,7 @@ from django.db import transaction
 
 from .models import Domain, KeywordFile, Conversation, Template, TemplateItem, Message, Project, ProjectUser, ProjectDomain, AIModel, Keyword, Brand, Statistic, add_value, Sitemap
 from .forms import KeywordFileForm, TemplateItemForm, MessageForm, TemplateForm, AddDomainToProjectForm, CreateConversationsForm
+from ranker.tasks import call_openai, save_keyword_answer
 
 import csv
 import os
@@ -138,6 +139,8 @@ class KeywordDetailView(generic.DetailView):
                 related_keywords.append(kw)               
 
         context['related_keywords'] = related_keywords
+        context['ai_models'] = AIModel.objects.all()
+        context['answers'] = keyword.answer_set.all()
         return context
 
     def get(self, request, *args, **kwargs):
@@ -148,6 +151,11 @@ class KeywordDetailView(generic.DetailView):
 
         return super().get(self, request, args, kwargs)
 
+def keyword_answer(request, ai_model_id, keyword_id):
+    keyword = get_object_or_404(Keyword, id = keyword_id)
+    # We currently update_or_create if a record exists. If this becomes a problem, update here to skip the API call.
+    call_openai.apply_async( (keyword.natural_language_question,), link=save_keyword_answer.s(ai_model_id, keyword_id)) #note the comma in arguments, critical to imply tuple, otherwise thinks array, passes response as first argument
+    return redirect('keyword_detail', keyword_id)
 
 
 def autocomplete_brands(request):
