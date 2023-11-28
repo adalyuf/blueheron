@@ -84,7 +84,6 @@ def save_keyword_answer(api_response, ai_model_id, keyword_id):
         keyword = keyword,
         ai_model = ai_model
     )
-    answer.save()
 
 @shared_task(queue="express")
 def save_keyword_response(api_response, keyword_id):
